@@ -1,0 +1,7 @@
+{
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "extends": ["eslint:recommended", "next", "next/core-web-vitals", "prettier"]
+}
