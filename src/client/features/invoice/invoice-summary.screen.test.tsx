@@ -47,21 +47,21 @@ it('should show list of invoice summaries', async () => {
   expect(screen.getByRole('list')).toBeInTheDocument()
 
   mockInvoices.forEach((mockInvoice) => {
-    const elInvoice = screen.getByRole('listitem', { name: mockInvoice.id })
+    const elInvoice = screen.getByText(mockInvoice.id).closest('li')
+    if (!elInvoice)
+      throw new Error(`No <li> element found closest to ${mockInvoice.id}`)
+
+    const inInvoice = within(elInvoice)
     expect(
-      within(elInvoice).getByText(
+      inInvoice.getByText(
         `Due ${format(mockInvoice.paymentDue, 'dd MMM yyyy')}`
       )
     ).toBeInTheDocument()
+    expect(inInvoice.getByText(mockInvoice.clientName)).toBeInTheDocument()
     expect(
-      within(elInvoice).getByText(mockInvoice.clientName)
+      inInvoice.getByText(currencyFormatter.format(mockInvoice.total / 100))
     ).toBeInTheDocument()
-    expect(
-      within(elInvoice).getByText(
-        currencyFormatter.format(mockInvoice.total / 100)
-      )
-    ).toBeInTheDocument()
-    expect(within(elInvoice).getByText(mockInvoice.status)).toBeInTheDocument()
+    expect(inInvoice.getByText(mockInvoice.status)).toBeInTheDocument()
   })
 })
 it('should show empty state when there are no invoices', async () => {

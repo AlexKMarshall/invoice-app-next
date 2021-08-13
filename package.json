@@ -32,6 +32,8 @@
     "@testing-library/user-event": "^13.2.1",
     "@types/faker": "^5.5.8",
     "@types/react": "^17.0.16",
+    "@typescript-eslint/eslint-plugin": "^4.29.1",
+    "@typescript-eslint/parser": "^4.29.1",
     "commitizen": "^4.2.4",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "7.32.0",
