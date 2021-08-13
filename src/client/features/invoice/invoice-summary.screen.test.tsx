@@ -64,3 +64,20 @@ it('should show list of invoice summaries', async () => {
     expect(within(elInvoice).getByText(mockInvoice.status)).toBeInTheDocument()
   })
 })
+it('should show empty state when there are no invoices', async () => {
+  invoiceModel.initialise([])
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  })
+
+  render(
+    <QueryClientProvider client={queryClient}>
+      <InvoiceSummaryScreen />
+    </QueryClientProvider>
+  )
+
+  await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
+  expect(
+    screen.getByRole('heading', { name: /there is nothing here/i })
+  ).toBeInTheDocument()
+})

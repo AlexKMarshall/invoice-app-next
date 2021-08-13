@@ -30,11 +30,21 @@ export function InvoiceSummaryScreen() {
       <h1>Invoices</h1>
       {query.isLoading ? <div>Loading...</div> : null}
       {query.isSuccess ? (
-        <ul>
-          {query.data.map((invoice) => (
-            <InvoiceSummaryItem key={invoice.id} invoice={invoice} />
-          ))}
-        </ul>
+        query.data.length > 0 ? (
+          <ul>
+            {query.data.map((invoice) => (
+              <InvoiceSummaryItem key={invoice.id} invoice={invoice} />
+            ))}
+          </ul>
+        ) : (
+          <>
+            <h2>There is nothing here</h2>
+            <p>
+              Create an invoice by clicking the <strong>New Invoice</strong>{' '}
+              button and get started
+            </p>
+          </>
+        )
       ) : null}
     </>
   )
