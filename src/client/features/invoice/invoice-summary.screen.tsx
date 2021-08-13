@@ -2,6 +2,7 @@ import { GetInvoiceSummary, ResponseStringify } from 'src/shared/dtos'
 import { format, parseJSON } from 'date-fns'
 
 import Link from 'next/link'
+import { currencyFormatter } from 'src/client/shared/utils'
 import { useId } from '@react-aria/utils'
 import { useQuery } from 'react-query'
 
@@ -52,7 +53,7 @@ function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
       </Link>
       <div>{`Due ${format(invoice.paymentDue, 'dd MMM yyyy')}`}</div>
       <div>{invoice.clientName}</div>
-      <div>{invoice.total}</div>
+      <div>{currencyFormatter.format(invoice.total / 100)}</div>
       <div>{invoice.status}</div>
     </li>
   )

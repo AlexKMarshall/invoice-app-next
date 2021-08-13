@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { GetInvoiceSummary } from 'src/shared/dtos'
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import faker from 'faker'
+import { generateInvoiceId } from 'src/client/shared/utils'
 
 // import prisma from 'src/server/prisma'
 
@@ -14,7 +15,7 @@ function randomStatus() {
 
 function buildMockInvoiceSummary() {
   return {
-    id: faker.datatype.uuid(),
+    id: generateInvoiceId(),
     paymentDue: faker.date.soon(),
     clientName: faker.name.findName(),
     total: faker.datatype.number(),
