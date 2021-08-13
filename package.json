@@ -9,6 +9,7 @@
     "lint": "eslint",
     "format": "prettier --write --ignore-path .gitignore",
     "test": "jest",
+    "test:cov": "jest --coverage",
     "tsc": "tsc --noEmit",
     "cm": "cz",
     "prepare": "husky install",
