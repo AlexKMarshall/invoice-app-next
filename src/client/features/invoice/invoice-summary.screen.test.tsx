@@ -47,6 +47,7 @@ it('should show list of invoice summaries', async () => {
   expect(screen.getByRole('list')).toBeInTheDocument()
 
   mockInvoices.forEach((mockInvoice) => {
+    // eslint-disable-next-line testing-library/no-node-access
     const elInvoice = screen.getByText(mockInvoice.id).closest('li')
     if (!elInvoice)
       throw new Error(`No <li> element found closest to ${mockInvoice.id}`)
