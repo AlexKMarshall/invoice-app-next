@@ -1,8 +1,8 @@
-export function randomDigit() {
+export function randomDigit(): number {
   return Math.floor(Math.random() * 10)
 }
 
-export function randomLetter() {
+export function randomLetter(): string {
   const randomOffset = Math.floor(Math.random() * 26)
   const startCode = 'A'.charCodeAt(0)
   const charCode = startCode + randomOffset

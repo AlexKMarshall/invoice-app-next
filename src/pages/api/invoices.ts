@@ -32,7 +32,7 @@ const mockInvoices = [
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<GetInvoiceSummary>
-) {
+): Promise<void> {
   // const posts = await prisma.post.findMany({})
 
   res.status(200).json({

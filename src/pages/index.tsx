@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import { InvoiceSummaryScreen } from 'src/client/features/invoice/invoice-summary.screen'
 
-export default function Home() {
+export default function Home(): JSX.Element {
   return (
     <>
       <Head>
