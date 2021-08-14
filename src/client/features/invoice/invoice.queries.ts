@@ -21,10 +21,16 @@ const invoiceKeys = {
   detail: (id: string) => [...invoiceKeys.details(), id] as const,
 }
 
-export function useInvoiceSummaries(
-  filters = ''
-): UseQueryResult<Array<InvoiceSummary>> {
-  return useQuery(invoiceKeys.list(filters), getInvoices)
+type UseInvoiceSummariesProps<TData> = {
+  filters?: string
+  select?: (invoices: Array<InvoiceSummary>) => TData
+}
+
+export function useInvoiceSummaries<TData = Array<InvoiceSummary>>({
+  filters = '',
+  select,
+}: UseInvoiceSummariesProps<TData> = {}): UseQueryResult<TData> {
+  return useQuery(invoiceKeys.list(filters), getInvoices, { select })
 }
 
 type UseCreateInvoiceProps = {

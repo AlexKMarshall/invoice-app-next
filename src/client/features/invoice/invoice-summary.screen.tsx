@@ -1,11 +1,11 @@
 import { InvoiceDetail, InvoiceSummary } from './invoice.types'
+import { currencyFormatter, inflect } from 'src/client/shared/utils'
 import { useCreateInvoice, useInvoiceSummaries } from './invoice.queries'
 import { useFieldArray, useForm } from 'react-hook-form'
 
 import { Heading } from 'src/client/shared/components/typography'
 import Link from 'next/link'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
-import { currencyFormatter } from 'src/client/shared/utils'
 import { format } from 'date-fns'
 import { useId } from '@react-aria/utils'
 import { useState } from 'react'
@@ -19,7 +19,10 @@ export function InvoiceSummaryScreen(): JSX.Element {
   return (
     <main>
       <header>
-        <Heading id={headingId}>Invoices</Heading>
+        <div>
+          <Heading id={headingId}>Invoices</Heading>
+          <TotalInvoiceCount />
+        </div>
         <button type="button" onClick={() => setIsFormOpen(true)}>
           New Invoice
         </button>
@@ -271,5 +274,22 @@ function CreateNewInvoiceForm({ onSubmitSuccess }: CreateNewInvoiceFormProps) {
       </section>
       <button type="submit">Save as Draft</button>
     </form>
+  )
+}
+
+function TotalInvoiceCount() {
+  const countQuery = useInvoiceSummaries({
+    select: (invoices) => invoices.length,
+  })
+  if (!countQuery.isSuccess) return null
+
+  const count = countQuery.data
+
+  if (count === 0) return <div>No invoices</div>
+
+  return (
+    <div>
+      There are {count} total {inflect('invoice')(count)}
+    </div>
   )
 }

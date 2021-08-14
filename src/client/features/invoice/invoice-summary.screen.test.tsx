@@ -28,6 +28,9 @@ it('should show list of invoice summaries', async () => {
   expect(screen.getByRole('heading', { name: /invoices/i })).toBeInTheDocument()
   await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
 
+  const invoiceCount = mockInvoiceSummaries.length
+  expect(screen.getByText(`There are ${invoiceCount} total invoices`))
+
   expect(screen.getByRole('list', { name: /invoices/i })).toBeInTheDocument()
 
   mockInvoiceSummaries.forEach((mockInvoice) => {
@@ -46,12 +49,14 @@ it('should show list of invoice summaries', async () => {
     expect(inInvoice.getByText(mockInvoice.status)).toBeInTheDocument()
   })
 })
+
 it('should show empty state when there are no invoices', async () => {
   invoiceModel.initialise([])
 
   render(<InvoiceSummaryScreen />)
 
   await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
+  expect(screen.getByText(/no invoices/i)).toBeInTheDocument()
   expect(
     screen.getByRole('heading', { name: /there is nothing here/i })
   ).toBeInTheDocument()
