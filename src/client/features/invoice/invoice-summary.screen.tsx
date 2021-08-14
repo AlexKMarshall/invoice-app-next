@@ -1,3 +1,4 @@
+import { TableHTMLAttributes, useState } from 'react'
 import { currencyFormatter, inflect } from 'src/client/shared/utils'
 
 import { Heading as BaseHeading } from 'src/client/shared/components/typography'
@@ -9,7 +10,6 @@ import { format } from 'date-fns'
 import styled from 'styled-components'
 import { useId } from '@react-aria/utils'
 import { useInvoiceSummaries } from './invoice.queries'
-import { useState } from 'react'
 
 export function InvoiceSummaryScreen(): JSX.Element {
   const listQuery = useInvoiceSummaries()
@@ -30,7 +30,7 @@ export function InvoiceSummaryScreen(): JSX.Element {
       </Header>
       {listQuery.isLoading ? <div>Loading...</div> : null}
       {listQuery.isSuccess ? (
-        <List
+        <Table
           aria-labelledby={headingId}
           collection={listQuery.data}
           renderItem={(invoice) => (
@@ -67,18 +67,18 @@ type ListProps<T> = {
   collection: Array<T>
   renderItem: (item: T, index: number, collection: Array<T>) => JSX.Element
   emptyState: JSX.Element
-} & React.ComponentPropsWithoutRef<'ul' | 'ol'>
+} & TableHTMLAttributes<HTMLTableElement>
 
-function List<T>({
+function Table<T>({
   collection,
   renderItem,
   emptyState,
   ...delegatedProps
 }: ListProps<T>) {
   return collection.length > 0 ? (
-    <ul role="list" {...delegatedProps}>
-      {collection.map(renderItem)}
-    </ul>
+    <table {...delegatedProps}>
+      <tbody>{collection.map(renderItem)}</tbody>
+    </table>
   ) : (
     emptyState
   )
@@ -92,19 +92,23 @@ function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
   const id = useId()
   const savingInvoiceIdDisplay = '------'
   return (
-    <li aria-labelledby={id}>
+    <tr aria-labelledby={id}>
       {invoice.id.toLowerCase().startsWith('saving') ? (
-        <div id={id}>{savingInvoiceIdDisplay}</div>
+        <th scope="row" id={id}>
+          {savingInvoiceIdDisplay}
+        </th>
       ) : (
-        <Link href={`/invoices/${invoice.id}`}>
-          <a id={id}>{invoice.id}</a>
-        </Link>
+        <th scope="row" id={id}>
+          <Link href={`/invoices/${invoice.id}`}>
+            <a>{invoice.id}</a>
+          </Link>
+        </th>
       )}
-      <div>{`Due ${format(invoice.paymentDue, 'dd MMM yyyy')}`}</div>
-      <div>{invoice.clientName}</div>
-      <div>{currencyFormatter.format(invoice.total / 100)}</div>
-      <div>{invoice.status}</div>
-    </li>
+      <td>{`Due ${format(invoice.paymentDue, 'dd MMM yyyy')}`}</td>
+      <td>{invoice.clientName}</td>
+      <td>{currencyFormatter.format(invoice.total / 100)}</td>
+      <td>{invoice.status}</td>
+    </tr>
   )
 }
 

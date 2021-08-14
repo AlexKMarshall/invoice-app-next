@@ -31,10 +31,10 @@ it('should show list of invoice summaries', async () => {
   const invoiceCount = mockInvoiceSummaries.length
   expect(screen.getByText(`There are ${invoiceCount} total invoices`))
 
-  expect(screen.getByRole('list', { name: /invoices/i })).toBeInTheDocument()
+  expect(screen.getByRole('table', { name: /invoices/i })).toBeInTheDocument()
 
   mockInvoiceSummaries.forEach((mockInvoice) => {
-    const elInvoice = screen.getByRole('listitem', { name: mockInvoice.id })
+    const elInvoice = screen.getByRole('row', { name: mockInvoice.id })
     const inInvoice = within(elInvoice)
 
     expect(
@@ -179,10 +179,10 @@ it('should allow new draft invoices to be creacted', async () => {
 
   // Expect the new invoice to appear optimistically
 
-  const elInvoiceList = await screen.findByRole('list', { name: /invoices/i })
-  const inInvoiceList = within(elInvoiceList)
+  const elInvoiceTable = await screen.findByRole('table', { name: /invoices/i })
+  const inInvoiceTable = within(elInvoiceTable)
   const savingIdDisplay = '------'
-  const elNewInvoiceItem = inInvoiceList.getByRole('listitem', {
+  const elNewInvoiceItem = inInvoiceTable.getByRole('row', {
     name: savingIdDisplay,
   })
   const inNewInvoiceItem = within(elNewInvoiceItem)
@@ -222,7 +222,7 @@ it('should allow new draft invoices to be creacted', async () => {
 
   const [savedInvoiceId] = invoiceIdMatch
   expect(
-    inInvoiceList.getByRole('link', { name: savedInvoiceId })
+    inInvoiceTable.getByRole('link', { name: savedInvoiceId })
   ).toBeInTheDocument()
 })
 it('should default invoice issue date to today', () => {
