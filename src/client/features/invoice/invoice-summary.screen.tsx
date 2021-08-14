@@ -14,11 +14,15 @@ export function InvoiceSummaryScreen(): JSX.Element {
   const listQuery = useInvoiceSummaries()
   const [notificationMessage, setNotificationMessage] = useState('')
   const headingId = useId()
+  const [isFormOpen, setIsFormOpen] = useState(false)
 
   return (
     <main>
       <header>
         <Heading id={headingId}>Invoices</Heading>
+        <button type="button" onClick={() => setIsFormOpen(true)}>
+          New Invoice
+        </button>
       </header>
       {listQuery.isLoading ? <div>Loading...</div> : null}
       {listQuery.isSuccess ? (
@@ -39,13 +43,15 @@ export function InvoiceSummaryScreen(): JSX.Element {
           }
         />
       ) : null}
-      <CreateNewInvoiceForm
-        onSubmitSuccess={(savedInvoice) => {
-          setNotificationMessage(
-            `New invoice id ${savedInvoice.id} successfully created`
-          )
-        }}
-      />
+      {isFormOpen && (
+        <CreateNewInvoiceForm
+          onSubmitSuccess={(savedInvoice) => {
+            setNotificationMessage(
+              `New invoice id ${savedInvoice.id} successfully created`
+            )
+          }}
+        />
+      )}
       <div role="status" aria-live="polite">
         {notificationMessage}
       </div>

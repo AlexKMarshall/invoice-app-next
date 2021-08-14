@@ -56,6 +56,13 @@ it('should show empty state when there are no invoices', async () => {
     screen.getByRole('heading', { name: /there is nothing here/i })
   ).toBeInTheDocument()
 })
+it('should not show new invoice form until button is clicked', () => {
+  render(<InvoiceSummaryScreen />)
+
+  expect(
+    screen.queryByRole('form', { name: /new invoice/i })
+  ).not.toBeInTheDocument()
+})
 it('should allow new draft invoices to be creacted', async () => {
   const existingInvoice = buildMockDraftInvoice()
   invoiceModel.initialise([existingInvoice])
@@ -68,6 +75,8 @@ it('should allow new draft invoices to be creacted', async () => {
   render(<InvoiceSummaryScreen />)
 
   await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
+
+  userEvent.click(screen.getByRole('button', { name: /new invoice/i }))
 
   expect(screen.getByRole('form', { name: /new invoice/i })).toBeInTheDocument()
 
@@ -214,6 +223,9 @@ it('should allow new draft invoices to be creacted', async () => {
 it('should default invoice issue date to today', () => {
   const today = new Date()
   render(<InvoiceSummaryScreen />)
+
+  userEvent.click(screen.getByRole('button', { name: /new invoice/i }))
+
   expect(screen.getByLabelText(/issue date/i)).toHaveValue(
     format(today, 'yyyy-MM-dd')
   )
