@@ -8,9 +8,9 @@ type DateStringify<T> = T extends Date
   ? { [P in keyof T]: DateStringify<T[P]> }
   : T
 
-export type ResponseStringify<T> = Jsonify<DateStringify<T>>
+export type Stringify<T> = Jsonify<DateStringify<T>>
 
-export type GetInvoiceSummary = {
+export type GetInvoiceSummaryDTO = {
   data: {
     invoices: Array<{
       id: string
@@ -19,5 +19,35 @@ export type GetInvoiceSummary = {
       total: number
       status: 'draft' | 'pending' | 'paid'
     }>
+  }
+}
+
+type InvoiceStatus = 'draft' | 'pending' | 'paid'
+
+export type NewInvoiceInputDTO = {
+  status: InvoiceStatus
+  senderAddress: {
+    street: string
+    city: string
+    postcode: string
+    country: string
+  }
+  clientName: string
+  clientEmail: string
+  clientAddress: {
+    street: string
+    city: string
+    postcode: string
+    country: string
+  }
+  issuedAt: Date
+  paymentTerms: number
+  projectDescription: string
+  itemList: Array<{ name: string; quantity: number; price: number }>
+}
+
+export type NewInvoiceReturnDTO = {
+  data: {
+    savedInvoice: NewInvoiceInputDTO & { id: string }
   }
 }

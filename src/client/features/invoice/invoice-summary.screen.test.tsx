@@ -5,6 +5,7 @@ import {
   render,
   screen,
   userEvent,
+  waitFor,
   waitForElementToBeRemoved,
   within,
 } from 'src/client/test/test-utils'
@@ -12,22 +13,6 @@ import {
 import { InvoiceSummaryScreen } from './invoice-summary.screen'
 import faker from 'faker'
 import { format } from 'date-fns'
-
-function randomStatus() {
-  const statuses = ['draft', 'pending', 'paid'] as const
-  const randomIndex = Math.floor(Math.random() * statuses.length)
-  return statuses[randomIndex]
-}
-
-function buildMockInvoiceSummary() {
-  return {
-    id: generateInvoiceId(),
-    paymentDue: faker.date.soon(),
-    clientName: faker.name.findName(),
-    total: faker.datatype.number(),
-    status: randomStatus(),
-  }
-}
 
 function buildMockDraftInvoiceInput() {
   return {
@@ -37,6 +22,8 @@ function buildMockDraftInvoiceInput() {
       postcode: faker.address.zipCode(),
       country: faker.address.country(),
     },
+    clientName: faker.name.findName(),
+    clientEmail: faker.internet.email(),
     clientAddress: {
       street: faker.address.streetAddress(),
       city: faker.address.city(),
@@ -44,7 +31,7 @@ function buildMockDraftInvoiceInput() {
       country: faker.address.country(),
     },
     issuedAt: faker.date.recent(),
-    paymentTerms: faker.datatype.number(),
+    paymentTerms: faker.datatype.number({ max: 30 }),
     projectDescription: faker.commerce.productDescription(),
     itemList: [
       {
@@ -56,9 +43,20 @@ function buildMockDraftInvoiceInput() {
   }
 }
 
+function buildMockDraftInvoice() {
+  return {
+    id: generateInvoiceId(),
+    status: 'draft' as const,
+    ...buildMockDraftInvoiceInput(),
+  }
+}
+
 it('should show list of invoice summaries', async () => {
-  const mockInvoices = [buildMockInvoiceSummary(), buildMockInvoiceSummary()]
-  invoiceModel.initialise(mockInvoices)
+  const mockInvoiceDetails = [buildMockDraftInvoice(), buildMockDraftInvoice()]
+  invoiceModel.initialise(mockInvoiceDetails)
+  const mockInvoiceSummaries = mockInvoiceDetails.map(
+    invoiceModel.invoiceDetailToSummary
+  )
   render(<InvoiceSummaryScreen />)
 
   expect(screen.getByRole('heading', { name: /invoices/i })).toBeInTheDocument()
@@ -66,7 +64,7 @@ it('should show list of invoice summaries', async () => {
 
   expect(screen.getByRole('list')).toBeInTheDocument()
 
-  mockInvoices.forEach((mockInvoice) => {
+  mockInvoiceSummaries.forEach((mockInvoice) => {
     // eslint-disable-next-line testing-library/no-node-access
     const elInvoice = screen.getByText(mockInvoice.id).closest('li')
     if (!elInvoice)
@@ -95,8 +93,14 @@ it('should show empty state when there are no invoices', async () => {
     screen.getByRole('heading', { name: /there is nothing here/i })
   ).toBeInTheDocument()
 })
-it('should allow new draft invoices to be creacted', () => {
+it('should allow new draft invoices to be creacted', async () => {
   const mockDraftInvoiceInput = buildMockDraftInvoiceInput()
+  // we aren't validating the id here, so we can give it an empty string
+  const mockInvoiceSummary = invoiceModel.invoiceDetailToSummary({
+    id: '',
+    status: 'draft',
+    ...mockDraftInvoiceInput,
+  })
   render(<InvoiceSummaryScreen />)
 
   expect(screen.getByRole('form', { name: /new invoice/i })).toBeInTheDocument()
@@ -125,6 +129,14 @@ it('should allow new draft invoices to be creacted', () => {
   const inBillTo = within(elBillToSection)
 
   validateTextfieldEntry(
+    inBillTo.getByLabelText(/client's name/i),
+    mockDraftInvoiceInput.clientName
+  )
+  validateTextfieldEntry(
+    inBillTo.getByLabelText(/client's email/i),
+    mockDraftInvoiceInput.clientEmail
+  )
+  validateTextfieldEntry(
     inBillTo.getByLabelText(/street address/i),
     mockDraftInvoiceInput.senderAddress.street
   )
@@ -147,7 +159,8 @@ it('should allow new draft invoices to be creacted', () => {
   )
   validateTextfieldEntry(
     screen.getByLabelText(/payment terms/i),
-    mockDraftInvoiceInput.paymentTerms.toString()
+    mockDraftInvoiceInput.paymentTerms.toString(),
+    mockDraftInvoiceInput.paymentTerms
   )
   validateTextfieldEntry(
     screen.getByLabelText(/project description/i),
@@ -168,18 +181,77 @@ it('should allow new draft invoices to be creacted', () => {
   )
   validateTextfieldEntry(
     inItemList.getByLabelText(/price/i),
-    (mockDraftInvoiceInput.itemList[0].price / 100).toString(),
-    mockDraftInvoiceInput.itemList[0].price / 100
+    mockDraftInvoiceInput.itemList[0].price.toString(),
+    mockDraftInvoiceInput.itemList[0].price
   )
 
   const elItemTotal = inItemList.getByLabelText(/total/i)
-  expect(elItemTotal).toHaveValue(
-    (mockDraftInvoiceInput.itemList[0].price *
-      mockDraftInvoiceInput.itemList[0].quantity) /
-      100
+  expect(elItemTotal).toHaveTextContent(
+    (
+      mockDraftInvoiceInput.itemList[0].price *
+      mockDraftInvoiceInput.itemList[0].quantity
+    ).toString()
   )
 
+  // save the draft invoice
+
   userEvent.click(screen.getByRole('button', { name: /save as draft/i }))
+
+  // Expect the new invoice to appear optimistically
+
+  const elInvoiceList = await screen.findByRole('list')
+  const inInvoiceList = within(elInvoiceList)
+  const savingIdDisplay = '------'
+  const elNewInvoiceId = inInvoiceList.getByText(savingIdDisplay)
+  const elNewInvoiceItem = elNewInvoiceId.closest('li')
+  if (!elNewInvoiceItem)
+    throw new Error('New invoice is not a descendent of a list item')
+  const inNewInvoiceItem = within(elNewInvoiceItem)
+
+  expect(
+    inNewInvoiceItem.getByText(
+      `Due ${format(mockInvoiceSummary.paymentDue, 'dd MMM yyyy')}`
+    )
+  ).toBeInTheDocument()
+  expect(
+    inNewInvoiceItem.getByText(mockInvoiceSummary.clientName)
+  ).toBeInTheDocument()
+  expect(
+    inNewInvoiceItem.getByText(
+      currencyFormatter.format(mockInvoiceSummary.total / 100)
+    )
+  ).toBeInTheDocument()
+  expect(
+    inNewInvoiceItem.getByText(mockInvoiceSummary.status)
+  ).toBeInTheDocument()
+
+  // expect the id to be populated properly once the response from the server received
+
+  const elNotificationArea = screen.getByRole('status')
+
+  await waitFor(() =>
+    expect(elNotificationArea).toHaveTextContent(
+      /New invoice id .* successfully created/i
+    )
+  )
+
+  const invoiceIdMatch = elNotificationArea.textContent?.match(/[A-Z]{2}\d{4}/)
+  if (!invoiceIdMatch)
+    throw new Error(
+      `Failed to match invoice id of required format in ${elNotificationArea.textContent}`
+    )
+
+  const [savedInvoiceId] = invoiceIdMatch
+  expect(
+    inInvoiceList.getByRole('link', { name: savedInvoiceId })
+  ).toBeInTheDocument()
+})
+it('should default invoice issue date to today', () => {
+  const today = new Date()
+  render(<InvoiceSummaryScreen />)
+  expect(screen.getByLabelText(/issue date/i)).toHaveValue(
+    format(today, 'yyyy-MM-dd')
+  )
 })
 
 function validateTextfieldEntry(

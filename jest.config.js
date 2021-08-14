@@ -2,8 +2,6 @@ module.exports = {
   setupFilesAfterEnv: ['./jest.setup.js'],
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
-    // '\\.(jpg)$': '<rootDir>/__mocks__/fileMock.js',
-    // '\\.(css|scss)$': '<rootDir>/__mocks__/styleMock.js',
   },
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': '<rootDir>/node_modules/babel-jest',
@@ -15,8 +13,6 @@ module.exports = {
     '<rootDir>/src/client/**/*.ts',
     '!.*\\.spec\\.ts$',
     '!.*\\.test\\.ts$',
-    // '!**/test/**',
-    // '!**/types/**',
     '!**/node_modules/**',
   ],
   coveragePathIgnorePatterns: [

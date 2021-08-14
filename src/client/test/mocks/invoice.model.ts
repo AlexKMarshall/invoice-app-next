@@ -1,18 +1,44 @@
-import { GetInvoiceSummary } from 'src/shared/dtos'
-import { IterableElement } from 'msw/node_modules/type-fest'
+import { GetInvoiceSummaryDTO, NewInvoiceReturnDTO } from 'src/shared/dtos'
 
-type InvoiceSummary = IterableElement<GetInvoiceSummary['data']['invoices']>
+import { IterableElement } from 'msw/node_modules/type-fest'
+import { add } from 'date-fns'
+import { generateInvoiceId } from 'src/client/shared/utils'
+
+type InvoiceSummary = IterableElement<GetInvoiceSummaryDTO['data']['invoices']>
+type InvoiceDetail = NewInvoiceReturnDTO['data']['savedInvoice']
 
 type Store = {
   invoices: Array<InvoiceSummary>
+  invoiceDetails: Array<InvoiceDetail>
 }
 
-const store: Store = { invoices: [] }
+const store: Store = { invoices: [], invoiceDetails: [] }
 
 export function findAll(): Promise<Array<InvoiceSummary>> {
-  return Promise.resolve(store.invoices)
+  return Promise.resolve(store.invoiceDetails.map(invoiceDetailToSummary))
 }
 
-export function initialise(invoices: Array<InvoiceSummary>): void {
-  store.invoices = invoices
+export function save(
+  invoice: Omit<InvoiceDetail, 'id'>
+): Promise<InvoiceDetail> {
+  const id = generateInvoiceId()
+  const invoiceWithId = { ...invoice, id }
+  store.invoiceDetails.push(invoiceWithId)
+  return Promise.resolve(invoiceWithId)
+}
+
+export function initialise(invoices: Array<InvoiceDetail>): void {
+  store.invoiceDetails = invoices
+}
+
+export function invoiceDetailToSummary(invoice: InvoiceDetail): InvoiceSummary {
+  return {
+    id: invoice.id,
+    paymentDue: add(invoice.issuedAt, { days: invoice.paymentTerms }),
+    clientName: invoice.clientName,
+    total: invoice.itemList
+      .map((item) => item.quantity * item.price)
+      .reduce((acc, cur) => acc + cur),
+    status: invoice.status,
+  }
 }
