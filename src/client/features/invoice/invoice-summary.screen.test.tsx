@@ -1,6 +1,7 @@
 import * as invoiceModel from 'src/client/test/mocks/invoice.model'
 
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { currencyFormatter, generateInvoiceId } from 'src/client/shared/utils'
 import {
   render,
   screen,
@@ -20,7 +21,7 @@ function randomStatus() {
 
 function buildMockInvoiceSummary() {
   return {
-    id: faker.datatype.uuid(),
+    id: generateInvoiceId(),
     paymentDue: faker.date.soon(),
     clientName: faker.name.findName(),
     total: faker.datatype.number(),
@@ -55,7 +56,11 @@ it('should show list of invoice summaries', async () => {
     expect(
       within(elInvoice).getByText(mockInvoice.clientName)
     ).toBeInTheDocument()
-    expect(within(elInvoice).getByText(mockInvoice.total)).toBeInTheDocument()
+    expect(
+      within(elInvoice).getByText(
+        currencyFormatter.format(mockInvoice.total / 100)
+      )
+    ).toBeInTheDocument()
     expect(within(elInvoice).getByText(mockInvoice.status)).toBeInTheDocument()
   })
 })

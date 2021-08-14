@@ -8,7 +8,7 @@ module.exports = {
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': '<rootDir>/node_modules/babel-jest',
   },
-  testRegex: '.test.tsx$',
+  testRegex: '.test.(ts|tsx)$',
   testEnvironment: 'jsdom',
   collectCoverageFrom: [
     '<rootDir>/src/client/**/*.tsx',
