@@ -91,5 +91,7 @@ const GlobalStyle = createGlobalStyle`
   body {
     font-family: 'Spartan', sans-serif;
     font-size: ${12 / 16}rem;
+    font-weight: 500;
+    letter-spacing: -0.25px;
   }
 `
