@@ -15,7 +15,9 @@
     "prepare": "husky install",
     "ts-node": "ts-node --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\"",
     "db:migrate:dev": "prisma migrate dev",
-    "db:reset": "prisma migrate reset"
+    "db:reset": "prisma migrate reset",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "dependencies": {
     "@prisma/client": "2.28.0",
@@ -31,6 +33,11 @@
     "styled-components": "^5.3.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.15.0",
+    "@storybook/addon-actions": "^6.3.7",
+    "@storybook/addon-essentials": "^6.3.7",
+    "@storybook/addon-links": "^6.3.7",
+    "@storybook/react": "^6.3.7",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.0.0",
     "@testing-library/user-event": "^13.2.1",
@@ -39,6 +46,7 @@
     "@types/styled-components": "^5.1.12",
     "@typescript-eslint/eslint-plugin": "^4.29.1",
     "@typescript-eslint/parser": "^4.29.1",
+    "babel-loader": "^8.2.2",
     "babel-plugin-styled-components": "^1.13.2",
     "commitizen": "^4.2.4",
     "cz-conventional-changelog": "^3.3.0",

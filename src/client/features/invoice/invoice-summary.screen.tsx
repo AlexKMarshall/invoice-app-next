@@ -1,6 +1,7 @@
 import { currencyFormatter, inflect } from 'src/client/shared/utils'
 
 import { Heading as BaseHeading } from 'src/client/shared/components/typography'
+import { Button } from 'src/client/shared/components/button'
 import { InvoiceSummary } from './invoice.types'
 import Link from 'next/link'
 import { NewInvoiceForm } from './new-invoice-form'
@@ -23,9 +24,9 @@ export function InvoiceSummaryScreen(): JSX.Element {
           <Heading id={headingId}>Invoices</Heading>
           <TotalInvoiceCount />
         </div>
-        <button type="button" onClick={() => setIsFormOpen(true)}>
+        <Button type="button" onClick={() => setIsFormOpen(true)}>
           New Invoice
-        </button>
+        </Button>
       </Header>
       {listQuery.isLoading ? <div>Loading...</div> : null}
       {listQuery.isSuccess ? (
