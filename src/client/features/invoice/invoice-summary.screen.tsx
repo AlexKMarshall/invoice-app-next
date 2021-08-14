@@ -3,7 +3,6 @@ import { format, parseJSON } from 'date-fns'
 
 import Link from 'next/link'
 import { currencyFormatter } from 'src/client/shared/utils'
-import { useId } from '@react-aria/utils'
 import { useQuery } from 'react-query'
 
 type InvoiceSummary = {
@@ -23,20 +22,44 @@ async function getInvoices(): Promise<Array<InvoiceSummary>> {
   }))
 }
 
-export function InvoiceSummaryScreen() {
+export function InvoiceSummaryScreen(): JSX.Element {
   const query = useQuery(['invoices'], getInvoices)
   return (
     <>
       <h1>Invoices</h1>
       {query.isLoading ? <div>Loading...</div> : null}
       {query.isSuccess ? (
-        <ul>
-          {query.data.map((invoice) => (
+        <List
+          collection={query.data}
+          renderItem={(invoice) => (
             <InvoiceSummaryItem key={invoice.id} invoice={invoice} />
-          ))}
-        </ul>
+          )}
+          emptyState={
+            <>
+              <h2>There is nothing here</h2>
+              <p>
+                Create an invoice by clicking the <strong>New Invoice</strong>{' '}
+                button and get started
+              </p>
+            </>
+          }
+        />
       ) : null}
     </>
+  )
+}
+
+type ListProps<T> = {
+  collection: Array<T>
+  renderItem: (item: T, index: number, collection: Array<T>) => JSX.Element
+  emptyState: JSX.Element
+}
+
+function List<T>({ collection, renderItem, emptyState }: ListProps<T>) {
+  return collection.length > 0 ? (
+    <ul>{collection.map(renderItem)}</ul>
+  ) : (
+    emptyState
   )
 }
 
@@ -45,11 +68,10 @@ type InvoiceSummaryItemProps = {
 }
 
 function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
-  const id = useId()
   return (
-    <li aria-labelledby={id}>
+    <li>
       <Link href={`/invoices/${invoice.id}`}>
-        <a id={id}>{invoice.id}</a>
+        <a>{invoice.id}</a>
       </Link>
       <div>{`Due ${format(invoice.paymentDue, 'dd MMM yyyy')}`}</div>
       <div>{invoice.clientName}</div>

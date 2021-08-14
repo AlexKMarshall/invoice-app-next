@@ -4,7 +4,7 @@ type DateStringify<T> = T extends Date
   ? string
   : T extends Array<infer U>
   ? Array<DateStringify<U>>
-  : T extends object
+  : T extends Record<string, unknown>
   ? { [P in keyof T]: DateStringify<T[P]> }
   : T
 
