@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "@prisma/client": "2.28.0",
-    "@react-aria/dialog": "^3.1.4",
     "@react-aria/ssr": "^3.0.3",
     "@react-aria/utils": "^3.8.2",
     "date-fns": "^2.23.0",
