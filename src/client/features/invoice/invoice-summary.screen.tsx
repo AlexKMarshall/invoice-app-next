@@ -24,7 +24,7 @@ export function InvoiceSummaryScreen(): JSX.Element {
           <Heading id={headingId}>Invoices</Heading>
           <TotalInvoiceCount />
         </div>
-        <Button type="button" onClick={() => setIsFormOpen(true)}>
+        <Button type="button" icon="plus" onClick={() => setIsFormOpen(true)}>
           New Invoice
         </Button>
       </Header>
