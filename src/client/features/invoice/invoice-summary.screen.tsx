@@ -1,24 +1,26 @@
 import { InvoiceDetail, InvoiceSummary } from './invoice.types'
 import { useCreateInvoice, useInvoiceSummaries } from './invoice.queries'
+import { useFieldArray, useForm } from 'react-hook-form'
 
 import Link from 'next/link'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { currencyFormatter } from 'src/client/shared/utils'
 import { format } from 'date-fns'
-import { useForm } from 'react-hook-form'
 import { useId } from '@react-aria/utils'
 import { useState } from 'react'
 
 export function InvoiceSummaryScreen(): JSX.Element {
   const listQuery = useInvoiceSummaries()
   const [notificationMessage, setNotificationMessage] = useState('')
+  const headingId = useId()
 
   return (
     <>
-      <h1>Invoices</h1>
+      <h1 id={headingId}>Invoices</h1>
       {listQuery.isLoading ? <div>Loading...</div> : null}
       {listQuery.isSuccess ? (
         <List
+          aria-labelledby={headingId}
           collection={listQuery.data}
           renderItem={(invoice) => (
             <InvoiceSummaryItem key={invoice.id} invoice={invoice} />
@@ -52,11 +54,16 @@ type ListProps<T> = {
   collection: Array<T>
   renderItem: (item: T, index: number, collection: Array<T>) => JSX.Element
   emptyState: JSX.Element
-}
+} & React.ComponentPropsWithoutRef<'ul' | 'ol'>
 
-function List<T>({ collection, renderItem, emptyState }: ListProps<T>) {
+function List<T>({
+  collection,
+  renderItem,
+  emptyState,
+  ...delegatedProps
+}: ListProps<T>) {
   return collection.length > 0 ? (
-    <ul>{collection.map(renderItem)}</ul>
+    <ul {...delegatedProps}>{collection.map(renderItem)}</ul>
   ) : (
     emptyState
   )
@@ -88,6 +95,7 @@ function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
 
 type NewInvoiceFormFields = Omit<NewInvoiceInputDTO, 'status'>
 
+const DEFAULT_ITEM_VALUES = { name: '', quantity: 0, price: 0 }
 const DEFAULT_FORM_VALUES = {
   senderAddress: {
     street: '',
@@ -106,7 +114,7 @@ const DEFAULT_FORM_VALUES = {
   issuedAt: format(new Date(), 'yyyy-MM-dd') ?? '',
   paymentTerms: 0,
   projectDescription: '',
-  itemList: [{ name: '', quantity: 0, price: 0 }],
+  itemList: [DEFAULT_ITEM_VALUES],
 }
 
 type CreateNewInvoiceFormProps = {
@@ -123,12 +131,16 @@ function CreateNewInvoiceForm({ onSubmitSuccess }: CreateNewInvoiceFormProps) {
   const billFromHeadingId = useId()
   const billToHeadingId = useId()
   const itemListHeadingId = useId()
-  const { register, handleSubmit, watch } = useForm<NewInvoiceFormFields>({
+  const { register, handleSubmit, control } = useForm<NewInvoiceFormFields>({
     defaultValues: DEFAULT_FORM_VALUES,
   })
-  const quantity = watch('itemList.0.quantity')
-  const price = watch('itemList.0.price')
-  const total = quantity * price
+  const itemsFieldArray = useFieldArray({
+    control,
+    name: 'itemList',
+  })
+  // const quantity = watch('itemList.0.quantity')
+  // const price = watch('itemList.0.price')
+  // const total = quantity * price
 
   return (
     <form
@@ -206,32 +218,48 @@ function CreateNewInvoiceForm({ onSubmitSuccess }: CreateNewInvoiceFormProps) {
           <input type="text" {...register('projectDescription')} />
         </label>
       </section>
-      <section aria-labelledby={itemListHeadingId}>
+      <section>
         <h3 id={itemListHeadingId}>Item List</h3>
-        <label>
-          <span>Item Name</span>
-          <input type="text" {...register('itemList.0.name')} />
-        </label>
-        <label>
-          <span>Qty.</span>
-          <input
-            type="number"
-            {...register('itemList.0.quantity', {
-              valueAsNumber: true,
-            })}
-          />
-        </label>
-        <label>
-          <span>Price</span>
-          <input
-            type="number"
-            {...register('itemList.0.price', { valueAsNumber: true })}
-          />
-        </label>
-        <div>
-          <span id="item-total">Total</span>
-          <div aria-labelledby="item-total">{total}</div>
-        </div>
+        <ul aria-labelledby={itemListHeadingId}>
+          {itemsFieldArray.fields.map((item, index) => (
+            <li key={item.id} style={{ display: 'flex' }}>
+              <label>
+                <span>Item Name</span>
+                <input
+                  type="text"
+                  defaultValue={`${item.name}`}
+                  {...register(`itemList.${index}.name`)}
+                />
+              </label>
+              <label>
+                <span>Qty.</span>
+                <input
+                  type="number"
+                  defaultValue={`${item.quantity}`}
+                  {...register(`itemList.${index}.quantity`, {
+                    valueAsNumber: true,
+                  })}
+                />
+              </label>
+              <label>
+                <span>Price</span>
+                <input
+                  type="number"
+                  defaultValue={`${item.price}`}
+                  {...register(`itemList.${index}.price`, {
+                    valueAsNumber: true,
+                  })}
+                />
+              </label>
+            </li>
+          ))}
+        </ul>
+        <button
+          type="button"
+          onClick={() => itemsFieldArray.append(DEFAULT_ITEM_VALUES)}
+        >
+          Add New Item
+        </button>
       </section>
       <button type="submit">Save as Draft</button>
     </form>

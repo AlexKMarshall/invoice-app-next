@@ -15,6 +15,7 @@ import faker from 'faker'
 import { format } from 'date-fns'
 
 function buildMockDraftInvoiceInput() {
+  const itemsCount = faker.datatype.number({ min: 2, max: 3 })
   return {
     senderAddress: {
       street: faker.address.streetAddress(),
@@ -33,13 +34,17 @@ function buildMockDraftInvoiceInput() {
     issuedAt: faker.date.recent(),
     paymentTerms: faker.datatype.number({ max: 30 }),
     projectDescription: faker.commerce.productDescription(),
-    itemList: [
-      {
-        name: faker.commerce.product(),
-        quantity: faker.datatype.number(),
-        price: faker.datatype.number(),
-      },
-    ],
+    itemList: new Array(itemsCount)
+      .fill(undefined)
+      .map(() => buildMockDraftItem()),
+  }
+}
+
+function buildMockDraftItem() {
+  return {
+    name: faker.commerce.product(),
+    quantity: faker.datatype.number(),
+    price: faker.datatype.number(),
   }
 }
 
@@ -62,15 +67,12 @@ it('should show list of invoice summaries', async () => {
   expect(screen.getByRole('heading', { name: /invoices/i })).toBeInTheDocument()
   await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
 
-  expect(screen.getByRole('list')).toBeInTheDocument()
+  expect(screen.getByRole('list', { name: /invoices/i })).toBeInTheDocument()
 
   mockInvoiceSummaries.forEach((mockInvoice) => {
-    // eslint-disable-next-line testing-library/no-node-access
-    const elInvoice = screen.getByText(mockInvoice.id).closest('li')
-    if (!elInvoice)
-      throw new Error(`No <li> element found closest to ${mockInvoice.id}`)
-
+    const elInvoice = screen.getByRole('listitem', { name: mockInvoice.id })
     const inInvoice = within(elInvoice)
+
     expect(
       inInvoice.getByText(
         `Due ${format(mockInvoice.paymentDue, 'dd MMM yyyy')}`
@@ -94,6 +96,8 @@ it('should show empty state when there are no invoices', async () => {
   ).toBeInTheDocument()
 })
 it('should allow new draft invoices to be creacted', async () => {
+  const existingInvoice = buildMockDraftInvoice()
+  invoiceModel.initialise([existingInvoice])
   const mockDraftInvoiceInput = buildMockDraftInvoiceInput()
   // we aren't validating the id here, so we can give it an empty string
   const mockInvoiceSummary = invoiceModel.invoiceDetailToSummary({
@@ -102,6 +106,8 @@ it('should allow new draft invoices to be creacted', async () => {
     ...mockDraftInvoiceInput,
   })
   render(<InvoiceSummaryScreen />)
+
+  await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
 
   expect(screen.getByRole('form', { name: /new invoice/i })).toBeInTheDocument()
 
@@ -167,31 +173,31 @@ it('should allow new draft invoices to be creacted', async () => {
     mockDraftInvoiceInput.projectDescription
   )
 
-  const elItemListSection = screen.getByRole('region', { name: /item list/i })
-  const inItemList = within(elItemListSection)
+  const elItemList = screen.getByRole('list', { name: /item list/i })
+  const inItemList = within(elItemList)
 
-  validateTextfieldEntry(
-    inItemList.getByLabelText(/item name/i),
-    mockDraftInvoiceInput.itemList[0].name
-  )
-  validateTextfieldEntry(
-    inItemList.getByLabelText(/qty/i),
-    mockDraftInvoiceInput.itemList[0].quantity.toString(),
-    mockDraftInvoiceInput.itemList[0].quantity
-  )
-  validateTextfieldEntry(
-    inItemList.getByLabelText(/price/i),
-    mockDraftInvoiceInput.itemList[0].price.toString(),
-    mockDraftInvoiceInput.itemList[0].price
-  )
+  mockDraftInvoiceInput.itemList.forEach((item, index, arr) => {
+    const [lastRow] = inItemList.getAllByRole('listitem').slice(-1)
+    const inLastRow = within(lastRow)
 
-  const elItemTotal = inItemList.getByLabelText(/total/i)
-  expect(elItemTotal).toHaveTextContent(
-    (
-      mockDraftInvoiceInput.itemList[0].price *
-      mockDraftInvoiceInput.itemList[0].quantity
-    ).toString()
-  )
+    validateTextfieldEntry(inLastRow.getByLabelText(/item name/i), item.name)
+    validateTextfieldEntry(
+      inLastRow.getByLabelText(/qty/i),
+      item.quantity.toString(),
+      item.quantity
+    )
+    validateTextfieldEntry(
+      inLastRow.getByLabelText(/price/i),
+      item.price.toString(),
+      item.price
+    )
+
+    const isAnotherRowToAdd = arr[index + 1] !== undefined
+
+    if (isAnotherRowToAdd) {
+      userEvent.click(screen.getByRole('button', { name: /add new item/i }))
+    }
+  })
 
   // save the draft invoice
 
@@ -199,13 +205,12 @@ it('should allow new draft invoices to be creacted', async () => {
 
   // Expect the new invoice to appear optimistically
 
-  const elInvoiceList = await screen.findByRole('list')
+  const elInvoiceList = await screen.findByRole('list', { name: /invoices/i })
   const inInvoiceList = within(elInvoiceList)
   const savingIdDisplay = '------'
-  const elNewInvoiceId = inInvoiceList.getByText(savingIdDisplay)
-  const elNewInvoiceItem = elNewInvoiceId.closest('li')
-  if (!elNewInvoiceItem)
-    throw new Error('New invoice is not a descendent of a list item')
+  const elNewInvoiceItem = inInvoiceList.getByRole('listitem', {
+    name: savingIdDisplay,
+  })
   const inNewInvoiceItem = within(elNewInvoiceItem)
 
   expect(

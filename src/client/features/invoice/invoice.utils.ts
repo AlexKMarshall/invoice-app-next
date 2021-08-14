@@ -9,7 +9,7 @@ export function invoiceDetailToSummary(invoice: InvoiceDetail): InvoiceSummary {
     clientName: invoice.clientName,
     total: invoice.itemList
       .map((item) => item.quantity * item.price)
-      .reduce((acc, cur) => acc + cur),
+      .reduce((acc, cur) => acc + cur, 0),
     status: invoice.status,
   }
 }
