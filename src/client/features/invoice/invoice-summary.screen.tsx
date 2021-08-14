@@ -2,6 +2,7 @@ import { InvoiceDetail, InvoiceSummary } from './invoice.types'
 import { useCreateInvoice, useInvoiceSummaries } from './invoice.queries'
 import { useFieldArray, useForm } from 'react-hook-form'
 
+import { Heading } from 'src/client/shared/components/typography'
 import Link from 'next/link'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { currencyFormatter } from 'src/client/shared/utils'
@@ -15,8 +16,10 @@ export function InvoiceSummaryScreen(): JSX.Element {
   const headingId = useId()
 
   return (
-    <>
-      <h1 id={headingId}>Invoices</h1>
+    <main>
+      <header>
+        <Heading id={headingId}>Invoices</Heading>
+      </header>
       {listQuery.isLoading ? <div>Loading...</div> : null}
       {listQuery.isSuccess ? (
         <List
@@ -46,7 +49,7 @@ export function InvoiceSummaryScreen(): JSX.Element {
       <div role="status" aria-live="polite">
         {notificationMessage}
       </div>
-    </>
+    </main>
   )
 }
 
@@ -63,7 +66,9 @@ function List<T>({
   ...delegatedProps
 }: ListProps<T>) {
   return collection.length > 0 ? (
-    <ul {...delegatedProps}>{collection.map(renderItem)}</ul>
+    <ul role="list" {...delegatedProps}>
+      {collection.map(renderItem)}
+    </ul>
   ) : (
     emptyState
   )
@@ -138,9 +143,6 @@ function CreateNewInvoiceForm({ onSubmitSuccess }: CreateNewInvoiceFormProps) {
     control,
     name: 'itemList',
   })
-  // const quantity = watch('itemList.0.quantity')
-  // const price = watch('itemList.0.price')
-  // const total = quantity * price
 
   return (
     <form

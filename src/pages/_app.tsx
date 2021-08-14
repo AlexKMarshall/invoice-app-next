@@ -1,9 +1,8 @@
-import 'src/client/shared/styles/globals.css'
-
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { AppProps } from 'next/app'
 import { SSRProvider } from '@react-aria/ssr'
+import { createGlobalStyle } from 'styled-components'
 
 const queryClient = new QueryClient()
 
@@ -20,6 +19,8 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <SSRProvider>
       <QueryClientProvider client={queryClient}>
+        <CSSReset />
+        <GlobalStyle />
         <Component {...pageProps} />
       </QueryClientProvider>
     </SSRProvider>
@@ -27,3 +28,68 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
 }
 
 export default MyApp
+
+const CSSReset = createGlobalStyle`
+  *,
+  *::after,
+  *::before {
+    box-sizing: border-box;
+  }
+
+  body,
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  figure,
+  blockquote,
+  dl,
+  dd {
+    margin: 0;
+  }
+
+  ul[role='list'],
+  ol[role='list'] {
+    list-style: none;
+  }
+
+  body {
+    min-height: 100vh;
+    text-rendering: optimizeSpeed;
+    line-height: 1.5;
+  }
+
+  a:not([class]) {
+    text-decoration-skip-ink: auto;
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html:focus-within {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+`
+
+const GlobalStyle = createGlobalStyle`
+  body {
+    font-family: 'Spartan', sans-serif;
+    font-size: ${12 / 16}rem;
+  }
+`
