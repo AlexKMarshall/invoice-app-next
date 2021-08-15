@@ -74,8 +74,8 @@ const Header = styled.header`
   flex-direction: row;
   align-items: center;
 
-  margin-top: 72px;
-  margin-bottom: 65px;
+  padding-top: 72px;
+  padding-bottom: 65px;
 
   & > :first-child {
     margin-right: auto;
@@ -126,12 +126,12 @@ function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
     <RowWrapper aria-labelledby={id}>
       {invoice.id.toLowerCase().startsWith('saving') ? (
         <Cell scope="row" id={id}>
-          {savingInvoiceIdDisplay}
+          <InvoiceId>{savingInvoiceIdDisplay}</InvoiceId>
         </Cell>
       ) : (
         <Cell scope="row" id={id}>
-          <Link href={`/invoices/${invoice.id}`}>
-            <a>{invoice.id}</a>
+          <Link href={`/invoices/${invoice.id}`} passHref>
+            <InvoiceId as="a">{invoice.id}</InvoiceId>
           </Link>
         </Cell>
       )}
@@ -169,6 +169,17 @@ const RowWrapper = styled.tr`
 
 const Cell = styled.td`
   background-color: white;
+`
+
+const InvoiceId = styled.span`
+  color: hsla(231deg, 28%, 7%, 1);
+  font-weight: 700;
+  text-decoration: none;
+
+  &:before {
+    content: '#';
+    color: hsla(231deg, 36%, 63%, 1);
+  }
 `
 
 const TallBox = styled.div`
