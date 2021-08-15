@@ -1,4 +1,5 @@
 import { ButtonHTMLAttributes } from 'react'
+import { COLORS } from '../styles/colors'
 import { Plus } from '../icons/plus'
 import styled from 'styled-components'
 
@@ -24,8 +25,8 @@ export function Button({
 }
 
 const Wrapper = styled.button`
-  --idle-background: hsla(252deg, 94%, 67%, 100%);
-  --hover-background: hsla(252deg, 100%, 73%);
+  --idle-background: ${COLORS.primaryColor.prop};
+  --hover-background: ${COLORS.primaryColor.light.prop};
   --background-color: var(--idle-background);
   --icon-size: 0px;
   position: relative;

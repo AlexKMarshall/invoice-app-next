@@ -4,6 +4,7 @@ import { currencyFormatter, inflect } from 'src/client/shared/utils'
 import { ArrowRight } from 'src/client/shared/icons/arrow-right'
 import { Heading as BaseHeading } from 'src/client/shared/components/typography'
 import { Button } from 'src/client/shared/components/button'
+import { COLORS } from 'src/client/shared/styles/colors'
 import { InvoiceSummary } from './invoice.types'
 import Link from 'next/link'
 import { NewInvoiceForm } from './new-invoice-form'
@@ -176,7 +177,7 @@ const RowWrapper = styled.tr`
   --cursor: pointer;
   position: relative;
   --border-radius: 8px;
-  box-shadow: 0 10px 10px -10px hsla(231deg, 38%, 45%, 0.1);
+  box-shadow: 0 10px 10px -10px ${COLORS.shadowColor.prop};
   --border-color: transparent;
   --border-width: 2px;
   --border-style: solid;
@@ -190,7 +191,7 @@ const RowWrapper = styled.tr`
 
   &:hover:not([data-saving]),
   &:focus-within:not([data-saving]) {
-    --border-color: hsla(252, 94%, 67%, 1);
+    --border-color: ${COLORS.primaryColor.prop};
   }
 
   &[data-saving] {
@@ -230,7 +231,7 @@ const DecorativeIcon = styled.div`
   right: 24px;
   top: 50%;
   transform: translateY(-50%);
-  color: hsla(252, 94%, 67%, 1);
+  color: ${COLORS.primaryColor.prop};
 
   & > * {
     display: block;
@@ -240,13 +241,13 @@ const DecorativeIcon = styled.div`
 `
 
 const InvoiceId = styled.span`
-  color: hsla(231deg, 28%, 7%, 1);
+  color: ${COLORS.textColor.strong.prop};
   font-weight: 700;
   text-decoration: none;
 
   &:before {
     content: '#';
-    color: hsla(231deg, 36%, 63%, 1);
+    color: ${COLORS.textColor.prop};
   }
 `
 
@@ -254,7 +255,7 @@ const InvoiceTotal = styled.span`
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: -0.8px;
-  color: hsla(231, 28%, 7%, 1);
+  color: ${COLORS.textColor.strong.prop};
 `
 
 function TotalInvoiceCount() {

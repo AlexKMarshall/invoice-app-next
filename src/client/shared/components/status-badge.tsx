@@ -1,27 +1,40 @@
 import styled, { CSSProperties } from 'styled-components'
 
-const STATUS_HSL = {
-  draft: '231deg, 20%, 27%',
-  pending: '34deg, 100%, 50%',
-  paid: '160deg, 67%, 52%',
+import { COLORS } from '../styles/colors'
+
+const STATUS_COLORS = {
+  draft: {
+    opaque: COLORS.statusColor.draft.prop,
+    faded: COLORS.statusColor.draft.faded.prop,
+  },
+  pending: {
+    opaque: COLORS.statusColor.pending.prop,
+    faded: COLORS.statusColor.pending.faded.prop,
+  },
+  paid: {
+    opaque: COLORS.statusColor.paid.prop,
+    faded: COLORS.statusColor.paid.faded.prop,
+  },
 }
 
 type Props = {
   status: 'draft' | 'pending' | 'paid'
 }
 export function StatusBadge({ status }: Props): JSX.Element {
-  const hsl = STATUS_HSL[status]
+  const { opaque, faded } = STATUS_COLORS[status]
 
-  return <Wrapper style={{ '--hsl': hsl } as CSSProperties}>{status}</Wrapper>
+  return (
+    <Wrapper
+      style={
+        { '--background-color': faded, '--color': opaque } as CSSProperties
+      }
+    >
+      {status}
+    </Wrapper>
+  )
 }
 
 const Wrapper = styled.div`
-  --hsl: 231deg, 20%, 27%;
-  --background-alpha: 0.06;
-  --color-alpha: 1;
-  --background-color: hsla(var(--hsl), var(--background-alpha));
-  --color: hsla(var(--hsl), var(--color-alpha));
-
   display: flex;
   justify-content: center;
   align-items: baseline;

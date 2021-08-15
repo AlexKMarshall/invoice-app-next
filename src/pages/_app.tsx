@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { AppProps } from 'next/app'
+import { COLORS } from 'src/client/shared/styles/colors'
 import { SSRProvider } from '@react-aria/ssr'
 import { createGlobalStyle } from 'styled-components'
 
@@ -88,13 +89,28 @@ const CSSReset = createGlobalStyle`
 `
 
 const GlobalStyle = createGlobalStyle`
+  :root {
+    --body-color: ${COLORS.bodyColor.value};
+    --text-color: ${COLORS.textColor.value};
+    --text-color-strong: ${COLORS.textColor.strong.value};
+    --primary-color: ${COLORS.primaryColor.value};
+    --primary-color-light: ${COLORS.primaryColor.light.value};
+    --status-color-draft: ${COLORS.statusColor.draft.value};
+    --status-color-draft-faded: ${COLORS.statusColor.draft.faded.value};
+    --status-color-pending: ${COLORS.statusColor.pending.value};
+    --status-color-pending-faded: ${COLORS.statusColor.pending.faded.value};
+    --status-color-paid: ${COLORS.statusColor.paid.value};
+    --status-color-paid-faded: ${COLORS.statusColor.paid.faded.value};
+    --shadow-color: ${COLORS.shadowColor.value};
+  }
+
   body {
     font-family: 'Spartan', sans-serif;
     font-size: ${12 / 16}rem;
     font-weight: 500;
     letter-spacing: -0.25px;
 
-    background-color: hsla(240deg, 27%, 98%, 100%);
-    color: hsla(231deg, 37%, 63%, 1);
+    background-color: ${COLORS.bodyColor.prop};
+    color: ${COLORS.textColor.prop};
   }
 `
