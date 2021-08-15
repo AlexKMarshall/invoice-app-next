@@ -1,6 +1,7 @@
 import { TableHTMLAttributes, useState } from 'react'
 import { currencyFormatter, inflect } from 'src/client/shared/utils'
 
+import { ArrowRight } from 'src/client/shared/icons/arrow-right'
 import { Heading as BaseHeading } from 'src/client/shared/components/typography'
 import { Button } from 'src/client/shared/components/button'
 import { InvoiceSummary } from './invoice.types'
@@ -145,12 +146,16 @@ function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
       </Cell>
       <Cell>
         <StatusBadge status={invoice.status} />
+        <DecorativeIcon>
+          <ArrowRight />
+        </DecorativeIcon>
       </Cell>
     </RowWrapper>
   )
 }
 
 const RowWrapper = styled.tr`
+  position: relative;
   --border-radius: 8px;
   box-shadow: 0 10px 10px -10px hsla(231deg, 38%, 45%, 0.1);
 
@@ -176,6 +181,20 @@ const RowWrapper = styled.tr`
 
 const Cell = styled.td`
   background-color: white;
+`
+
+const DecorativeIcon = styled.div`
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: hsla(252, 94%, 67%, 1);
+
+  & > * {
+    display: block;
+    width: 7px;
+    height: 10px;
+  }
 `
 
 const InvoiceId = styled.span`
