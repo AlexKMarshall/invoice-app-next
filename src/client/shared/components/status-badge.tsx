@@ -1,10 +1,18 @@
-import styled from 'styled-components'
+import styled, { CSSProperties } from 'styled-components'
+
+const STATUS_HSL = {
+  draft: '231deg, 20%, 27%',
+  pending: '34deg, 100%, 50%',
+  paid: '160deg, 67%, 52%',
+}
 
 type Props = {
   status: 'draft' | 'pending' | 'paid'
 }
 export function StatusBadge({ status }: Props): JSX.Element {
-  return <Wrapper>{status}</Wrapper>
+  const hsl = STATUS_HSL[status]
+
+  return <Wrapper style={{ '--hsl': hsl } as CSSProperties}>{status}</Wrapper>
 }
 
 const Wrapper = styled.div`

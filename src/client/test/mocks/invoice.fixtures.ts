@@ -3,10 +3,10 @@ import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import faker from 'faker'
 import { generateInvoiceId } from 'src/client/shared/utils'
 
-export function buildMockDraftInvoiceInput(): NewInvoiceInputDTO {
+export function buildMockInvoiceInput(): NewInvoiceInputDTO {
   const itemsCount = faker.datatype.number({ min: 1, max: 3 })
   return {
-    status: 'draft',
+    status: pickRandomStatus(),
     senderAddress: {
       street: faker.address.streetAddress(),
       city: faker.address.city(),
@@ -24,13 +24,17 @@ export function buildMockDraftInvoiceInput(): NewInvoiceInputDTO {
     issuedAt: faker.date.recent(),
     paymentTerms: faker.datatype.number({ max: 30 }),
     projectDescription: faker.commerce.productDescription(),
-    itemList: new Array(itemsCount)
-      .fill(undefined)
-      .map(() => buildMockDraftItem()),
+    itemList: new Array(itemsCount).fill(undefined).map(() => buildMockItem()),
   }
 }
 
-function buildMockDraftItem() {
+function pickRandomStatus() {
+  const statuses = ['draft', 'pending', 'paid'] as const
+  const randomIndex = Math.floor(Math.random() * statuses.length)
+  return statuses[randomIndex]
+}
+
+function buildMockItem() {
   return {
     name: faker.commerce.product(),
     quantity: faker.datatype.number({ min: 1, max: 9 }),
@@ -38,9 +42,9 @@ function buildMockDraftItem() {
   }
 }
 
-export function buildMockDraftInvoice(): InvoiceDetail {
+export function buildMockInvoice(): InvoiceDetail {
   return {
     id: generateInvoiceId(),
-    ...buildMockDraftInvoiceInput(),
+    ...buildMockInvoiceInput(),
   }
 }

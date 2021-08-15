@@ -1,8 +1,8 @@
 import * as invoiceModel from 'src/client/test/mocks/invoice.model'
 
 import {
-  buildMockDraftInvoice,
-  buildMockDraftInvoiceInput,
+  buildMockInvoice,
+  buildMockInvoiceInput,
 } from 'src/client/test/mocks/invoice.fixtures'
 import {
   render,
@@ -18,7 +18,7 @@ import { currencyFormatter } from 'src/client/shared/utils'
 import { format } from 'date-fns'
 
 it('should show list of invoice summaries', async () => {
-  const mockInvoiceDetails = [buildMockDraftInvoice(), buildMockDraftInvoice()]
+  const mockInvoiceDetails = [buildMockInvoice(), buildMockInvoice()]
   invoiceModel.initialise(mockInvoiceDetails)
   const mockInvoiceSummaries = mockInvoiceDetails.map(
     invoiceModel.invoiceDetailToSummary
@@ -69,9 +69,9 @@ it('should not show new invoice form until button is clicked', () => {
   ).not.toBeInTheDocument()
 })
 it('should allow new draft invoices to be creacted', async () => {
-  const existingInvoice = buildMockDraftInvoice()
+  const existingInvoice = buildMockInvoice()
   invoiceModel.initialise([existingInvoice])
-  const mockDraftInvoiceInput = buildMockDraftInvoiceInput()
+  const mockDraftInvoiceInput = buildMockInvoiceInput()
   // we aren't validating the id here, so we can give it an empty string
   const mockInvoiceSummary = invoiceModel.invoiceDetailToSummary({
     id: '',
