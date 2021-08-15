@@ -2,6 +2,7 @@ import { COLORS, TYPOGRAPHY } from 'src/client/shared/styles/theme'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { AppProps } from 'next/app'
+import { Layout } from 'src/client/shared/components/layout'
 import { SSRProvider } from '@react-aria/ssr'
 import { createGlobalStyle } from 'styled-components'
 
@@ -22,7 +23,9 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
       <QueryClientProvider client={queryClient}>
         <CSSReset />
         <GlobalStyle />
-        <Component {...pageProps} />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
       </QueryClientProvider>
     </SSRProvider>
   )
