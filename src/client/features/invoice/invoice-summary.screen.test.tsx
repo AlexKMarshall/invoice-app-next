@@ -37,6 +37,9 @@ it('should show list of invoice summaries', async () => {
     const elInvoice = screen.getByRole('row', { name: mockInvoice.id })
     const inInvoice = within(elInvoice)
 
+    const invoiceLink = inInvoice.getByRole('link')
+    expect(invoiceLink).toHaveAttribute('href', `/invoices/${mockInvoice.id}`)
+    expect(invoiceLink).toHaveAccessibleName(mockInvoice.id)
     expect(
       inInvoice.getByText(
         `Due ${format(mockInvoice.paymentDue, 'dd MMM yyyy')}`
@@ -187,6 +190,9 @@ it('should allow new draft invoices to be creacted', async () => {
   })
   const inNewInvoiceItem = within(elNewInvoiceItem)
 
+  // invoices don't get links til they're saved and have a real ID
+  expect(inNewInvoiceItem.queryByRole('link')).not.toBeInTheDocument()
+
   expect(
     inNewInvoiceItem.getByText(
       `Due ${format(mockInvoiceSummary.paymentDue, 'dd MMM yyyy')}`
@@ -221,9 +227,10 @@ it('should allow new draft invoices to be creacted', async () => {
     )
 
   const [savedInvoiceId] = invoiceIdMatch
+  // we should now have a link to that invoice
   expect(
     inInvoiceTable.getByRole('link', { name: savedInvoiceId })
-  ).toBeInTheDocument()
+  ).toHaveAttribute('href', `/invoices/${savedInvoiceId}`)
 })
 it('should default invoice issue date to today', () => {
   const today = new Date()

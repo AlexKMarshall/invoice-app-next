@@ -1,4 +1,4 @@
-import { TableHTMLAttributes, useRef, useState } from 'react'
+import { MouseEventHandler, TableHTMLAttributes, useRef, useState } from 'react'
 import { currencyFormatter, inflect } from 'src/client/shared/utils'
 
 import { ArrowRight } from 'src/client/shared/icons/arrow-right'
@@ -127,17 +127,20 @@ function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
   const savingInvoiceIdDisplay = '------'
   const linkRef = useRef<HTMLAnchorElement>(null)
 
-  function handleInvoiceClick(): void {
-    if (linkRef.current) {
-      linkRef.current.click()
-    }
+  const handleInvoiceClick: MouseEventHandler = (event) => {
+    // don't click if we don't have a link
+    if (!linkRef.current) return
+    // don't duplicate the click if we already clicked on the real link element
+    if (event.target === linkRef.current) return
+
+    linkRef.current.click()
   }
 
   return (
     <RowWrapper
       aria-labelledby={id}
       data-saving={isSaving ? 'true' : undefined}
-      onClick={handleInvoiceClick}
+      onClick={(event) => handleInvoiceClick(event)}
     >
       {isSaving ? (
         <Cell scope="row" id={id}>
