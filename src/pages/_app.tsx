@@ -1,7 +1,7 @@
+import { COLORS, TYPOGRAPHY } from 'src/client/shared/styles/theme'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { AppProps } from 'next/app'
-import { COLORS } from 'src/client/shared/styles/colors'
 import { SSRProvider } from '@react-aria/ssr'
 import { createGlobalStyle } from 'styled-components'
 
@@ -90,6 +90,7 @@ const CSSReset = createGlobalStyle`
 
 const GlobalStyle = createGlobalStyle`
   :root {
+    /* COLORS */
     --body-color: ${COLORS.bodyColor.value};
     --text-color: ${COLORS.textColor.value};
     --text-color-strong: ${COLORS.textColor.strong.value};
@@ -102,12 +103,15 @@ const GlobalStyle = createGlobalStyle`
     --status-color-paid: ${COLORS.statusColor.paid.value};
     --status-color-paid-faded: ${COLORS.statusColor.paid.faded.value};
     --shadow-color: ${COLORS.shadowColor.value};
+    /* TYPOGRAPHY */
+    --font-weight-normal: ${TYPOGRAPHY.fontWeight.normal.value};
+    --font-weight-bold: ${TYPOGRAPHY.fontWeight.bold.value};
   }
 
   body {
     font-family: 'Spartan', sans-serif;
     font-size: ${12 / 16}rem;
-    font-weight: 500;
+    font-weight: ${TYPOGRAPHY.fontWeight.normal.prop};
     letter-spacing: -0.25px;
 
     background-color: ${COLORS.bodyColor.prop};

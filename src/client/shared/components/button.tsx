@@ -1,5 +1,6 @@
+import { COLORS, TYPOGRAPHY } from '../styles/theme'
+
 import { ButtonHTMLAttributes } from 'react'
-import { COLORS } from '../styles/colors'
 import { Plus } from '../icons/plus'
 import styled from 'styled-components'
 
@@ -36,7 +37,7 @@ const Wrapper = styled.button`
   border-radius: 999px;
   background-color: var(--background-color);
   color: white;
-  font-weight: 700;
+  font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
 
   &:hover {
     --background-color: var(--hover-background);

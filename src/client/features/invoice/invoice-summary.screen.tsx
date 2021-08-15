@@ -1,10 +1,10 @@
+import { COLORS, TYPOGRAPHY } from 'src/client/shared/styles/theme'
 import { MouseEventHandler, TableHTMLAttributes, useRef, useState } from 'react'
 import { currencyFormatter, inflect } from 'src/client/shared/utils'
 
 import { ArrowRight } from 'src/client/shared/icons/arrow-right'
 import { Heading as BaseHeading } from 'src/client/shared/components/typography'
 import { Button } from 'src/client/shared/components/button'
-import { COLORS } from 'src/client/shared/styles/colors'
 import { InvoiceSummary } from './invoice.types'
 import Link from 'next/link'
 import { NewInvoiceForm } from './new-invoice-form'
@@ -242,7 +242,7 @@ const DecorativeIcon = styled.div`
 
 const InvoiceId = styled.span`
   color: ${COLORS.textColor.strong.prop};
-  font-weight: 700;
+  font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
   text-decoration: none;
 
   &:before {
@@ -253,7 +253,7 @@ const InvoiceId = styled.span`
 
 const InvoiceTotal = styled.span`
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
   letter-spacing: -0.8px;
   color: ${COLORS.textColor.strong.prop};
 `

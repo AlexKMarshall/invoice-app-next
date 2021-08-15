@@ -1,6 +1,5 @@
+import { COLORS, TYPOGRAPHY } from '../styles/theme'
 import styled, { CSSProperties } from 'styled-components'
-
-import { COLORS } from '../styles/colors'
 
 const STATUS_COLORS = {
   draft: {
@@ -42,7 +41,7 @@ const Wrapper = styled.div`
   border-radius: 6px;
   background: var(--background-color);
   color: var(--color);
-  font-weight: 700;
+  font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
   text-transform: capitalize;
 
   &:before {

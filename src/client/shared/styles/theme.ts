@@ -50,3 +50,16 @@ export const COLORS = {
     prop: 'var(--shadow-color)',
   },
 }
+
+export const TYPOGRAPHY = {
+  fontWeight: {
+    normal: {
+      value: 500,
+      prop: 'var(--font-weight-normal)',
+    },
+    bold: {
+      value: 700,
+      prop: 'var(--font-weight-bold)',
+    },
+  },
+}
