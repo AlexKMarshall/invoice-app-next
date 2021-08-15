@@ -14,6 +14,7 @@ module.exports = {
     '<rootDir>/src/pages/**/*.ts',
     '!.*\\.spec\\.ts$',
     '!.*\\.test\\.ts$',
+    '!.*\\.stories\\.ts$',
     '!**/node_modules/**',
   ],
   coveragePathIgnorePatterns: [
