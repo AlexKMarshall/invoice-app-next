@@ -62,4 +62,56 @@ export const TYPOGRAPHY = {
       prop: 'var(--font-weight-bold)',
     },
   },
+  h1: {
+    fontSize: {
+      value: `${32 / 16}rem`,
+      prop: 'var(--h1-font-size)',
+    },
+    lineHeight: {
+      value: `${36 / 16}rem`,
+      prop: 'var(--h1-line-height)',
+    },
+    letterSpacing: {
+      value: '-1px',
+      prop: 'var(--h1-letter-spacing)',
+    },
+  },
+  h2: {
+    fontSize: {
+      value: `${20 / 16}rem`,
+      prop: 'var(--h2-font-size)',
+    },
+    lineHeight: {
+      value: `${22 / 16}rem`,
+      prop: 'var(--h2-line-height)',
+    },
+    letterSpacing: {
+      value: '-0.63px',
+      prop: 'var(--h2-letter-spacing)',
+    },
+  },
+  h3: {
+    fontSize: {
+      value: `1rem`,
+      prop: 'var(--h3-font-size)',
+    },
+    lineHeight: {
+      value: `${24 / 16}rem`,
+      prop: 'var(--h3-line-height)',
+    },
+    letterSpacing: {
+      value: '-0.8px',
+      prop: 'var(--h3-letter-spacing)',
+    },
+  },
+  body1: {
+    fontSize: {
+      value: `${12 / 16}rem`,
+      prop: 'var(--body1-font-size)',
+    },
+    letterSpacing: {
+      value: '-0.25px',
+      prop: 'var(--body1-letter-spacing)',
+    },
+  },
 }

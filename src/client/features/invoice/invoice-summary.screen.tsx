@@ -5,6 +5,7 @@ import { currencyFormatter, inflect } from 'src/client/shared/utils'
 import { ArrowRight } from 'src/client/shared/icons/arrow-right'
 import { Heading as BaseHeading } from 'src/client/shared/components/typography'
 import { Button } from 'src/client/shared/components/button'
+import Image from 'next/image'
 import { InvoiceSummary } from './invoice.types'
 import Link from 'next/link'
 import { NewInvoiceForm } from './new-invoice-form'
@@ -24,7 +25,9 @@ export function InvoiceSummaryScreen(): JSX.Element {
     <Main>
       <Header>
         <div>
-          <Heading id={headingId}>Invoices</Heading>
+          <Heading level={1} id={headingId}>
+            Invoices
+          </Heading>
           <TotalInvoiceCount />
         </div>
         <Button type="button" icon="plus" onClick={() => setIsFormOpen(true)}>
@@ -40,13 +43,19 @@ export function InvoiceSummaryScreen(): JSX.Element {
             <InvoiceSummaryItem key={invoice.id} invoice={invoice} />
           )}
           emptyState={
-            <>
-              <h2>There is nothing here</h2>
+            <EmptyStateWrapper>
+              <Image
+                src="/illustration-empty.svg"
+                alt="Illustration of woman with a megaphone emerging from an open envelope, with a paper aeroplane flying around her"
+                width="241"
+                height="200"
+              />
+              <Heading level={2}>There is nothing here</Heading>
               <p>
                 Create an invoice by clicking the <strong>New Invoice</strong>{' '}
                 button and get started
               </p>
-            </>
+            </EmptyStateWrapper>
           }
         />
       ) : null}
@@ -87,6 +96,20 @@ const Header = styled.header`
 
 const Heading = styled(BaseHeading)`
   margin-bottom: 8px;
+`
+
+const EmptyStateWrapper = styled.div`
+  margin-left: auto;
+  margin-right: auto;
+  max-width: min-content;
+  text-align: center;
+  padding-top: 48px;
+
+  & > :nth-child(2) {
+    margin-top: 64px;
+    margin-bottom: 24px;
+    white-space: nowrap;
+  }
 `
 
 type TableProps<T> = {
@@ -252,9 +275,9 @@ const InvoiceId = styled.span`
 `
 
 const InvoiceTotal = styled.span`
-  font-size: 1rem;
+  font-size: ${TYPOGRAPHY.h3.fontSize};
   font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
-  letter-spacing: -0.8px;
+  letter-spacing: ${TYPOGRAPHY.h3.letterSpacing};
   color: ${COLORS.textColor.strong.prop};
 `
 

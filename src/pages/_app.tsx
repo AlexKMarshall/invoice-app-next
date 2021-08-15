@@ -104,15 +104,26 @@ const GlobalStyle = createGlobalStyle`
     --status-color-paid-faded: ${COLORS.statusColor.paid.faded.value};
     --shadow-color: ${COLORS.shadowColor.value};
     /* TYPOGRAPHY */
+    --h1-font-size: ${TYPOGRAPHY.h1.fontSize.value};
+    --h1-line-height: ${TYPOGRAPHY.h1.lineHeight.value};
+    --h1-letter-spacing: ${TYPOGRAPHY.h1.letterSpacing.value};
+    --h2-font-size: ${TYPOGRAPHY.h2.fontSize.value};
+    --h2-line-height: ${TYPOGRAPHY.h2.lineHeight.value};
+    --h2-letter-spacing: ${TYPOGRAPHY.h2.letterSpacing.value};
+    --h3-font-size: ${TYPOGRAPHY.h3.fontSize.value};
+    --h3-line-height: ${TYPOGRAPHY.h3.lineHeight.value};
+    --h3-letter-spacing: ${TYPOGRAPHY.h3.letterSpacing.value};
+    --body1-font-size: ${TYPOGRAPHY.body1.fontSize.value};
+    --body1-letter-spacing: ${TYPOGRAPHY.body1.letterSpacing.value};
     --font-weight-normal: ${TYPOGRAPHY.fontWeight.normal.value};
     --font-weight-bold: ${TYPOGRAPHY.fontWeight.bold.value};
   }
 
   body {
     font-family: 'Spartan', sans-serif;
-    font-size: ${12 / 16}rem;
+    font-size: ${TYPOGRAPHY.body1.fontSize.prop};
     font-weight: ${TYPOGRAPHY.fontWeight.normal.prop};
-    letter-spacing: -0.25px;
+    letter-spacing: ${TYPOGRAPHY.body1.letterSpacing.prop};
 
     background-color: ${COLORS.bodyColor.prop};
     color: ${COLORS.textColor.prop};
