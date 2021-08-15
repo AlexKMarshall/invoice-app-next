@@ -137,7 +137,11 @@ function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
       )}
       <Cell>{`Due ${format(invoice.paymentDue, 'dd MMM yyyy')}`}</Cell>
       <Cell>{invoice.clientName}</Cell>
-      <Cell>{currencyFormatter.format(invoice.total / 100)}</Cell>
+      <Cell style={{ textAlign: 'right' }}>
+        <InvoiceTotal>
+          {currencyFormatter.format(invoice.total / 100)}
+        </InvoiceTotal>
+      </Cell>
       <Cell>
         <TallBox>{invoice.status}</TallBox>
       </Cell>
@@ -152,6 +156,8 @@ const RowWrapper = styled.tr`
   & > * {
     padding-top: 1rem;
     padding-bottom: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
 
     &:first-child {
       padding-left: 2rem;
@@ -182,8 +188,16 @@ const InvoiceId = styled.span`
   }
 `
 
+const InvoiceTotal = styled.span`
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+  color: hsla(231, 28%, 7%, 1);
+`
+
 const TallBox = styled.div`
   height: 3rem;
+  width: 100%;
   background-color: salmon;
 `
 

@@ -4,7 +4,7 @@ import faker from 'faker'
 import { generateInvoiceId } from 'src/client/shared/utils'
 
 export function buildMockDraftInvoiceInput(): NewInvoiceInputDTO {
-  const itemsCount = faker.datatype.number({ min: 2, max: 3 })
+  const itemsCount = faker.datatype.number({ min: 1, max: 3 })
   return {
     status: 'draft',
     senderAddress: {
@@ -33,8 +33,8 @@ export function buildMockDraftInvoiceInput(): NewInvoiceInputDTO {
 function buildMockDraftItem() {
   return {
     name: faker.commerce.product(),
-    quantity: faker.datatype.number(),
-    price: faker.datatype.number(),
+    quantity: faker.datatype.number({ min: 1, max: 9 }),
+    price: faker.datatype.number({ min: 100, max: 100000 }),
   }
 }
 

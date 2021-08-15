@@ -95,5 +95,6 @@ const GlobalStyle = createGlobalStyle`
     letter-spacing: -0.25px;
 
     background-color: hsla(240deg, 27%, 98%, 100%);
+    color: hsla(231deg, 37%, 63%, 1);
   }
 `
