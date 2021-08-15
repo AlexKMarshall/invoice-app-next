@@ -103,6 +103,8 @@ const GlobalStyle = createGlobalStyle`
     --status-color-paid: ${COLORS.statusColor.paid.value};
     --status-color-paid-faded: ${COLORS.statusColor.paid.faded.value};
     --shadow-color: ${COLORS.shadowColor.value};
+    --sidebar-color: ${COLORS.sidebarColor.value};
+    --divider-color: ${COLORS.dividerColor.value};
     /* TYPOGRAPHY */
     --h1-font-size: ${TYPOGRAPHY.h1.fontSize.value};
     --h1-line-height: ${TYPOGRAPHY.h1.lineHeight.value};

@@ -49,6 +49,14 @@ export const COLORS = {
     value: 'hsla(231deg, 38%, 45%, 10%)',
     prop: 'var(--shadow-color)',
   },
+  sidebarColor: {
+    value: 'hsla(231, 20%, 27%, 100%)',
+    prop: 'var(--sidebar-color)',
+  },
+  dividerColor: {
+    value: 'hsla(231, 20%, 36%, 100%)',
+    prop: 'var(--divider-color)',
+  },
 }
 
 export const TYPOGRAPHY = {
