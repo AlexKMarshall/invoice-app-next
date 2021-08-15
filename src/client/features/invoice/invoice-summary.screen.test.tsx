@@ -1,8 +1,8 @@
 import * as invoiceModel from 'src/client/test/mocks/invoice.model'
 
 import {
+  buildMockDraftInvoiceInput,
   buildMockInvoice,
-  buildMockInvoiceInput,
 } from 'src/client/test/mocks/invoice.fixtures'
 import {
   render,
@@ -71,7 +71,7 @@ it('should not show new invoice form until button is clicked', () => {
 it('should allow new draft invoices to be creacted', async () => {
   const existingInvoice = buildMockInvoice()
   invoiceModel.initialise([existingInvoice])
-  const mockDraftInvoiceInput = buildMockInvoiceInput()
+  const mockDraftInvoiceInput = buildMockDraftInvoiceInput()
   // we aren't validating the id here, so we can give it an empty string
   const mockInvoiceSummary = invoiceModel.invoiceDetailToSummary({
     id: '',

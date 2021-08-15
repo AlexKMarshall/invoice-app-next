@@ -28,6 +28,10 @@ export function buildMockInvoiceInput(): NewInvoiceInputDTO {
   }
 }
 
+export function buildMockDraftInvoiceInput(): NewInvoiceInputDTO {
+  return { ...buildMockInvoiceInput(), status: 'draft' }
+}
+
 function pickRandomStatus() {
   const statuses = ['draft', 'pending', 'paid'] as const
   const randomIndex = Math.floor(Math.random() * statuses.length)
@@ -46,5 +50,12 @@ export function buildMockInvoice(): InvoiceDetail {
   return {
     id: generateInvoiceId(),
     ...buildMockInvoiceInput(),
+  }
+}
+
+export function buildMockDraftInvoice(): InvoiceDetail {
+  return {
+    ...buildMockInvoice(),
+    status: 'draft',
   }
 }

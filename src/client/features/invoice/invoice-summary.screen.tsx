@@ -1,4 +1,4 @@
-import { TableHTMLAttributes, useState } from 'react'
+import { TableHTMLAttributes, useRef, useState } from 'react'
 import { currencyFormatter, inflect } from 'src/client/shared/utils'
 
 import { ArrowRight } from 'src/client/shared/icons/arrow-right'
@@ -123,17 +123,32 @@ type InvoiceSummaryItemProps = {
 
 function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
   const id = useId()
+  const isSaving = invoice.id.toLowerCase().startsWith('saving')
   const savingInvoiceIdDisplay = '------'
+  const linkRef = useRef<HTMLAnchorElement>(null)
+
+  function handleInvoiceClick(): void {
+    if (linkRef.current) {
+      linkRef.current.click()
+    }
+  }
+
   return (
-    <RowWrapper aria-labelledby={id}>
-      {invoice.id.toLowerCase().startsWith('saving') ? (
+    <RowWrapper
+      aria-labelledby={id}
+      data-saving={isSaving ? 'true' : undefined}
+      onClick={handleInvoiceClick}
+    >
+      {isSaving ? (
         <Cell scope="row" id={id}>
           <InvoiceId>{savingInvoiceIdDisplay}</InvoiceId>
         </Cell>
       ) : (
         <Cell scope="row" id={id}>
           <Link href={`/invoices/${invoice.id}`} passHref>
-            <InvoiceId as="a">{invoice.id}</InvoiceId>
+            <InvoiceId as="a" ref={linkRef}>
+              {invoice.id}
+            </InvoiceId>
           </Link>
         </Cell>
       )}
@@ -155,24 +170,48 @@ function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
 }
 
 const RowWrapper = styled.tr`
+  --cursor: pointer;
   position: relative;
   --border-radius: 8px;
   box-shadow: 0 10px 10px -10px hsla(231deg, 38%, 45%, 0.1);
+  --border-color: transparent;
+  --border-width: 2px;
+  --border-style: solid;
+  --border: var(--border-width) var(--border-style) var(--border-color);
+
+  cursor: var(--cursor);
+
+  & a:focus {
+    outline: none;
+  }
+
+  &:hover:not([data-saving]),
+  &:focus-within:not([data-saving]) {
+    --border-color: hsla(252, 94%, 67%, 1);
+  }
+
+  &[data-saving] {
+    --cursor: default;
+  }
 
   & > * {
     padding-top: 1rem;
     padding-bottom: 1rem;
+    border-top: var(--border);
+    border-bottom: var(--border);
     padding-left: 1.25rem;
     padding-right: 1.25rem;
 
     &:first-child {
       padding-left: 2rem;
+      border-left: var(--border);
       border-top-left-radius: var(--border-radius);
       border-bottom-left-radius: var(--border-radius);
     }
 
     &:last-child {
       padding-right: 3rem;
+      border-right: var(--border);
       border-top-right-radius: var(--border-radius);
       border-bottom-right-radius: var(--border-radius);
     }
