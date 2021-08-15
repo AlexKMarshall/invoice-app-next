@@ -93,5 +93,7 @@ const GlobalStyle = createGlobalStyle`
     font-size: ${12 / 16}rem;
     font-weight: 500;
     letter-spacing: -0.25px;
+
+    background-color: hsla(240deg, 27%, 98%, 100%);
   }
 `

@@ -63,72 +63,6 @@ export function InvoiceSummaryScreen(): JSX.Element {
   )
 }
 
-type ListProps<T> = {
-  collection: Array<T>
-  renderItem: (item: T, index: number, collection: Array<T>) => JSX.Element
-  emptyState: JSX.Element
-} & TableHTMLAttributes<HTMLTableElement>
-
-function Table<T>({
-  collection,
-  renderItem,
-  emptyState,
-  ...delegatedProps
-}: ListProps<T>) {
-  return collection.length > 0 ? (
-    <table {...delegatedProps}>
-      <tbody>{collection.map(renderItem)}</tbody>
-    </table>
-  ) : (
-    emptyState
-  )
-}
-
-type InvoiceSummaryItemProps = {
-  invoice: InvoiceSummary
-}
-
-function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
-  const id = useId()
-  const savingInvoiceIdDisplay = '------'
-  return (
-    <tr aria-labelledby={id}>
-      {invoice.id.toLowerCase().startsWith('saving') ? (
-        <th scope="row" id={id}>
-          {savingInvoiceIdDisplay}
-        </th>
-      ) : (
-        <th scope="row" id={id}>
-          <Link href={`/invoices/${invoice.id}`}>
-            <a>{invoice.id}</a>
-          </Link>
-        </th>
-      )}
-      <td>{`Due ${format(invoice.paymentDue, 'dd MMM yyyy')}`}</td>
-      <td>{invoice.clientName}</td>
-      <td>{currencyFormatter.format(invoice.total / 100)}</td>
-      <td>{invoice.status}</td>
-    </tr>
-  )
-}
-
-function TotalInvoiceCount() {
-  const countQuery = useInvoiceSummaries({
-    select: (invoices) => invoices.length,
-  })
-  if (!countQuery.isSuccess) return null
-
-  const count = countQuery.data
-
-  if (count === 0) return <div>No invoices</div>
-
-  return (
-    <div>
-      There are {count} total {inflect('invoice')(count)}
-    </div>
-  )
-}
-
 const Main = styled.main`
   max-width: 730px;
   margin-left: auto;
@@ -151,3 +85,110 @@ const Header = styled.header`
 const Heading = styled(BaseHeading)`
   margin-bottom: 8px;
 `
+
+type TableProps<T> = {
+  collection: Array<T>
+  renderItem: (item: T, index: number, collection: Array<T>) => JSX.Element
+  emptyState: JSX.Element
+} & TableHTMLAttributes<HTMLTableElement>
+
+function Table<T>({
+  collection,
+  renderItem,
+  emptyState,
+  ...delegatedProps
+}: TableProps<T>) {
+  return collection.length > 0 ? (
+    <TableWrapper {...delegatedProps}>
+      <tbody>{collection.map(renderItem)}</tbody>
+    </TableWrapper>
+  ) : (
+    emptyState
+  )
+}
+
+const TableWrapper = styled.table`
+  width: 100%;
+
+  border-spacing: 0 1rem;
+  margin-top: -1rem;
+  margin-bottom: -1rem;
+`
+
+type InvoiceSummaryItemProps = {
+  invoice: InvoiceSummary
+}
+
+function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
+  const id = useId()
+  const savingInvoiceIdDisplay = '------'
+  return (
+    <RowWrapper aria-labelledby={id}>
+      {invoice.id.toLowerCase().startsWith('saving') ? (
+        <Cell scope="row" id={id}>
+          {savingInvoiceIdDisplay}
+        </Cell>
+      ) : (
+        <Cell scope="row" id={id}>
+          <Link href={`/invoices/${invoice.id}`}>
+            <a>{invoice.id}</a>
+          </Link>
+        </Cell>
+      )}
+      <Cell>{`Due ${format(invoice.paymentDue, 'dd MMM yyyy')}`}</Cell>
+      <Cell>{invoice.clientName}</Cell>
+      <Cell>{currencyFormatter.format(invoice.total / 100)}</Cell>
+      <Cell>
+        <TallBox>{invoice.status}</TallBox>
+      </Cell>
+    </RowWrapper>
+  )
+}
+
+const RowWrapper = styled.tr`
+  --border-radius: 8px;
+  box-shadow: 0 10px 10px -10px hsla(231deg, 38%, 45%, 0.1);
+
+  & > * {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+
+    &:first-child {
+      padding-left: 2rem;
+      border-top-left-radius: var(--border-radius);
+      border-bottom-left-radius: var(--border-radius);
+    }
+
+    &:last-child {
+      padding-right: 3rem;
+      border-top-right-radius: var(--border-radius);
+      border-bottom-right-radius: var(--border-radius);
+    }
+  }
+`
+
+const Cell = styled.td`
+  background-color: white;
+`
+
+const TallBox = styled.div`
+  height: 3rem;
+  background-color: salmon;
+`
+
+function TotalInvoiceCount() {
+  const countQuery = useInvoiceSummaries({
+    select: (invoices) => invoices.length,
+  })
+  if (!countQuery.isSuccess) return null
+
+  const count = countQuery.data
+
+  if (count === 0) return <div>No invoices</div>
+
+  return (
+    <div>
+      There are {count} total {inflect('invoice')(count)}
+    </div>
+  )
+}
