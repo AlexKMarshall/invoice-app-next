@@ -6,6 +6,7 @@ import { Button } from 'src/client/shared/components/button'
 import { InvoiceSummary } from './invoice.types'
 import Link from 'next/link'
 import { NewInvoiceForm } from './new-invoice-form'
+import { StatusBadge } from 'src/client/shared/components/status-badge'
 import { format } from 'date-fns'
 import styled from 'styled-components'
 import { useId } from '@react-aria/utils'
@@ -143,7 +144,7 @@ function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
         </InvoiceTotal>
       </Cell>
       <Cell>
-        <TallBox>{invoice.status}</TallBox>
+        <StatusBadge status={invoice.status} />
       </Cell>
     </RowWrapper>
   )
@@ -193,12 +194,6 @@ const InvoiceTotal = styled.span`
   font-weight: 700;
   letter-spacing: -0.8px;
   color: hsla(231, 28%, 7%, 1);
-`
-
-const TallBox = styled.div`
-  height: 3rem;
-  width: 100%;
-  background-color: salmon;
 `
 
 function TotalInvoiceCount() {
