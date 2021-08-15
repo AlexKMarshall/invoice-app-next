@@ -182,9 +182,9 @@ function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
       <Cell>{`Due ${format(invoice.paymentDue, 'dd MMM yyyy')}`}</Cell>
       <Cell>{invoice.clientName}</Cell>
       <Cell style={{ textAlign: 'right' }}>
-        <InvoiceTotal>
+        <Heading level={3} forwardedAs="span">
           {currencyFormatter.format(invoice.total / 100)}
-        </InvoiceTotal>
+        </Heading>
       </Cell>
       <Cell>
         <StatusBadge status={invoice.status} />
@@ -272,13 +272,6 @@ const InvoiceId = styled.span`
     content: '#';
     color: ${COLORS.textColor.prop};
   }
-`
-
-const InvoiceTotal = styled.span`
-  font-size: ${TYPOGRAPHY.h3.fontSize};
-  font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
-  letter-spacing: ${TYPOGRAPHY.h3.letterSpacing};
-  color: ${COLORS.textColor.strong.prop};
 `
 
 function TotalInvoiceCount() {

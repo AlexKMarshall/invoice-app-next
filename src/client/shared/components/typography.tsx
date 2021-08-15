@@ -20,10 +20,19 @@ const LEVELS = {
       '--letter-spacing': TYPOGRAPHY.h2.letterSpacing.prop,
     },
   },
+  3: {
+    component: 'h3' as const,
+    style: {
+      '--font-size': TYPOGRAPHY.h3.fontSize.prop,
+      '--line-height': TYPOGRAPHY.h3.lineHeight.prop,
+      '--letter-spacing': TYPOGRAPHY.h3.letterSpacing.prop,
+    },
+  },
 }
 
 type Props = {
-  level?: 1 | 2
+  level?: keyof typeof LEVELS
+  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'span' | 'div'
 } & BaseHTMLAttributes<HTMLHeadingElement>
 
 export function Heading({
