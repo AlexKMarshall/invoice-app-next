@@ -1,6 +1,9 @@
 import * as invoiceModel from 'src/client/test/mocks/invoice.model'
 
-import { currencyFormatter, generateInvoiceId } from 'src/client/shared/utils'
+import {
+  buildMockDraftInvoice,
+  buildMockDraftInvoiceInput,
+} from 'src/client/test/mocks/invoice.fixtures'
 import {
   render,
   screen,
@@ -11,50 +14,8 @@ import {
 } from 'src/client/test/test-utils'
 
 import { InvoiceSummaryScreen } from './invoice-summary.screen'
-import faker from 'faker'
+import { currencyFormatter } from 'src/client/shared/utils'
 import { format } from 'date-fns'
-
-function buildMockDraftInvoiceInput() {
-  const itemsCount = faker.datatype.number({ min: 2, max: 3 })
-  return {
-    senderAddress: {
-      street: faker.address.streetAddress(),
-      city: faker.address.city(),
-      postcode: faker.address.zipCode(),
-      country: faker.address.country(),
-    },
-    clientName: faker.name.findName(),
-    clientEmail: faker.internet.email(),
-    clientAddress: {
-      street: faker.address.streetAddress(),
-      city: faker.address.city(),
-      postcode: faker.address.zipCode(),
-      country: faker.address.country(),
-    },
-    issuedAt: faker.date.recent(),
-    paymentTerms: faker.datatype.number({ max: 30 }),
-    projectDescription: faker.commerce.productDescription(),
-    itemList: new Array(itemsCount)
-      .fill(undefined)
-      .map(() => buildMockDraftItem()),
-  }
-}
-
-function buildMockDraftItem() {
-  return {
-    name: faker.commerce.product(),
-    quantity: faker.datatype.number(),
-    price: faker.datatype.number(),
-  }
-}
-
-function buildMockDraftInvoice() {
-  return {
-    id: generateInvoiceId(),
-    status: 'draft' as const,
-    ...buildMockDraftInvoiceInput(),
-  }
-}
 
 it('should show list of invoice summaries', async () => {
   const mockInvoiceDetails = [buildMockDraftInvoice(), buildMockDraftInvoice()]
@@ -102,7 +63,6 @@ it('should allow new draft invoices to be creacted', async () => {
   // we aren't validating the id here, so we can give it an empty string
   const mockInvoiceSummary = invoiceModel.invoiceDetailToSummary({
     id: '',
-    status: 'draft',
     ...mockDraftInvoiceInput,
   })
   render(<InvoiceSummaryScreen />)
