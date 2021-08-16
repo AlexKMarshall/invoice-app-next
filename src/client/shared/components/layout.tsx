@@ -9,17 +9,15 @@ type Props = {
 export function Layout({ children }: Props): JSX.Element {
   return (
     <LayoutWrapper>
-      {children}
       <Sidebar />
+      {children}
     </LayoutWrapper>
   )
 }
 
 const LayoutWrapper = styled.div`
-  display: grid;
-  grid-template-areas: 'screen';
+  min-height: 100vh;
 
-  & > * {
-    grid-area: screen;
-  }
+  display: grid;
+  grid-template-columns: auto 1fr;
 `

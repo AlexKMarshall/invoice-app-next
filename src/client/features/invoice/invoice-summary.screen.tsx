@@ -22,63 +22,73 @@ export function InvoiceSummaryScreen(): JSX.Element {
   const [isFormOpen, setIsFormOpen] = useState(false)
 
   return (
-    <Main>
-      <Header>
-        <div>
-          <Heading level={1} id={headingId}>
-            Invoices
-          </Heading>
-          <TotalInvoiceCount />
+    <Wrapper>
+      <Main>
+        <Header>
+          <div>
+            <Heading level={1} id={headingId}>
+              Invoices
+            </Heading>
+            <TotalInvoiceCount />
+          </div>
+          <Button type="button" icon="plus" onClick={() => setIsFormOpen(true)}>
+            New Invoice
+          </Button>
+        </Header>
+        {listQuery.isLoading ? <div>Loading...</div> : null}
+        {listQuery.isSuccess ? (
+          <Table
+            aria-labelledby={headingId}
+            collection={listQuery.data}
+            renderItem={(invoice) => (
+              <InvoiceSummaryItem key={invoice.id} invoice={invoice} />
+            )}
+            emptyState={
+              <EmptyStateWrapper>
+                <Image
+                  src="/illustration-empty.svg"
+                  alt="Illustration of woman with a megaphone emerging from an open envelope, with a paper aeroplane flying around her"
+                  width="241"
+                  height="200"
+                />
+                <Heading level={2}>There is nothing here</Heading>
+                <p>
+                  Create an invoice by clicking the <strong>New Invoice</strong>{' '}
+                  button and get started
+                </p>
+              </EmptyStateWrapper>
+            }
+          />
+        ) : null}
+        {isFormOpen && (
+          <NewInvoiceForm
+            onSubmitSuccess={(savedInvoice) => {
+              setNotificationMessage(
+                `New invoice id ${savedInvoice.id} successfully created`
+              )
+            }}
+          />
+        )}
+        <div role="status" aria-live="polite">
+          {notificationMessage}
         </div>
-        <Button type="button" icon="plus" onClick={() => setIsFormOpen(true)}>
-          New Invoice
-        </Button>
-      </Header>
-      {listQuery.isLoading ? <div>Loading...</div> : null}
-      {listQuery.isSuccess ? (
-        <Table
-          aria-labelledby={headingId}
-          collection={listQuery.data}
-          renderItem={(invoice) => (
-            <InvoiceSummaryItem key={invoice.id} invoice={invoice} />
-          )}
-          emptyState={
-            <EmptyStateWrapper>
-              <Image
-                src="/illustration-empty.svg"
-                alt="Illustration of woman with a megaphone emerging from an open envelope, with a paper aeroplane flying around her"
-                width="241"
-                height="200"
-              />
-              <Heading level={2}>There is nothing here</Heading>
-              <p>
-                Create an invoice by clicking the <strong>New Invoice</strong>{' '}
-                button and get started
-              </p>
-            </EmptyStateWrapper>
-          }
-        />
-      ) : null}
-      {isFormOpen && (
-        <NewInvoiceForm
-          onSubmitSuccess={(savedInvoice) => {
-            setNotificationMessage(
-              `New invoice id ${savedInvoice.id} successfully created`
-            )
-          }}
-        />
-      )}
-      <div role="status" aria-live="polite">
-        {notificationMessage}
-      </div>
-    </Main>
+      </Main>
+    </Wrapper>
   )
 }
 
+const Wrapper = styled.div`
+  display: flex;
+  justify-content: center;
+`
+
 const Main = styled.main`
-  max-width: 730px;
-  margin-left: auto;
-  margin-right: auto;
+  flex-grow: 0;
+  flex-shrink: 1;
+  flex-basis: 730px;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  box-sizing: content-box;
 `
 
 const Header = styled.header`
@@ -225,8 +235,8 @@ const RowWrapper = styled.tr`
     padding-bottom: 1rem;
     border-top: var(--border);
     border-bottom: var(--border);
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
 
     &:first-child {
       padding-left: 2rem;
