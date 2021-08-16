@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { GetInvoiceSummary } from 'src/shared/dtos'
+import { GetInvoiceSummaryDTO } from 'src/shared/dtos'
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import faker from 'faker'
 import { generateInvoiceId } from 'src/client/shared/utils'
@@ -31,7 +31,7 @@ const mockInvoices = [
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<GetInvoiceSummary>
+  res: NextApiResponse<GetInvoiceSummaryDTO>
 ): Promise<void> {
   // const posts = await prisma.post.findMany({})
 

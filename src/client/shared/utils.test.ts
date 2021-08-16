@@ -26,19 +26,7 @@ describe('generateInvoiceId', () => {
   it('should generate invoice in format AB1234', () => {
     const result = generateInvoiceId()
 
-    const characters = result.split('')
-    expect(characters).toHaveLength(6)
-
-    expect(characters[0]).toEqual(expect.stringMatching(/[A-Z]/i))
-    expect(characters[1]).toEqual(expect.stringMatching(/[A-Z]/i))
-    expect(parseInt(characters[2])).toBeLessThanOrEqual(9)
-    expect(parseInt(characters[2])).toBeGreaterThanOrEqual(0)
-    expect(parseInt(characters[3])).toBeLessThanOrEqual(9)
-    expect(parseInt(characters[3])).toBeGreaterThanOrEqual(0)
-    expect(parseInt(characters[4])).toBeLessThanOrEqual(9)
-    expect(parseInt(characters[4])).toBeGreaterThanOrEqual(0)
-    expect(parseInt(characters[5])).toBeLessThanOrEqual(9)
-    expect(parseInt(characters[5])).toBeGreaterThanOrEqual(0)
+    expect(result).toMatch(/^[A-Z]{2}\d{4}$/)
   })
 })
 
