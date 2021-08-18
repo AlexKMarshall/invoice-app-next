@@ -9,12 +9,10 @@ module.exports = {
   testRegex: '.test.(ts|tsx)$',
   testEnvironment: 'jsdom',
   collectCoverageFrom: [
-    '<rootDir>/src/client/**/*.tsx',
-    '<rootDir>/src/client/**/*.ts',
-    '<rootDir>/src/pages/**/*.ts',
-    '!.*\\.spec\\.ts$',
-    '!.*\\.test\\.ts$',
-    '!.*\\.stories\\.ts$',
+    '<rootDir>/src/client/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/src/pages/**/*.*',
+    '!<rootDir>/src/pages/api/**/*.*',
+    '!<rootDir>/src/**/*.{spec,test,stories}.{js,tsx}',
     '!**/node_modules/**',
   ],
   coveragePathIgnorePatterns: [
