@@ -1,8 +1,8 @@
 import * as invoiceModel from 'src/client/test/mocks/invoice.model'
 
 import {
-  buildMockDraftInvoice,
   buildMockDraftInvoiceInput,
+  buildMockInvoice,
 } from 'src/client/test/mocks/invoice.fixtures'
 import {
   render,
@@ -18,7 +18,7 @@ import { currencyFormatter } from 'src/client/shared/utils'
 import { format } from 'date-fns'
 
 it('should show list of invoice summaries', async () => {
-  const mockInvoiceDetails = [buildMockDraftInvoice(), buildMockDraftInvoice()]
+  const mockInvoiceDetails = [buildMockInvoice(), buildMockInvoice()]
   invoiceModel.initialise(mockInvoiceDetails)
   const mockInvoiceSummaries = mockInvoiceDetails.map(
     invoiceModel.invoiceDetailToSummary
@@ -28,12 +28,18 @@ it('should show list of invoice summaries', async () => {
   expect(screen.getByRole('heading', { name: /invoices/i })).toBeInTheDocument()
   await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
 
-  expect(screen.getByRole('list', { name: /invoices/i })).toBeInTheDocument()
+  const invoiceCount = mockInvoiceSummaries.length
+  expect(screen.getByText(`There are ${invoiceCount} total invoices`))
+
+  expect(screen.getByRole('table', { name: /invoices/i })).toBeInTheDocument()
 
   mockInvoiceSummaries.forEach((mockInvoice) => {
-    const elInvoice = screen.getByRole('listitem', { name: mockInvoice.id })
+    const elInvoice = screen.getByRole('row', { name: mockInvoice.id })
     const inInvoice = within(elInvoice)
 
+    const invoiceLink = inInvoice.getByRole('link')
+    expect(invoiceLink).toHaveAttribute('href', `/invoices/${mockInvoice.id}`)
+    expect(invoiceLink).toHaveAccessibleName(mockInvoice.id)
     expect(
       inInvoice.getByText(
         `Due ${format(mockInvoice.paymentDue, 'dd MMM yyyy')}`
@@ -46,18 +52,27 @@ it('should show list of invoice summaries', async () => {
     expect(inInvoice.getByText(mockInvoice.status)).toBeInTheDocument()
   })
 })
+
 it('should show empty state when there are no invoices', async () => {
   invoiceModel.initialise([])
 
   render(<InvoiceSummaryScreen />)
 
   await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
+  expect(screen.getByText(/no invoices/i)).toBeInTheDocument()
   expect(
     screen.getByRole('heading', { name: /there is nothing here/i })
   ).toBeInTheDocument()
 })
+it('should not show new invoice form until button is clicked', () => {
+  render(<InvoiceSummaryScreen />)
+
+  expect(
+    screen.queryByRole('form', { name: /new invoice/i })
+  ).not.toBeInTheDocument()
+})
 it('should allow new draft invoices to be creacted', async () => {
-  const existingInvoice = buildMockDraftInvoice()
+  const existingInvoice = buildMockInvoice()
   invoiceModel.initialise([existingInvoice])
   const mockDraftInvoiceInput = buildMockDraftInvoiceInput()
   // we aren't validating the id here, so we can give it an empty string
@@ -68,6 +83,8 @@ it('should allow new draft invoices to be creacted', async () => {
   render(<InvoiceSummaryScreen />)
 
   await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
+
+  userEvent.click(screen.getByRole('button', { name: /new invoice/i }))
 
   expect(screen.getByRole('form', { name: /new invoice/i })).toBeInTheDocument()
 
@@ -165,13 +182,16 @@ it('should allow new draft invoices to be creacted', async () => {
 
   // Expect the new invoice to appear optimistically
 
-  const elInvoiceList = await screen.findByRole('list', { name: /invoices/i })
-  const inInvoiceList = within(elInvoiceList)
+  const elInvoiceTable = await screen.findByRole('table', { name: /invoices/i })
+  const inInvoiceTable = within(elInvoiceTable)
   const savingIdDisplay = '------'
-  const elNewInvoiceItem = inInvoiceList.getByRole('listitem', {
+  const elNewInvoiceItem = inInvoiceTable.getByRole('row', {
     name: savingIdDisplay,
   })
   const inNewInvoiceItem = within(elNewInvoiceItem)
+
+  // invoices don't get links til they're saved and have a real ID
+  expect(inNewInvoiceItem.queryByRole('link')).not.toBeInTheDocument()
 
   expect(
     inNewInvoiceItem.getByText(
@@ -207,13 +227,17 @@ it('should allow new draft invoices to be creacted', async () => {
     )
 
   const [savedInvoiceId] = invoiceIdMatch
+  // we should now have a link to that invoice
   expect(
-    inInvoiceList.getByRole('link', { name: savedInvoiceId })
-  ).toBeInTheDocument()
+    inInvoiceTable.getByRole('link', { name: savedInvoiceId })
+  ).toHaveAttribute('href', `/invoices/${savedInvoiceId}`)
 })
 it('should default invoice issue date to today', () => {
   const today = new Date()
   render(<InvoiceSummaryScreen />)
+
+  userEvent.click(screen.getByRole('button', { name: /new invoice/i }))
+
   expect(screen.getByLabelText(/issue date/i)).toHaveValue(
     format(today, 'yyyy-MM-dd')
   )

@@ -11,8 +11,10 @@ module.exports = {
   collectCoverageFrom: [
     '<rootDir>/src/client/**/*.tsx',
     '<rootDir>/src/client/**/*.ts',
+    '<rootDir>/src/pages/**/*.ts',
     '!.*\\.spec\\.ts$',
     '!.*\\.test\\.ts$',
+    '!.*\\.stories\\.ts$',
     '!**/node_modules/**',
   ],
   coveragePathIgnorePatterns: [

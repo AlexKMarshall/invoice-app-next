@@ -26,3 +26,8 @@ export const currencyFormatter = new Intl.NumberFormat('en-GB', {
   style: 'currency',
   currency: 'GBP',
 })
+
+export function inflect(singular: string, plural = `${singular}s`) {
+  return (quantity: number): string =>
+    Math.abs(quantity) === 1 ? singular : plural
+}
