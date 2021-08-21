@@ -2,7 +2,9 @@ import { COLORS, TYPOGRAPHY } from 'src/client/shared/styles/theme'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { AppProps } from 'next/app'
+import { DrawerProvider } from 'src/client/shared/components/drawer'
 import { Layout } from 'src/client/shared/components/layout'
+import { OverlayProvider } from '@react-aria/overlays'
 import { SSRProvider } from '@react-aria/ssr'
 import { createGlobalStyle } from 'styled-components'
 
@@ -23,9 +25,13 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
       <QueryClientProvider client={queryClient}>
         <CSSReset />
         <GlobalStyle />
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        <DrawerProvider>
+          <Layout>
+            <OverlayProvider>
+              <Component {...pageProps} />
+            </OverlayProvider>
+          </Layout>
+        </DrawerProvider>
       </QueryClientProvider>
     </SSRProvider>
   )
