@@ -1,4 +1,10 @@
 import { COLORS, TYPOGRAPHY } from 'src/client/shared/styles/theme'
+import {
+  Drawer,
+  DrawerContainer,
+  DrawerOverlayContainer,
+  useDrawer,
+} from 'src/client/shared/components/drawer'
 import { MouseEventHandler, TableHTMLAttributes, useRef, useState } from 'react'
 import { currencyFormatter, inflect } from 'src/client/shared/utils'
 
@@ -29,60 +35,66 @@ export function InvoiceSummaryScreen(): JSX.Element {
   const listQuery = useInvoiceSummaries()
   const [notificationMessage, setNotificationMessage] = useState('')
   const headingId = useId()
-  const [isFormOpen, setIsFormOpen] = useState(false)
+  const { open, close, titleId: drawerTitleId } = useDrawer()
 
   return (
     <LayoutWrapper>
-      <Main>
-        <Header>
-          <div>
-            <Heading level={1} id={headingId}>
-              Invoices
-            </Heading>
-            <TotalInvoiceCount />
+      <DrawerOverlayContainer>
+        <Main>
+          <Header>
+            <div>
+              <Heading level={1} id={headingId}>
+                Invoices
+              </Heading>
+              <TotalInvoiceCount />
+            </div>
+            <Button type="button" icon="plus" onClick={() => open()}>
+              New Invoice
+            </Button>
+          </Header>
+          {listQuery.isLoading ? <div>Loading...</div> : null}
+          {listQuery.isSuccess ? (
+            <Table
+              aria-labelledby={headingId}
+              collection={listQuery.data}
+              renderItem={(invoice) => (
+                <InvoiceSummaryItem key={invoice.id} invoice={invoice} />
+              )}
+              emptyState={
+                <EmptyStateWrapper>
+                  <Image
+                    src="/illustration-empty.svg"
+                    alt="Illustration of woman with a megaphone emerging from an open envelope, with a paper aeroplane flying around her"
+                    width="241"
+                    height="200"
+                  />
+                  <Heading level={2}>There is nothing here</Heading>
+                  <p>
+                    Create an invoice by clicking the{' '}
+                    <strong>New Invoice</strong> button and get started
+                  </p>
+                </EmptyStateWrapper>
+              }
+            />
+          ) : null}
+          <Drawer>
+            <DrawerTitle id={drawerTitleId}>New Invoice</DrawerTitle>
+            <NewInvoiceForm
+              aria-labelledby={drawerTitleId}
+              onSubmit={() => close()}
+              onSubmitSuccess={(savedInvoice) => {
+                setNotificationMessage(
+                  `New invoice id ${savedInvoice.id} successfully created`
+                )
+              }}
+            />
+          </Drawer>
+          <div role="status" aria-live="polite">
+            {notificationMessage}
           </div>
-          <Button type="button" icon="plus" onClick={() => setIsFormOpen(true)}>
-            New Invoice
-          </Button>
-        </Header>
-        {listQuery.isLoading ? <div>Loading...</div> : null}
-        {listQuery.isSuccess ? (
-          <Table
-            aria-labelledby={headingId}
-            collection={listQuery.data}
-            renderItem={(invoice) => (
-              <InvoiceSummaryItem key={invoice.id} invoice={invoice} />
-            )}
-            emptyState={
-              <EmptyStateWrapper>
-                <Image
-                  src="/illustration-empty.svg"
-                  alt="Illustration of woman with a megaphone emerging from an open envelope, with a paper aeroplane flying around her"
-                  width="241"
-                  height="200"
-                />
-                <Heading level={2}>There is nothing here</Heading>
-                <p>
-                  Create an invoice by clicking the <strong>New Invoice</strong>{' '}
-                  button and get started
-                </p>
-              </EmptyStateWrapper>
-            }
-          />
-        ) : null}
-        {isFormOpen && (
-          <NewInvoiceForm
-            onSubmitSuccess={(savedInvoice) => {
-              setNotificationMessage(
-                `New invoice id ${savedInvoice.id} successfully created`
-              )
-            }}
-          />
-        )}
-        <div role="status" aria-live="polite">
-          {notificationMessage}
-        </div>
-      </Main>
+        </Main>
+      </DrawerOverlayContainer>
+      <DrawerContainer />
       <Sidebar />
     </LayoutWrapper>
   )
@@ -123,6 +135,14 @@ const EmptyStateWrapper = styled.div`
     margin-bottom: 24px;
     white-space: nowrap;
   }
+`
+
+const DrawerTitle = styled.h2`
+  font-size: ${24 / 16}rem;
+  font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
+  line-height: ${32 / 16}rem;
+  letter-spacing: -0.5px;
+  color: ${COLORS.textColor.strong.prop};
 `
 
 type TableProps<T> = {

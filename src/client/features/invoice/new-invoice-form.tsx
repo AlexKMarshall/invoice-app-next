@@ -7,7 +7,9 @@ import { useCreateInvoice } from './invoice.queries'
 import { useId } from '@react-aria/utils'
 
 type Props = {
+  onSubmit?: (data: NewInvoiceInputDTO) => void
   onSubmitSuccess?: (data: InvoiceDetail) => void
+  'aria-labelledby': string
 }
 
 type NewInvoiceFormFields = Omit<NewInvoiceInputDTO, 'status'>
@@ -34,13 +36,16 @@ const DEFAULT_FORM_VALUES = {
   itemList: [DEFAULT_ITEM_VALUES],
 }
 
-export function NewInvoiceForm({ onSubmitSuccess }: Props): JSX.Element {
+export function NewInvoiceForm({
+  onSubmit,
+  onSubmitSuccess,
+  ...delegatedProps
+}: Props): JSX.Element {
   const createInvoiceMutation = useCreateInvoice({
     onSuccess: (savedInvoice) => {
       onSubmitSuccess?.(savedInvoice)
     },
   })
-  const formHeadingId = useId()
   const billFromHeadingId = useId()
   const billToHeadingId = useId()
   const itemListHeadingId = useId()
@@ -54,12 +59,12 @@ export function NewInvoiceForm({ onSubmitSuccess }: Props): JSX.Element {
 
   return (
     <form
-      aria-labelledby={formHeadingId}
       onSubmit={handleSubmit((data) => {
         createInvoiceMutation.mutate({ status: 'draft', ...data })
+        onSubmit?.({ status: 'draft', ...data })
       })}
+      {...delegatedProps}
     >
-      <h2 id={formHeadingId}>New Invoice</h2>
       <section aria-labelledby={billFromHeadingId}>
         <h3 id={billFromHeadingId}>Bill From</h3>
         <label>
