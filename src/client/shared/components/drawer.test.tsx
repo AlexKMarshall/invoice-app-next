@@ -16,7 +16,7 @@ type Props = {
   drawerTitle: string
 }
 function Example({ mainContent, drawerContent, drawerTitle }: Props) {
-  const { open, close } = useDrawer()
+  const { open, close, titleId } = useDrawer()
 
   return (
     <div>
@@ -24,7 +24,8 @@ function Example({ mainContent, drawerContent, drawerTitle }: Props) {
         <main>
           <button onClick={() => open()}>Open Drawer</button>
           {mainContent}
-          <Drawer title={drawerTitle}>
+          <Drawer aria-labelledby={titleId}>
+            <h2 id={titleId}>{drawerTitle}</h2>
             {drawerContent}
             <button onClick={() => close()}>Close Drawer</button>
           </Drawer>

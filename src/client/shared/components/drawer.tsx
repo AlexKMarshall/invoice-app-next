@@ -6,16 +6,16 @@ import { RefObject } from 'hoist-non-react-statics/node_modules/@types/react'
 import { createContext } from 'react'
 import styled from 'styled-components'
 import { useDialog } from '@react-aria/dialog'
+import { useId } from '@react-aria/utils'
 import { useOverlay } from '@react-aria/overlays'
 
 type Props = {
-  title: string
   children: ReactNode
 }
 
 export function Drawer(props: Props): JSX.Element {
-  const { title, children } = props
-  const { isOpen, close } = useDrawer()
+  const { children } = props
+  const { isOpen, close, titleId } = useDrawer()
   const overlayRef = useRef<HTMLDivElement>(null)
 
   const { overlayProps, underlayProps } = useOverlay(
@@ -23,14 +23,13 @@ export function Drawer(props: Props): JSX.Element {
     overlayRef
   )
 
-  const { dialogProps, titleProps } = useDialog({}, overlayRef)
+  const { dialogProps } = useDialog({ 'aria-labelledby': titleId }, overlayRef)
 
   return isOpen ? (
     <DrawerPortal>
       <Underlay {...underlayProps}>
         <FocusScope contain autoFocus restoreFocus>
           <Overlay {...dialogProps} {...overlayProps}>
-            <h2 {...titleProps}>{title}</h2>
             {children}
           </Overlay>
         </FocusScope>
@@ -54,6 +53,7 @@ type DrawerContextValue = {
   isOpen: boolean
   open: () => void
   close: () => void
+  titleId: string
 }
 const DrawerContext = createContext<DrawerContextValue | undefined>(undefined)
 
@@ -78,6 +78,7 @@ type DrawerProviderProps = {
 export function DrawerProvider({ children }: DrawerProviderProps): JSX.Element {
   const drawerPortalRef = useRef<HTMLDivElement>(null)
   const { state: isOpen, setTrue: open, setFalse: close } = useBooleanState()
+  const titleId = useId()
 
   const value = useMemo(
     () => ({
@@ -85,8 +86,9 @@ export function DrawerProvider({ children }: DrawerProviderProps): JSX.Element {
       isOpen,
       open,
       close,
+      titleId,
     }),
-    [close, isOpen, open]
+    [close, isOpen, open, titleId]
   )
 
   return (
@@ -132,4 +134,5 @@ const Overlay = styled.div`
   padding: 2rem;
   padding-left: calc(104px + 2rem);
   background-color: white;
+  overflow-y: auto;
 `

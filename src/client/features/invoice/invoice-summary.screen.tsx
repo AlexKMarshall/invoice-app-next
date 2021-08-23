@@ -35,8 +35,7 @@ export function InvoiceSummaryScreen(): JSX.Element {
   const listQuery = useInvoiceSummaries()
   const [notificationMessage, setNotificationMessage] = useState('')
   const headingId = useId()
-  const [isFormOpen, setIsFormOpen] = useState(false)
-  const { open, close } = useDrawer()
+  const { open, close, titleId: drawerTitleId } = useDrawer()
 
   return (
     <LayoutWrapper>
@@ -78,8 +77,10 @@ export function InvoiceSummaryScreen(): JSX.Element {
               }
             />
           ) : null}
-          <Drawer title="New Invoice">
+          <Drawer>
+            <DrawerTitle id={drawerTitleId}>New Invoice</DrawerTitle>
             <NewInvoiceForm
+              aria-labelledby={drawerTitleId}
               onSubmit={() => close()}
               onSubmitSuccess={(savedInvoice) => {
                 setNotificationMessage(
@@ -134,6 +135,14 @@ const EmptyStateWrapper = styled.div`
     margin-bottom: 24px;
     white-space: nowrap;
   }
+`
+
+const DrawerTitle = styled.h2`
+  font-size: ${24 / 16}rem;
+  font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
+  line-height: ${32 / 16}rem;
+  letter-spacing: -0.5px;
+  color: ${COLORS.textColor.strong.prop};
 `
 
 type TableProps<T> = {
