@@ -4,6 +4,7 @@ import { FocusScope } from '@react-aria/focus'
 import ReactDOM from 'react-dom'
 import { RefObject } from 'hoist-non-react-statics/node_modules/@types/react'
 import { createContext } from 'react'
+import styled from 'styled-components'
 import { useDialog } from '@react-aria/dialog'
 import { useOverlay } from '@react-aria/overlays'
 
@@ -26,38 +27,14 @@ export function Drawer(props: Props): JSX.Element {
 
   return isOpen ? (
     <DrawerPortal>
-      <div
-        aria-modal
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 0,
-          background: 'hsla(0deg, 0%, 0%, 50%)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-        {...underlayProps}
-      >
+      <Underlay {...underlayProps}>
         <FocusScope contain autoFocus restoreFocus>
-          <div
-            style={{
-              background: 'white',
-              color: 'black',
-              padding: 30,
-            }}
-            {...dialogProps}
-            {...overlayProps}
-          >
-            <h3 style={{ marginTop: 0 }} {...titleProps}>
-              {title}
-            </h3>
+          <Overlay {...dialogProps} {...overlayProps}>
+            <h2 {...titleProps}>{title}</h2>
             {children}
-          </div>
+          </Overlay>
         </FocusScope>
-      </div>
+      </Underlay>
     </DrawerPortal>
   ) : (
     <></>
@@ -139,3 +116,19 @@ export function DrawerContainer(): JSX.Element {
 
   return <div ref={drawerPortalRef} />
 }
+
+const Underlay = styled.div`
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+`
+
+const Overlay = styled.div`
+  max-width: 80 vh;
+  padding: 2rem;
+  padding-left: calc(104px + 2rem);
+  background-color: white;
+`
