@@ -1,4 +1,10 @@
 import { COLORS, TYPOGRAPHY } from 'src/client/shared/styles/theme'
+import {
+  Drawer,
+  DrawerContainer,
+  DrawerOverlayContainer,
+  useDrawer,
+} from 'src/client/shared/components/drawer'
 import { MouseEventHandler, TableHTMLAttributes, useRef, useState } from 'react'
 import { currencyFormatter, inflect } from 'src/client/shared/utils'
 
@@ -30,59 +36,64 @@ export function InvoiceSummaryScreen(): JSX.Element {
   const [notificationMessage, setNotificationMessage] = useState('')
   const headingId = useId()
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const { open, close } = useDrawer()
 
   return (
     <LayoutWrapper>
-      <Main>
-        <Header>
-          <div>
-            <Heading level={1} id={headingId}>
-              Invoices
-            </Heading>
-            <TotalInvoiceCount />
+      <DrawerOverlayContainer>
+        <Main>
+          <Header>
+            <div>
+              <Heading level={1} id={headingId}>
+                Invoices
+              </Heading>
+              <TotalInvoiceCount />
+            </div>
+            <Button type="button" icon="plus" onClick={() => open()}>
+              New Invoice
+            </Button>
+          </Header>
+          {listQuery.isLoading ? <div>Loading...</div> : null}
+          {listQuery.isSuccess ? (
+            <Table
+              aria-labelledby={headingId}
+              collection={listQuery.data}
+              renderItem={(invoice) => (
+                <InvoiceSummaryItem key={invoice.id} invoice={invoice} />
+              )}
+              emptyState={
+                <EmptyStateWrapper>
+                  <Image
+                    src="/illustration-empty.svg"
+                    alt="Illustration of woman with a megaphone emerging from an open envelope, with a paper aeroplane flying around her"
+                    width="241"
+                    height="200"
+                  />
+                  <Heading level={2}>There is nothing here</Heading>
+                  <p>
+                    Create an invoice by clicking the{' '}
+                    <strong>New Invoice</strong> button and get started
+                  </p>
+                </EmptyStateWrapper>
+              }
+            />
+          ) : null}
+          <Drawer title="New Invoice">
+            <NewInvoiceForm
+              onSubmit={() => close()}
+              onSubmitSuccess={(savedInvoice) => {
+                setNotificationMessage(
+                  `New invoice id ${savedInvoice.id} successfully created`
+                )
+              }}
+            />
+          </Drawer>
+          <div role="status" aria-live="polite">
+            {notificationMessage}
           </div>
-          <Button type="button" icon="plus" onClick={() => setIsFormOpen(true)}>
-            New Invoice
-          </Button>
-        </Header>
-        {listQuery.isLoading ? <div>Loading...</div> : null}
-        {listQuery.isSuccess ? (
-          <Table
-            aria-labelledby={headingId}
-            collection={listQuery.data}
-            renderItem={(invoice) => (
-              <InvoiceSummaryItem key={invoice.id} invoice={invoice} />
-            )}
-            emptyState={
-              <EmptyStateWrapper>
-                <Image
-                  src="/illustration-empty.svg"
-                  alt="Illustration of woman with a megaphone emerging from an open envelope, with a paper aeroplane flying around her"
-                  width="241"
-                  height="200"
-                />
-                <Heading level={2}>There is nothing here</Heading>
-                <p>
-                  Create an invoice by clicking the <strong>New Invoice</strong>{' '}
-                  button and get started
-                </p>
-              </EmptyStateWrapper>
-            }
-          />
-        ) : null}
-        {isFormOpen && (
-          <NewInvoiceForm
-            onSubmitSuccess={(savedInvoice) => {
-              setNotificationMessage(
-                `New invoice id ${savedInvoice.id} successfully created`
-              )
-            }}
-          />
-        )}
-        <div role="status" aria-live="polite">
-          {notificationMessage}
-        </div>
-      </Main>
+        </Main>
+      </DrawerOverlayContainer>
+      <DrawerContainer />
       <Sidebar />
     </LayoutWrapper>
   )

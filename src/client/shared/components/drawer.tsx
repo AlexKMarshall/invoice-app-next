@@ -123,11 +123,12 @@ const Underlay = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
 `
 
 const Overlay = styled.div`
-  max-width: 80 vh;
+  max-width: 80vw;
   padding: 2rem;
   padding-left: calc(104px + 2rem);
   background-color: white;
