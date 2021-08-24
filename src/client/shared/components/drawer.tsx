@@ -131,8 +131,8 @@ const Underlay = styled.div`
 
 const Overlay = styled.div`
   max-width: 80vw;
-  padding: 2rem;
-  padding-left: calc(104px + 2rem);
+  padding: 56px;
+  padding-left: calc(104px + 56px);
   background-color: white;
   overflow-y: auto;
 `

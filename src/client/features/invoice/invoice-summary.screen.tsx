@@ -138,6 +138,7 @@ const EmptyStateWrapper = styled.div`
 `
 
 const DrawerTitle = styled.h2`
+  margin-bottom: 48px;
   font-size: ${24 / 16}rem;
   font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
   line-height: ${32 / 16}rem;

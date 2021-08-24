@@ -19,6 +19,26 @@ export const COLORS = {
       prop: 'var(--primary-color-light)',
     },
   },
+  mutedColor: {
+    value: 'hsla(231deg, 67%, 99%, 100%)',
+    prop: 'var(--muted-color)',
+    hover: {
+      value: 'hsla(231deg, 73%, 93%, 100%)',
+      prop: 'var(--muted-color-hover)',
+    },
+  },
+  monoColor: {
+    value: 'hsla(231deg, 20%, 27%, 100%)',
+    prop: 'var(--mono-color)',
+    hover: {
+      value: 'hsla(231deg, 28%, 7%, 100%)',
+      prop: 'var(--mono-color-hover)',
+    },
+    text: {
+      value: 'hsla(231deg, 20%, 61%, 100%)',
+      prop: 'var(--mono-color-text)',
+    },
+  },
   statusColor: {
     draft: {
       value: 'hsla(231deg, 20%, 27%, 100%)',
@@ -56,6 +76,10 @@ export const COLORS = {
   dividerColor: {
     value: 'hsla(231, 20%, 36%, 100%)',
     prop: 'var(--divider-color)',
+  },
+  fieldBorderColor: {
+    value: 'hsla(231deg, 75%, 93%, 100%)',
+    prop: 'var(--field-border-color)',
   },
 }
 

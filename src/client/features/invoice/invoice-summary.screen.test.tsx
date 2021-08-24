@@ -88,8 +88,8 @@ it('should allow new draft invoices to be creacted', async () => {
 
   expect(screen.getByRole('form', { name: /new invoice/i })).toBeInTheDocument()
 
-  const elBillFromSection = screen.getByRole('region', { name: /bill from/i })
-  const inBillFrom = within(elBillFromSection)
+  const elBillFromGroup = screen.getByRole('group', { name: /bill from/i })
+  const inBillFrom = within(elBillFromGroup)
 
   validateTextfieldEntry(
     inBillFrom.getByLabelText(/street address/i),
@@ -108,8 +108,8 @@ it('should allow new draft invoices to be creacted', async () => {
     mockDraftInvoiceInput.senderAddress.country
   )
 
-  const elBillToSection = screen.getByRole('region', { name: /bill to/i })
-  const inBillTo = within(elBillToSection)
+  const elBillToGroup = screen.getByRole('group', { name: /bill to/i })
+  const inBillTo = within(elBillToGroup)
 
   validateTextfieldEntry(
     inBillTo.getByLabelText(/client's name/i),
@@ -150,16 +150,18 @@ it('should allow new draft invoices to be creacted', async () => {
     mockDraftInvoiceInput.projectDescription
   )
 
-  const elItemList = screen.getByRole('list', { name: /item list/i })
+  const elItemList = screen.getByRole('table', { name: /item list/i })
   const inItemList = within(elItemList)
 
   mockDraftInvoiceInput.itemList.forEach((item, index, arr) => {
-    const [lastRow] = inItemList.getAllByRole('listitem').slice(-1)
+    userEvent.click(screen.getByRole('button', { name: /add new item/i }))
+
+    const [lastRow] = inItemList.getAllByRole('row').slice(-1)
     const inLastRow = within(lastRow)
 
     validateTextfieldEntry(inLastRow.getByLabelText(/item name/i), item.name)
     validateTextfieldEntry(
-      inLastRow.getByLabelText(/qty/i),
+      inLastRow.getByLabelText(/quantity/i),
       item.quantity.toString(),
       item.quantity
     )
@@ -168,12 +170,6 @@ it('should allow new draft invoices to be creacted', async () => {
       item.price.toString(),
       item.price
     )
-
-    const isAnotherRowToAdd = arr[index + 1] !== undefined
-
-    if (isAnotherRowToAdd) {
-      userEvent.click(screen.getByRole('button', { name: /add new item/i }))
-    }
   })
 
   // save the draft invoice
