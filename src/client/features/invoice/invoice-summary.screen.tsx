@@ -81,7 +81,8 @@ export function InvoiceSummaryScreen(): JSX.Element {
             <DrawerTitle id={drawerTitleId}>New Invoice</DrawerTitle>
             <NewInvoiceForm
               aria-labelledby={drawerTitleId}
-              onSubmit={() => close()}
+              onCancel={close}
+              onSubmit={close}
               onSubmitSuccess={(savedInvoice) => {
                 setNotificationMessage(
                   `New invoice id ${savedInvoice.id} successfully created`
@@ -138,6 +139,7 @@ const EmptyStateWrapper = styled.div`
 `
 
 const DrawerTitle = styled.h2`
+  margin-bottom: 48px;
   font-size: ${24 / 16}rem;
   font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
   line-height: ${32 / 16}rem;

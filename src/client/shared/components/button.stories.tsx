@@ -1,7 +1,9 @@
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 
 import { Button } from './button'
+import { Global } from '../styles/global'
 import React from 'react'
+import { Reset } from '../styles/reset'
 
 export default {
   title: 'Example/Button',
@@ -11,7 +13,13 @@ export default {
   },
 } as ComponentMeta<typeof Button>
 
-const Template: ComponentStory<typeof Button> = (args) => <Button {...args} />
+const Template: ComponentStory<typeof Button> = (args) => (
+  <>
+    <Reset />
+    <Global />
+    <Button {...args} />
+  </>
+)
 
 export const Primary = Template.bind({})
 Primary.args = {
@@ -22,4 +30,17 @@ export const WithIcon = Template.bind({})
 WithIcon.args = {
   children: 'New Invoice',
   icon: 'plus',
+}
+
+export const WithPrefix = Template.bind({})
+WithPrefix.args = {
+  children: 'Add New Item',
+  prefix: '+',
+  variant: 'muted',
+}
+
+export const Mono = Template.bind({})
+Mono.args = {
+  children: 'Save Draft',
+  variant: 'mono',
 }
