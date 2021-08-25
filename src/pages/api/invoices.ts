@@ -1,6 +1,7 @@
+import { GetInvoiceSummaryDTO, NewInvoiceReturnDTO } from 'src/shared/dtos'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { GetInvoiceSummaryDTO } from 'src/shared/dtos'
+// import { Merge } from 'type-fest'
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import faker from 'faker'
 import { generateInvoiceId } from 'src/client/shared/utils'
@@ -29,15 +30,29 @@ const mockInvoices = [
   buildMockInvoiceSummary(),
 ]
 
+type CustomNextApiRequest = NextApiRequest
+
 export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<GetInvoiceSummaryDTO>
+  req: CustomNextApiRequest,
+  res: NextApiResponse<GetInvoiceSummaryDTO | NewInvoiceReturnDTO>
 ): Promise<void> {
   // const posts = await prisma.post.findMany({})
-
-  res.status(200).json({
-    data: {
-      invoices: mockInvoices,
-    },
-  })
+  switch (req.method) {
+    case 'GET':
+      res.status(200).json({
+        data: {
+          invoices: mockInvoices,
+        },
+      })
+      return
+    case 'POST':
+      res.status(201).json({
+        data: {
+          savedInvoice: { id: generateInvoiceId(), ...req.body },
+        },
+      })
+      return
+    default:
+      return
+  }
 }

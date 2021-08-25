@@ -1,12 +1,12 @@
 module.exports = {
-  setupFilesAfterEnv: ['./jest.setup.js'],
+  setupFilesAfterEnv: ['./jest.client.setup.js'],
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
   },
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': '<rootDir>/node_modules/babel-jest',
   },
-  testRegex: '.test.(ts|tsx)$',
+  testRegex: '.*/(page-tests/(?!api)|client).*.test.(ts|tsx)$',
   testEnvironment: 'jsdom',
   collectCoverageFrom: [
     '<rootDir>/src/client/**/*.{js,jsx,ts,tsx}',
