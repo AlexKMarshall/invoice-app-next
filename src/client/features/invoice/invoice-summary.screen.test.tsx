@@ -153,7 +153,7 @@ it('should allow new draft invoices to be creacted', async () => {
   const elItemList = screen.getByRole('table', { name: /item list/i })
   const inItemList = within(elItemList)
 
-  mockDraftInvoiceInput.itemList.forEach((item, index, arr) => {
+  mockDraftInvoiceInput.itemList.forEach((item) => {
     userEvent.click(screen.getByRole('button', { name: /add new item/i }))
 
     const [lastRow] = inItemList.getAllByRole('row').slice(-1)
@@ -237,6 +237,24 @@ it('should default invoice issue date to today', () => {
   expect(screen.getByLabelText(/issue date/i)).toHaveValue(
     format(today, 'yyyy-MM-dd')
   )
+})
+it('should be possible to cancel the new invoice form', () => {
+  render(<InvoiceSummaryScreen />)
+
+  expect(screen.getByRole('heading', { name: /invoices/i })).toBeInTheDocument()
+
+  userEvent.click(screen.getByRole('button', { name: /new invoice/i }))
+  expect(
+    screen.queryByRole('heading', { name: /invoices/i })
+  ).not.toBeInTheDocument()
+  expect(screen.getByRole('form', { name: /new invoice/i })).toBeInTheDocument()
+
+  userEvent.click(screen.getByRole('button', { name: /discard/i }))
+
+  expect(
+    screen.queryByRole('form', { name: /new invoice/i })
+  ).not.toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: /invoices/i })).toBeInTheDocument()
 })
 
 function validateTextfieldEntry(

@@ -12,6 +12,7 @@ import { useCreateInvoice } from './invoice.queries'
 import { useId } from '@react-aria/utils'
 
 type Props = {
+  onCancel?: () => void
   onSubmit?: (data: NewInvoiceInputDTO) => void
   onSubmitSuccess?: (data: InvoiceDetail) => void
   'aria-labelledby': string
@@ -42,6 +43,7 @@ const DEFAULT_FORM_VALUES = {
 }
 
 export function NewInvoiceForm({
+  onCancel,
   onSubmit,
   onSubmitSuccess,
   ...delegatedProps
@@ -54,7 +56,6 @@ export function NewInvoiceForm({
   const billFromLegendId = useId()
   const billToLegendId = useId()
   const itemListHeadingId = useId()
-  const itemNameLabelId = useId()
   const { register, handleSubmit, control } = useForm<NewInvoiceFormFields>({
     defaultValues: DEFAULT_FORM_VALUES,
   })
@@ -216,6 +217,9 @@ export function NewInvoiceForm({
         </GridWrapper>
       </Fieldset>
       <ButtonGroup>
+        <Button type="button" variant="muted" onClick={() => onCancel?.()}>
+          Discard
+        </Button>
         <Button type="submit" variant="mono">
           Save as Draft
         </Button>
@@ -291,4 +295,8 @@ const TableInput = styled.input`
 
 const ButtonGroup = styled.div`
   display: flex;
+
+  & > :first-child {
+    margin-right: auto;
+  }
 `

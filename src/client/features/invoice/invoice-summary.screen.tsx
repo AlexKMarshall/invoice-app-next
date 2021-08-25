@@ -81,7 +81,8 @@ export function InvoiceSummaryScreen(): JSX.Element {
             <DrawerTitle id={drawerTitleId}>New Invoice</DrawerTitle>
             <NewInvoiceForm
               aria-labelledby={drawerTitleId}
-              onSubmit={() => close()}
+              onCancel={close}
+              onSubmit={close}
               onSubmitSuccess={(savedInvoice) => {
                 setNotificationMessage(
                   `New invoice id ${savedInvoice.id} successfully created`
