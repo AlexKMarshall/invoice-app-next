@@ -6,7 +6,11 @@ module.exports = {
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': '<rootDir>/node_modules/babel-jest',
   },
-  testRegex: '.*/(page-tests/(?!api)|client).*.test.(ts|tsx)$',
+  testMatch: [
+    '<rootDir>/src/client/**/*.test.{js,jsx,ts,tsx}',
+    '<rootDir>/src/test/page-tests/**/*.test.{js,jsx,ts,tsx}',
+    '!<rootDir>/src/test/page-tests/api/**/*.test.{js,jsx,ts,tsx}',
+  ],
   testEnvironment: 'jsdom',
   collectCoverageFrom: [
     '<rootDir>/src/client/**/*.{js,jsx,ts,tsx}',

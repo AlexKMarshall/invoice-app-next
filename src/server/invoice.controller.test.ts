@@ -1,5 +1,19 @@
-it('should run a test', () => {
-  expect(2 + 2).toBe(4)
-})
+import * as invoiceController from './invoice.controller'
 
-export {}
+it('should get invoices', async () => {
+  const result = await invoiceController.getInvoices()
+
+  expect(result).toMatchObject({
+    data: {
+      invoices: expect.arrayContaining([
+        expect.objectContaining({
+          id: expect.stringMatching(/[A-Z]{2}\d{4}/),
+          clientName: expect.any(String),
+          paymentDue: expect.any(Date),
+          status: expect.any(String),
+          total: expect.any(Number),
+        }),
+      ]),
+    },
+  })
+})

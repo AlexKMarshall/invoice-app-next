@@ -6,7 +6,10 @@ module.exports = {
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': '<rootDir>/node_modules/babel-jest',
   },
-  testRegex: '.*/(page-tests/api|server).*.test.(ts|tsx)$',
+  testMatch: [
+    '<rootDir>/src/server/**/*.test.{js,jsx,ts,tsx}',
+    '<rootDir>/src/test/api/**/*.test.{js,jsx,ts,tsx}',
+  ],
   testEnvironment: 'node',
   collectCoverageFrom: [
     '<rootDir>/src/server/**/*.{js,jsx,ts,tsx}',
