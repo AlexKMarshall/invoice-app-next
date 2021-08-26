@@ -10,7 +10,7 @@ module.exports = {
   testMatch: [
     '<rootDir>/src/client/**/*.test.{js,jsx,ts,tsx}',
     '<rootDir>/src/test/page-tests/**/*.test.{js,jsx,ts,tsx}',
-    '!<rootDir>/src/test/page-tests/api/**/*.test.{js,jsx,ts,tsx}',
+    '!**/api/**/*.test.{js,jsx,ts,tsx}',
   ],
   testEnvironment: 'jsdom',
   collectCoverageFrom: [

@@ -7,10 +7,8 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 // import prisma from 'src/server/prisma'
 
-type CustomNextApiRequest = NextApiRequest
-
 export default async function handler(
-  req: CustomNextApiRequest,
+  req: NextApiRequest,
   res: NextApiResponse<GetInvoiceSummaryDTO | NewInvoiceReturnDTO>
 ): Promise<void> {
   switch (req.method) {

@@ -9,7 +9,7 @@ module.exports = {
   },
   testMatch: [
     '<rootDir>/src/server/**/*.test.{js,jsx,ts,tsx}',
-    '<rootDir>/src/test/api/**/*.test.{js,jsx,ts,tsx}',
+    '<rootDir>/src/test/page-tests/api/**/*.test.{js,jsx,ts,tsx}',
   ],
   testEnvironment: 'node',
   collectCoverageFrom: [
