@@ -1,5 +1,6 @@
 module.exports = {
   setupFilesAfterEnv: ['./jest.client.setup.js'],
+  preset: 'ts-jest/presets/default-esm',
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
   },

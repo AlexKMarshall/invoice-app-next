@@ -1,19 +1,31 @@
 import * as invoiceController from './invoice.controller'
+import * as invoiceModel from './invoice.model'
+
+import { buildMockInvoiceSummary } from './test/mocks/invoice.fixtures'
+import { mocked } from 'ts-jest/utils'
+
+jest.mock('./invoice.model')
+
+const mockInvoiceModel = mocked(invoiceModel, true)
+
+afterEach(() => {
+  jest.resetAllMocks()
+})
 
 it('should get invoices', async () => {
+  const mockInvoices = [
+    buildMockInvoiceSummary(),
+    buildMockInvoiceSummary(),
+    buildMockInvoiceSummary(),
+  ]
+
+  mockInvoiceModel.findAll.mockResolvedValueOnce(mockInvoices)
+
   const result = await invoiceController.getInvoices()
 
   expect(result).toMatchObject({
     data: {
-      invoices: expect.arrayContaining([
-        expect.objectContaining({
-          id: expect.stringMatching(/[A-Z]{2}\d{4}/),
-          clientName: expect.any(String),
-          paymentDue: expect.any(Date),
-          status: expect.any(String),
-          total: expect.any(Number),
-        }),
-      ]),
+      invoices: mockInvoices,
     },
   })
 })
