@@ -10,9 +10,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  title     String
-  content   String?
+model Invoice {
+  id         String   @id
+  paymentDue DateTime
+  clientName String
+  total      Int      @default(0)
+  status     String
 }

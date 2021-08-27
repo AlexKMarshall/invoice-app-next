@@ -18,7 +18,5 @@ export default async function handler(
     case 'POST':
       res.status(201).json(await invoiceController.postInvoice(req.body))
       return
-    default:
-      return
   }
 }

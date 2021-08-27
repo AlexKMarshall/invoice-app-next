@@ -1,9 +1,26 @@
-import { buildMockDraftInvoiceInput } from 'src/server/test/mocks/invoice.fixtures'
+import {
+  buildMockDraftInvoiceInput,
+  buildMockInvoiceSummary,
+} from 'src/server/test/mocks/invoice.fixtures'
+import { connect, disconnect, seedInvoices } from 'src/server/database'
+
 import handler from 'src/pages/api/invoices'
 import { testApiHandler } from 'next-test-api-route-handler'
 
+beforeAll(async () => {
+  await connect()
+})
+
+afterAll(async () => {
+  await disconnect()
+})
+
 it('should get invoices', async () => {
   expect.hasAssertions()
+
+  const mockInvoices = [buildMockInvoiceSummary(), buildMockInvoiceSummary()]
+
+  await seedInvoices(...mockInvoices)
 
   await testApiHandler({
     handler,
@@ -11,9 +28,9 @@ it('should get invoices', async () => {
       const response = await fetch({ method: 'GET' })
       const data = await response.json()
 
-      expect(data).toMatchObject({
+      expect(data).toEqual({
         data: {
-          invoices: expect.any(Array),
+          invoices: JSON.parse(JSON.stringify(mockInvoices)),
         },
       })
     },
@@ -22,6 +39,10 @@ it('should get invoices', async () => {
 
 it('should post a draft invoice', async () => {
   expect.hasAssertions()
+
+  const mockInvoices = [buildMockInvoiceSummary(), buildMockInvoiceSummary()]
+
+  await seedInvoices(...mockInvoices)
 
   await testApiHandler({
     handler,

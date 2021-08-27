@@ -1,16 +1,29 @@
 import { NewInvoiceInputDTO, NewInvoiceReturnDTO } from 'src/shared/dtos'
 
-import { buildMockInvoiceSummary } from './test/mocks/invoice.fixtures'
+import { InvoiceSummary } from './invoice.types'
 import { generateInvoiceId } from 'src/client/shared/utils'
+import prisma from 'src/server/prisma'
 
-const mockInvoices = [
-  buildMockInvoiceSummary(),
-  buildMockInvoiceSummary(),
-  buildMockInvoiceSummary(),
-]
+function includes<T extends U, U>(coll: ReadonlyArray<T>, el: U): el is T {
+  return coll.includes(el as T)
+}
 
-export function findAll(): Promise<typeof mockInvoices> {
-  return Promise.resolve(mockInvoices)
+function exists<T>(item: T | undefined | null): item is T {
+  return item !== undefined && item !== null
+}
+
+export function findAll(): Promise<Array<InvoiceSummary>> {
+  return prisma.invoice.findMany().then((rawInvoices) =>
+    rawInvoices
+      .map((rawInvoice) => {
+        const validStatuses = ['draft', 'pending', 'paid'] as const
+        if (includes(validStatuses, rawInvoice.status)) {
+          return rawInvoice as InvoiceSummary
+        }
+        return null
+      })
+      .filter(exists)
+  )
 }
 
 export function create(
