@@ -1,12 +1,18 @@
 module.exports = {
-  setupFilesAfterEnv: ['./jest.setup.js'],
+  setupFilesAfterEnv: ['./jest.client.setup.js'],
+  preset: 'ts-jest/presets/default-esm',
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
+    '^prisma/(.*)$': '<rootDir>/prisma/$1',
   },
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': '<rootDir>/node_modules/babel-jest',
   },
-  testRegex: '.test.(ts|tsx)$',
+  testMatch: [
+    '<rootDir>/src/client/**/*.test.{js,jsx,ts,tsx}',
+    '<rootDir>/src/test/page-tests/**/*.test.{js,jsx,ts,tsx}',
+    '!**/api/**/*.test.{js,jsx,ts,tsx}',
+  ],
   testEnvironment: 'jsdom',
   collectCoverageFrom: [
     '<rootDir>/src/client/**/*.{js,jsx,ts,tsx}',

@@ -3,16 +3,65 @@
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialActions"]
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  title     String
-  content   String?
+model Address {
+  id       Int     @id @default(autoincrement())
+  street   String
+  city     String
+  country  String
+  postcode String
+  client   Client?
+  sender   Sender?
+}
+
+model Client {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String
+  address   Address   @relation(fields: [addressId], references: [id])
+  addressId Int
+  invoice   Invoice[]
+}
+
+model Sender {
+  id        Int       @id @default(autoincrement())
+  address   Address   @relation(fields: [addressId], references: [id])
+  addressId Int
+  invoice   Invoice[]
+}
+
+model Item {
+  id           Int           @id @default(autoincrement())
+  name         String
+  price        Int
+  invoiceItems InvoiceItem[]
+}
+
+model InvoiceItem {
+  id        Int     @id @default(autoincrement())
+  item      Item    @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId    Int
+  quantity  Int
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  invoiceId String
+}
+
+model Invoice {
+  id                 String        @id
+  status             String
+  issuedAt           DateTime
+  projectDescription String
+  paymentTerms       Int
+  sender             Sender        @relation(fields: [senderId], references: [id])
+  senderId           Int
+  client             Client        @relation(fields: [clientId], references: [id])
+  clientId           Int
+  invoiceItems       InvoiceItem[]
 }
