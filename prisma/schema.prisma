@@ -3,7 +3,7 @@
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -14,6 +14,61 @@ model InvoiceSummary {
   id         String   @id
   paymentDue DateTime
   clientName String
-  total      Int      @default(0)
+  total      Int
   status     String
+}
+
+model Address {
+  id       Int     @id @default(autoincrement())
+  street   String
+  city     String
+  country  String
+  postcode String
+  client   Client?
+  sender   Sender?
+}
+
+model Client {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String
+  address   Address   @relation(fields: [addressId], references: [id])
+  addressId Int
+  invoice   Invoice[]
+}
+
+model Sender {
+  id        Int       @id @default(autoincrement())
+  address   Address   @relation(fields: [addressId], references: [id])
+  addressId Int
+  invoice   Invoice[]
+}
+
+model Item {
+  id           Int           @id @default(autoincrement())
+  name         String
+  price        Int
+  invoiceItems InvoiceItem[]
+}
+
+model InvoiceItem {
+  id        Int     @id @default(autoincrement())
+  item      Item    @relation(fields: [itemId], references: [id])
+  itemId    Int
+  quantity  Int
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  invoiceId String
+}
+
+model Invoice {
+  id           String        @id
+  status       String
+  createdAt    DateTime
+  description  String
+  paymentTerm  Int
+  sender       Sender        @relation(fields: [senderId], references: [id])
+  senderId     Int
+  client       Client        @relation(fields: [clientId], references: [id])
+  clientId     Int
+  invoiceItems InvoiceItem[]
 }

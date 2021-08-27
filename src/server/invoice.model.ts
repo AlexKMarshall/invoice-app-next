@@ -1,9 +1,10 @@
 import * as z from 'zod'
 
 import { AsyncReturnType, IterableElement } from 'type-fest'
-import { NewInvoiceInputDTO, NewInvoiceReturnDTO } from 'src/shared/dtos'
 
+import { InvoiceDetail } from 'src/client/features/invoice/invoice.types'
 import { InvoiceSummary } from './invoice.types'
+import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { generateInvoiceId } from 'src/client/shared/utils'
 import prisma from 'src/server/prisma'
 
@@ -34,9 +35,7 @@ export function findAll(): Promise<Array<InvoiceSummary>> {
   )
 }
 
-export function create(
-  newInvoice: NewInvoiceInputDTO
-): Promise<NewInvoiceReturnDTO['data']['savedInvoice']> {
+export function create(newInvoice: NewInvoiceInputDTO): Promise<InvoiceDetail> {
   const id = generateInvoiceId()
 
   const savedInvoice = { ...newInvoice, id }
