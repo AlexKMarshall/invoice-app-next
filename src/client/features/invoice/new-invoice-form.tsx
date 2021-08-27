@@ -161,13 +161,14 @@ export function NewInvoiceForm({
           <Table aria-labelledby={itemListHeadingId}>
             <thead>
               <tr>
-                <Th scope="col" style={{ width: '50%' }}>
-                  Item Name
-                </Th>
-                <Th scope="col" style={{ width: '10%' }}>
+                <Th scope="col">Item Name</Th>
+                {/* Don't like this hardcoding of widths */}
+                <Th scope="col" style={{ width: '20%' }}>
                   Qty.
                 </Th>
-                <Th scope="col">Price</Th>
+                <Th scope="col" style={{ width: '30%' }}>
+                  Price
+                </Th>
               </tr>
             </thead>
             <tbody>
@@ -278,7 +279,10 @@ const Input = styled(InputBase)<InputProps>`
 `
 
 const Table = styled.table`
+  --spacing: 1rem;
   table-layout: fixed;
+  border-spacing: var(--spacing);
+  margin: calc(-1 * var(--spacing));
 `
 
 const Th = styled.th`
