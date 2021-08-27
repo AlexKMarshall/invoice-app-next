@@ -209,7 +209,7 @@ export function NewInvoiceForm({
           <Button
             type="button"
             prefix="+"
-            variant="muted"
+            color="muted"
             onClick={() => itemsFieldArray.append(DEFAULT_ITEM_VALUES)}
           >
             Add New Item
@@ -217,10 +217,10 @@ export function NewInvoiceForm({
         </GridWrapper>
       </Fieldset>
       <ButtonGroup>
-        <Button type="button" variant="muted" onClick={() => onCancel?.()}>
+        <Button type="button" color="muted" onClick={() => onCancel?.()}>
           Discard
         </Button>
-        <Button type="submit" variant="mono">
+        <Button type="submit" color="mono">
           Save as Draft
         </Button>
       </ButtonGroup>

@@ -36,11 +36,11 @@ export const WithPrefix = Template.bind({})
 WithPrefix.args = {
   children: 'Add New Item',
   prefix: '+',
-  variant: 'muted',
+  color: 'muted',
 }
 
 export const Mono = Template.bind({})
 Mono.args = {
   children: 'Save Draft',
-  variant: 'mono',
+  color: 'mono',
 }
