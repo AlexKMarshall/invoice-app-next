@@ -42,8 +42,8 @@ it('should get invoices', async () => {
 
       expect(data).toEqual({
         data: {
-          invoices: JSON.parse(
-            JSON.stringify(mockInvoices.map(invoiceDetailToSummary))
+          invoices: expect.arrayContaining(
+            JSON.parse(JSON.stringify(mockInvoices.map(invoiceDetailToSummary)))
           ),
         },
       })
@@ -54,26 +54,26 @@ it('should get invoices', async () => {
 it('should post a draft invoice', async () => {
   expect.hasAssertions()
 
-  const mockInvoices = [
-    buildMockDraftInvoiceInput(),
-    buildMockDraftInvoiceInput(),
-  ]
+  const initialInvoices = [buildMockInvoiceDetail(), buildMockInvoiceDetail()]
 
-  await seedInvoices(...mockInvoices)
+  await seedInvoices(...initialInvoices)
 
   await testApiHandler({
     handler,
     test: async ({ fetch }) => {
-      const initialInvoicesReponse = await fetch()
-      const initialInvoicesData = await initialInvoicesReponse.json()
+      const initialGetReponse = await fetch()
+      const initialGetData = await initialGetReponse.json()
 
-      // expect(initialInvoicesData).toEqual({
-      //   data: {
-      //     invoices: expect.arrayContaining(
-      //       mockInvoices.map((inv) => ({ clientName: inv.clientName }))
-      //     ),
-      //   },
-      // })
+      // we should get the original seeded data
+      expect(initialGetData).toEqual({
+        data: {
+          invoices: expect.arrayContaining(
+            JSON.parse(
+              JSON.stringify(initialInvoices.map(invoiceDetailToSummary))
+            )
+          ),
+        },
+      })
 
       const newInvoiceInput = buildMockDraftInvoiceInput()
 
@@ -87,6 +87,7 @@ it('should post a draft invoice', async () => {
 
       const result = await response.json()
 
+      // a post request should give us back the full saved invoice object
       expect(result).toEqual({
         data: {
           savedInvoice: {
@@ -99,19 +100,22 @@ it('should post a draft invoice', async () => {
         },
       })
 
-      // const finalGetResponse = await fetch()
-      // const finalGetData = await finalGetResponse.json()
+      const finalGetResponse = await fetch()
+      const finalGetData = await finalGetResponse.json()
 
-      // expect(finalGetData).toEqual({
-      //   data: {
-      //     invoices: expect.arrayContaining([
-      //       ...JSON.parse(JSON.stringify(mockInvoices)),
-      //       // expect.objectContaining({
-      //       //   clientName: newInvoiceInput.clientName,
-      //       // }),
-      //     ]),
-      //   },
-      // })
+      // expect to receive back our original two invoices, plus the new one
+      expect(finalGetData).toEqual({
+        data: {
+          invoices: expect.arrayContaining([
+            ...JSON.parse(
+              JSON.stringify(initialInvoices.map(invoiceDetailToSummary))
+            ),
+            expect.objectContaining({
+              clientName: newInvoiceInput.clientName,
+            }),
+          ]),
+        },
+      })
     },
   })
 })
