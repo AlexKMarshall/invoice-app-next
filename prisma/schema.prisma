@@ -10,7 +10,7 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Invoice {
+model InvoiceSummary {
   id         String   @id
   paymentDue DateTime
   clientName String

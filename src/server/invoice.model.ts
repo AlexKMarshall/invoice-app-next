@@ -8,7 +8,7 @@ import { generateInvoiceId } from 'src/client/shared/utils'
 import prisma from 'src/server/prisma'
 
 function findAllDb() {
-  return prisma.invoice.findMany()
+  return prisma.invoiceSummary.findMany()
 }
 
 type DBInvoiceSummary = IterableElement<AsyncReturnType<typeof findAllDb>>
