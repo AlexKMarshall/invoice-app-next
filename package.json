@@ -17,6 +17,7 @@
     "tsc": "tsc --noEmit",
     "cm": "cz",
     "prepare": "husky install",
+    "postinstall": "yarn prisma generate",
     "ts-node": "ts-node --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\"",
     "db:migrate:dev": "prisma migrate dev",
     "db:reset": "prisma migrate reset",
