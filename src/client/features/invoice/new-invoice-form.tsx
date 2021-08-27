@@ -161,13 +161,14 @@ export function NewInvoiceForm({
           <Table aria-labelledby={itemListHeadingId}>
             <thead>
               <tr>
-                <Th scope="col" style={{ width: '50%' }}>
-                  Item Name
-                </Th>
-                <Th scope="col" style={{ width: '10%' }}>
+                <Th scope="col">Item Name</Th>
+                {/* Don't like this hardcoding of widths */}
+                <Th scope="col" style={{ width: '20%' }}>
                   Qty.
                 </Th>
-                <Th scope="col">Price</Th>
+                <Th scope="col" style={{ width: '30%' }}>
+                  Price
+                </Th>
               </tr>
             </thead>
             <tbody>
@@ -209,7 +210,7 @@ export function NewInvoiceForm({
           <Button
             type="button"
             prefix="+"
-            variant="muted"
+            color="muted"
             onClick={() => itemsFieldArray.append(DEFAULT_ITEM_VALUES)}
           >
             Add New Item
@@ -217,10 +218,10 @@ export function NewInvoiceForm({
         </GridWrapper>
       </Fieldset>
       <ButtonGroup>
-        <Button type="button" variant="muted" onClick={() => onCancel?.()}>
+        <Button type="button" color="muted" onClick={() => onCancel?.()}>
           Discard
         </Button>
-        <Button type="submit" variant="mono">
+        <Button type="submit" color="mono">
           Save as Draft
         </Button>
       </ButtonGroup>
@@ -278,7 +279,10 @@ const Input = styled(InputBase)<InputProps>`
 `
 
 const Table = styled.table`
+  --spacing: 1rem;
   table-layout: fixed;
+  border-spacing: var(--spacing);
+  margin: calc(-1 * var(--spacing));
 `
 
 const Th = styled.th`
