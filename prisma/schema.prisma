@@ -7,15 +7,8 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
-}
-
-model InvoiceSummary {
-  id         String   @id
-  paymentDue DateTime
-  clientName String
-  total      Int
-  status     String
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialActions"]
 }
 
 model Address {
@@ -53,10 +46,10 @@ model Item {
 
 model InvoiceItem {
   id        Int     @id @default(autoincrement())
-  item      Item    @relation(fields: [itemId], references: [id])
+  item      Item    @relation(fields: [itemId], references: [id], onDelete: Cascade)
   itemId    Int
   quantity  Int
-  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   invoiceId String
 }
 

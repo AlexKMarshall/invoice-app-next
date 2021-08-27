@@ -1,21 +1,15 @@
-import { InvoiceSummary as DBInvoiceSummary } from '@prisma/client'
-import { InvoiceSummary } from './invoice.types'
+import * as invoiceModel from './invoice.model'
+
+import { InvoiceDetail } from './invoice.types'
+import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import prisma from 'src/server/prisma'
 
-export async function seedInvoiceSummaries(
-  ...invoices: Array<InvoiceSummary>
-): Promise<DBInvoiceSummary[]> {
-  await clearInvoiceSummaries()
-
-  const savePromises = invoices.map((invoice) =>
-    prisma.invoiceSummary.create({ data: invoice })
-  )
+export function seedInvoices(
+  ...invoices: Array<NewInvoiceInputDTO>
+): Promise<InvoiceDetail[]> {
+  const savePromises = invoices.map((invoice) => invoiceModel.create(invoice))
 
   return Promise.all(savePromises)
-}
-
-function clearInvoiceSummaries() {
-  return prisma.invoiceSummary.deleteMany()
 }
 
 export function disconnect(): Promise<void> {

@@ -6,33 +6,92 @@ import { InvoiceDetail } from 'src/client/features/invoice/invoice.types'
 import { InvoiceSummary } from './invoice.types'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { Prisma } from '@prisma/client'
+import { add } from 'date-fns'
 import { generateInvoiceId } from 'src/client/shared/utils'
 import prisma from 'src/server/prisma'
 
-function dbFindAll() {
-  return prisma.invoiceSummary.findMany()
+function dbFindAllSummaries() {
+  return prisma.invoice.findMany({
+    select: {
+      id: true,
+      issuedAt: true,
+      paymentTerms: true,
+      client: {
+        select: {
+          name: true,
+        },
+      },
+      invoiceItems: {
+        select: {
+          quantity: true,
+          item: {
+            select: {
+              price: true,
+            },
+          },
+        },
+      },
+      status: true,
+    },
+  })
 }
 
-type DBInvoiceSummary = IterableElement<AsyncReturnType<typeof dbFindAll>>
+type DbInvoiceSummary = IterableElement<
+  AsyncReturnType<typeof dbFindAllSummaries>
+>
 
 function schemaForType<T>() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return <S extends z.ZodType<T, any, any>>(arg: S) => arg
 }
 
-const invoiceSummarySchema = schemaForType<DBInvoiceSummary>()(
+const invoiceSummaryDbSchema = schemaForType<DbInvoiceSummary>()(
   z.object({
     id: z.string(),
-    paymentDue: z.date(),
-    clientName: z.string(),
-    total: z.number(),
+    issuedAt: z.date(),
+    paymentTerms: z.number(),
+    client: z.object({
+      name: z.string(),
+    }),
+    invoiceItems: z.array(
+      z.object({
+        quantity: z.number(),
+        item: z.object({
+          price: z.number(),
+        }),
+      })
+    ),
     status: z.enum(['draft', 'pending', 'paid']),
   })
 )
 
+function dbSummaryToInvoiceSummary(
+  invoice: z.infer<typeof invoiceSummaryDbSchema>
+): InvoiceSummary {
+  const {
+    id,
+    issuedAt,
+    paymentTerms,
+    client: { name: clientName },
+    invoiceItems,
+    status,
+  } = invoice
+
+  const paymentDue = add(issuedAt, { days: paymentTerms })
+
+  const total = invoiceItems.reduce(
+    (acc, cur) => acc + cur.quantity * cur.item.price,
+    0
+  )
+
+  return { id, paymentDue, clientName, total, status }
+}
+
 export function findAll(): Promise<Array<InvoiceSummary>> {
-  return dbFindAll().then((rawInvoices) =>
-    rawInvoices.map((rawInvoice) => invoiceSummarySchema.parse(rawInvoice))
+  return dbFindAllSummaries().then((rawInvoices) =>
+    rawInvoices
+      .map((rawInvoice) => invoiceSummaryDbSchema.parse(rawInvoice))
+      .map(dbSummaryToInvoiceSummary)
   )
 }
 

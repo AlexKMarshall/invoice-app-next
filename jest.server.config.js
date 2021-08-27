@@ -3,6 +3,7 @@ module.exports = {
   preset: 'ts-jest/presets/default-esm',
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
+    '^prisma/(.*)$': '<rootDir>/prisma/$1',
   },
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': '<rootDir>/node_modules/babel-jest',
