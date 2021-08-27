@@ -61,14 +61,14 @@ model InvoiceItem {
 }
 
 model Invoice {
-  id           String        @id
-  status       String
-  createdAt    DateTime
-  description  String
-  paymentTerm  Int
-  sender       Sender        @relation(fields: [senderId], references: [id])
-  senderId     Int
-  client       Client        @relation(fields: [clientId], references: [id])
-  clientId     Int
-  invoiceItems InvoiceItem[]
+  id                 String        @id
+  status             String
+  issuedAt           DateTime
+  projectDescription String
+  paymentTerms       Int
+  sender             Sender        @relation(fields: [senderId], references: [id])
+  senderId           Int
+  client             Client        @relation(fields: [clientId], references: [id])
+  clientId           Int
+  invoiceItems       InvoiceItem[]
 }

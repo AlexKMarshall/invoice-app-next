@@ -2,10 +2,10 @@ import { InvoiceSummary as DBInvoiceSummary } from '@prisma/client'
 import { InvoiceSummary } from './invoice.types'
 import prisma from 'src/server/prisma'
 
-export async function seedInvoices(
+export async function seedInvoiceSummaries(
   ...invoices: Array<InvoiceSummary>
 ): Promise<DBInvoiceSummary[]> {
-  await clearInvoices()
+  await clearInvoiceSummaries()
 
   const savePromises = invoices.map((invoice) =>
     prisma.invoiceSummary.create({ data: invoice })
@@ -14,12 +14,8 @@ export async function seedInvoices(
   return Promise.all(savePromises)
 }
 
-function clearInvoices() {
+function clearInvoiceSummaries() {
   return prisma.invoiceSummary.deleteMany()
-}
-
-export function connect(): Promise<void> {
-  return prisma.$connect()
 }
 
 export function disconnect(): Promise<void> {
