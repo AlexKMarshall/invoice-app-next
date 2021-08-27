@@ -9,6 +9,7 @@ export type InvoiceSummary = {
 }
 
 export type InvoiceDetail = {
+  id: string
   status: InvoiceStatus
   senderAddress: {
     street: string

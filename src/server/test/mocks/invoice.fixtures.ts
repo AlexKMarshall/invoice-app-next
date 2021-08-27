@@ -1,3 +1,6 @@
+import { Except, IterableElement, PartialDeep } from 'type-fest'
+
+import { InvoiceDetail } from 'src/server/invoice.types'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import faker from 'faker'
 import { generateInvoiceId } from 'src/client/shared/utils'
@@ -26,8 +29,22 @@ export function buildMockInvoiceSummary(): InvoiceSummary {
   }
 }
 
-export function buildMockInvoiceInput(): NewInvoiceInputDTO {
-  const itemsCount = faker.datatype.number({ min: 1, max: 3 })
+export function buildMockInvoiceInput(
+  overrides: PartialDeep<NewInvoiceInputDTO> = {}
+): NewInvoiceInputDTO {
+  const {
+    senderAddress: overrideSenderAddress,
+    clientAddress: overrideClientAddress,
+    itemList: overrideItemList,
+    issuedAt: overrideIssuedAt,
+    ...otherOverrides
+  } = overrides
+
+  const itemList = buildMockItemList(overrideItemList)
+
+  const issuedAt =
+    overrideIssuedAt instanceof Date ? overrideIssuedAt : faker.date.recent()
+
   return {
     status: randomStatus(),
     senderAddress: {
@@ -35,6 +52,7 @@ export function buildMockInvoiceInput(): NewInvoiceInputDTO {
       city: faker.address.city(),
       postcode: faker.address.zipCode(),
       country: faker.address.country(),
+      ...overrideSenderAddress,
     },
     clientName: faker.name.findName(),
     clientEmail: faker.internet.email(),
@@ -43,22 +61,53 @@ export function buildMockInvoiceInput(): NewInvoiceInputDTO {
       city: faker.address.city(),
       postcode: faker.address.zipCode(),
       country: faker.address.country(),
+      ...overrideClientAddress,
     },
-    issuedAt: faker.date.recent(),
+    issuedAt,
     paymentTerms: faker.datatype.number({ max: 30 }),
     projectDescription: faker.commerce.productDescription(),
-    itemList: new Array(itemsCount).fill(undefined).map(() => buildMockItem()),
+    itemList,
+    ...otherOverrides,
   }
 }
 
-function buildMockItem() {
+type ItemList = InvoiceDetail['itemList']
+function buildMockItemList(overrides?: PartialDeep<ItemList>): ItemList {
+  const randomLength = faker.datatype.number({ min: 1, max: 3 })
+
+  const partialItems =
+    overrides ?? Array.from({ length: randomLength }, () => undefined)
+
+  return partialItems.map((override) => ({ ...buildMockItem(override) }))
+}
+
+type Item = IterableElement<ItemList>
+function buildMockItem(overrides: PartialDeep<Item> = {}): Item {
   return {
     name: faker.commerce.product(),
     quantity: faker.datatype.number({ min: 1, max: 9 }),
     price: faker.datatype.number({ min: 100, max: 100000 }),
+    ...overrides,
   }
 }
 
-export function buildMockDraftInvoiceInput(): NewInvoiceInputDTO {
-  return { ...buildMockInvoiceInput(), status: 'draft' }
+type NewDraftInvoiceInputDTO = Except<NewInvoiceInputDTO, 'status'> & {
+  status: 'draft'
+}
+export function buildMockDraftInvoiceInput(
+  overrides?: PartialDeep<NewDraftInvoiceInputDTO>
+): NewDraftInvoiceInputDTO {
+  return { ...buildMockInvoiceInput(overrides), status: 'draft' }
+}
+
+export function buildMockInvoiceDetail(
+  overrides: PartialDeep<InvoiceDetail> = {}
+): InvoiceDetail {
+  const { id: overrideId, ...otherOverrides } = overrides
+
+  const id = overrideId ?? generateInvoiceId()
+  return {
+    id,
+    ...buildMockInvoiceInput(otherOverrides),
+  }
 }
