@@ -1,28 +1,36 @@
+import * as z from 'zod'
+
+import { AsyncReturnType, IterableElement } from 'type-fest'
 import { NewInvoiceInputDTO, NewInvoiceReturnDTO } from 'src/shared/dtos'
 
 import { InvoiceSummary } from './invoice.types'
 import { generateInvoiceId } from 'src/client/shared/utils'
 import prisma from 'src/server/prisma'
 
-function includes<T extends U, U>(coll: ReadonlyArray<T>, el: U): el is T {
-  return coll.includes(el as T)
+function findAllDb() {
+  return prisma.invoice.findMany()
 }
 
-function exists<T>(item: T | undefined | null): item is T {
-  return item !== undefined && item !== null
+type DBInvoiceSummary = IterableElement<AsyncReturnType<typeof findAllDb>>
+
+function schemaForType<T>() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return <S extends z.ZodType<T, any, any>>(arg: S) => arg
 }
+
+const invoiceSummarySchema = schemaForType<DBInvoiceSummary>()(
+  z.object({
+    id: z.string(),
+    paymentDue: z.date(),
+    clientName: z.string(),
+    total: z.number(),
+    status: z.enum(['draft', 'pending', 'paid']),
+  })
+)
 
 export function findAll(): Promise<Array<InvoiceSummary>> {
-  return prisma.invoice.findMany().then((rawInvoices) =>
-    rawInvoices
-      .map((rawInvoice) => {
-        const validStatuses = ['draft', 'pending', 'paid'] as const
-        if (includes(validStatuses, rawInvoice.status)) {
-          return rawInvoice as InvoiceSummary
-        }
-        return null
-      })
-      .filter(exists)
+  return findAllDb().then((rawInvoices) =>
+    rawInvoices.map((rawInvoice) => invoiceSummarySchema.parse(rawInvoice))
   )
 }
 
