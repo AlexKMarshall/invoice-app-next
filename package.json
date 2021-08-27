@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "yarn prisma migrate deploy",
     "build": "next build",
+    "build:dev": "next build",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write --ignore-path .gitignore",
