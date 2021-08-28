@@ -2,37 +2,20 @@ import {
   buildMockDraftInvoiceInput,
   buildMockInvoiceDetail,
 } from 'src/server/test/mocks/invoice.fixtures'
-import { disconnect, seedInvoices } from 'src/server/database'
+import { database, prepareDbForTests } from 'src/server/test/test-utils'
 
-import { deleteDatabase } from 'prisma/utils'
-import { execSync } from 'child_process'
 import handler from 'src/pages/api/invoices'
 import { invoiceDetailToSummary } from 'src/server/features/invoice/invoice.mappers'
 import { testApiHandler } from 'next-test-api-route-handler'
 
-let dbFileName: string
-
-beforeEach(async () => {
-  dbFileName = `test-${process.env.JEST_WORKER_ID}`
-  const dbUrl = `file:./${dbFileName}.db`
-  process.env.DATABASE_URL = dbUrl
-
-  const command = `DATABASE_URL=${dbUrl} npx prisma migrate deploy`
-
-  execSync(command)
-})
-
-afterEach(async () => {
-  await disconnect()
-  deleteDatabase(dbFileName)
-})
+prepareDbForTests()
 
 it('should get invoices', async () => {
   expect.hasAssertions()
 
   const mockInvoices = [buildMockInvoiceDetail(), buildMockInvoiceDetail()]
 
-  await seedInvoices(...mockInvoices)
+  await database.seedInvoices(...mockInvoices)
 
   await testApiHandler({
     handler,
@@ -56,7 +39,7 @@ it('should post a draft invoice', async () => {
 
   const initialInvoices = [buildMockInvoiceDetail(), buildMockInvoiceDetail()]
 
-  await seedInvoices(...initialInvoices)
+  await database.seedInvoices(...initialInvoices)
 
   await testApiHandler({
     handler,
