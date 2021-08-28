@@ -23,9 +23,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: DB container
-        run: yarn start:db:ci && yarn db:deploy
+        run: yarn start:db:ci
       - name: Install dependencies
         run: yarn --frozen-lockfile
+      - name: DB migrate
+        run: yarn db:deploy
       - name: Lint code
         run: yarn lint .
       - name: Test
