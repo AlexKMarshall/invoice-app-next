@@ -29,7 +29,8 @@ it('should get invoices', async () => {
 
   const result = await invoiceController.getInvoices()
 
-  expect(result).toMatchObject({
+  expect(result.code).toBe(200)
+  expect(result.response).toMatchObject({
     data: {
       invoices: mockInvoices,
     },
@@ -50,7 +51,8 @@ it('should post valid draft invoice', async () => {
 
   const result = await invoiceController.postInvoice(dtoInput)
 
-  expect(result).toMatchObject({
+  expect(result.code).toBe(201)
+  expect(result.response).toMatchObject({
     data: {
       savedInvoice: mockSavedInvoice,
     },

@@ -9,28 +9,42 @@ import {
 
 import { parseJSON } from 'date-fns'
 
-export async function getInvoices(): Promise<GetInvoiceSummaryDTO> {
-  const invoices = await invoiceModel.findAll()
-  return {
-    data: {
-      invoices,
-    },
+export type ControllerResponse<TData = unknown> = Promise<
+  ControllerSuccessResponse<TData> | ControllerErrorResponse
+>
+
+type ControllerSuccessResponse<TData = unknown> = {
+  code: number
+  response: TData
+}
+
+type ControllerErrorResponse<TError = unknown> = {
+  code: number
+  response: {
+    error: TError
   }
 }
 
-export async function postInvoice(
+export function getInvoices(): ControllerResponse<GetInvoiceSummaryDTO> {
+  return invoiceModel
+    .findAll()
+    .then((invoices) => ({ code: 200, response: { data: { invoices } } }))
+    .catch((error) => ({
+      code: 500,
+      response: { error: JSON.stringify(error) },
+    }))
+}
+
+export function postInvoice(
   newInvoice: Stringify<NewInvoiceInputDTO>
-): Promise<NewInvoiceReturnDTO> {
+): ControllerResponse<NewInvoiceReturnDTO> {
   const invoiceWithDates = {
     ...newInvoice,
     issuedAt: parseJSON(newInvoice.issuedAt),
   }
 
-  const savedInvoice = await invoiceModel.create(invoiceWithDates)
-
-  return {
-    data: {
-      savedInvoice,
-    },
-  }
+  return invoiceModel.create(invoiceWithDates).then((savedInvoice) => ({
+    code: 201,
+    response: { data: { savedInvoice } },
+  }))
 }
