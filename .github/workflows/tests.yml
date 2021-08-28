@@ -7,7 +7,10 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DATABASE_URL: file:./ci.db
+      POSTGRES_USER: test
+      POSTGRES_DB: test
+      POSTGRES_PASSWORD: ${{ secrets.TEST_DATABASE_PASSWORD }}
+      DATABASE_URL: postgresql://test:${{ secrets.TEST_DATABASE_PASSWORD }}@localhost:5432/test?schema=test
 
     strategy:
       matrix:
@@ -19,22 +22,16 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
+      - name: DB container
+        run: yarn start:db:ci
       - name: Install dependencies
         run: yarn --frozen-lockfile
       - name: Lint code
         run: yarn lint .
-      - name: DB container
-        env:
-          POSTGRES_USER: test
-          POSTGRES_DB: test
-          POSTGRES_PASSWORD: ${{ secrets.TEST_DATABASE_PASSWORD }}
-        run: yarn start:db:ci
       - name: Test
-        env:
-          DATABASE_URL: postgresql://test:${{ secrets.TEST_DATABASE_PASSWORD }}@localhost:5432/test?schema=test
         run: yarn test:cov
-      - name: DB container down
-        run: yarn stop:db:ci
       - name: Build
         run: yarn build
+      - name: DB container down
+        run: yarn stop:db:ci
       - uses: codecov/codecov-action@v1
