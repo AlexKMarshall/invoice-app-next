@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "yarn prisma migrate deploy",
     "build": "next build",
     "build:dev": "next build",
     "start": "next start",
@@ -24,6 +23,7 @@
     "ts-node": "ts-node --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\"",
     "db:migrate:dev": "prisma migrate dev",
     "db:reset": "prisma migrate reset",
+    "db:deploy": "yarn prisma migrate deploy",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
