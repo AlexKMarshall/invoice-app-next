@@ -23,8 +23,18 @@ jobs:
         run: yarn --frozen-lockfile
       - name: Lint code
         run: yarn lint .
+      - name: DB container
+        env:
+          POSTGRES_USER: test
+          POSTGRES_DB: test
+          POSTGRES_PASSWORD: ${{ secrets.TEST_DATABASE_PASSWORD }}
+        run: yarn start:db:ci
       - name: Test
+        env:
+          DATABASE_URL: postgresql://test:${{ secrets.TEST_DATABASE_PASSWORD }}@localhost:5432/test?schema=test
         run: yarn test:cov
+      - name: DB container down
+        run: yarn stop:db:ci
       - name: Build
         run: yarn build
       - uses: codecov/codecov-action@v1
