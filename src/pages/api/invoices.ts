@@ -1,4 +1,4 @@
-import * as invoiceController from 'src/server/invoice.controller'
+import * as invoiceController from 'src/server/features/invoice/invoice.controller'
 
 import { GetInvoiceSummaryDTO, NewInvoiceReturnDTO } from 'src/shared/dtos'
 import { NextApiRequest, NextApiResponse } from 'next'

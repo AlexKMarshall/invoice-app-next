@@ -5,7 +5,7 @@ import { NewInvoiceInputDTO, Stringify } from 'src/shared/dtos'
 import {
   buildMockDraftInvoiceInput,
   buildMockInvoiceSummary,
-} from './test/mocks/invoice.fixtures'
+} from '../../test/mocks/invoice.fixtures'
 
 import { generateInvoiceId } from 'src/client/shared/utils'
 import { mocked } from 'ts-jest/utils'

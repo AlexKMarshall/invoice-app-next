@@ -1,6 +1,6 @@
 import { Except, IterableElement, PartialDeep } from 'type-fest'
 
-import { InvoiceDetail } from 'src/server/invoice.types'
+import { InvoiceDetail } from 'src/server/features/invoice/invoice.types'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import faker from 'faker'
 import { generateInvoiceId } from 'src/client/shared/utils'
