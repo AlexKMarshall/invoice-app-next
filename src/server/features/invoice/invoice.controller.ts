@@ -43,8 +43,14 @@ export function postInvoice(
     issuedAt: parseJSON(newInvoice.issuedAt),
   }
 
-  return invoiceModel.create(invoiceWithDates).then((savedInvoice) => ({
-    code: 201,
-    response: { data: { savedInvoice } },
-  }))
+  return invoiceModel
+    .create(invoiceWithDates)
+    .then((savedInvoice) => ({
+      code: 201,
+      response: { data: { savedInvoice } },
+    }))
+    .catch((error) => ({
+      code: 500,
+      response: { error: JSON.stringify(error) },
+    }))
 }
