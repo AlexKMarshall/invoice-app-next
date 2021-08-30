@@ -173,21 +173,4 @@ describe('postInvoice', () => {
       },
     })
   })
-  it('should return error on invalid email', async () => {
-    const mockInput = buildMockInvoiceInput({
-      clientEmail: 'not an email',
-    })
-    const dtoInput = JSON.parse(JSON.stringify(mockInput))
-
-    const result = await invoiceController.postInvoice(dtoInput)
-
-    expect(result.code).toBe(400)
-    expect(result.response).toEqual({
-      error: {
-        fieldErrors: {
-          clientEmail: ['Invalid email'],
-        },
-      },
-    })
-  })
 })
