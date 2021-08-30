@@ -29,6 +29,7 @@ const InputField = styled.input`
   margin-top: 10px;
   padding: 16px 20px;
   border: 1px solid ${COLORS.fieldBorderColor.prop};
+  outline-color: ${COLORS.primaryColor.prop};
   border-radius: 4px;
   font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
 `
