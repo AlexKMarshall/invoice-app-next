@@ -81,6 +81,10 @@ export const COLORS = {
     value: 'hsla(231deg, 75%, 93%, 100%)',
     prop: 'var(--field-border-color)',
   },
+  warningColor: {
+    value: 'hsla(0deg, 80%, 63%, 100%)',
+    prop: 'var(--warning-color)',
+  },
 }
 
 export const TYPOGRAPHY = {

@@ -26,3 +26,10 @@ Primary.args = {
   label: 'Street Address',
   value: '19 Union Terrace',
 }
+
+export const WithError = Template.bind({})
+WithError.args = {
+  label: 'Street Address',
+  value: '',
+  errorMessage: "can't be empty",
+}
