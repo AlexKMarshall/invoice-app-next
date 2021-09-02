@@ -56,7 +56,12 @@ export function NewInvoiceForm({
   const billFromLegendId = useId()
   const billToLegendId = useId()
   const itemListHeadingId = useId()
-  const { register, handleSubmit, control } = useForm<NewInvoiceFormFields>({
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<NewInvoiceFormFields>({
     defaultValues: DEFAULT_FORM_VALUES,
   })
   const itemsFieldArray = useFieldArray({
@@ -78,22 +83,32 @@ export function NewInvoiceForm({
           <Input
             $span="full"
             label="Street Address"
-            {...register('senderAddress.street')}
+            errorMessage={errors.senderAddress?.street?.message}
+            {...register('senderAddress.street', {
+              required: "can't be empty",
+            })}
           />
           <Input
             $span="third"
             label="City"
-            {...register('senderAddress.city')}
+            errorMessage={errors.senderAddress?.city?.message}
+            {...register('senderAddress.city', { required: "can't be empty" })}
           />
           <Input
             $span="third"
             label="Post Code"
-            {...register('senderAddress.postcode')}
+            errorMessage={errors.senderAddress?.postcode?.message}
+            {...register('senderAddress.postcode', {
+              required: "can't be empty",
+            })}
           />
           <Input
             $span="third"
             label="Country"
-            {...register('senderAddress.country')}
+            errorMessage={errors.senderAddress?.country?.message}
+            {...register('senderAddress.country', {
+              required: "can't be empty",
+            })}
           />
         </GridWrapper>
       </Fieldset>
@@ -103,32 +118,53 @@ export function NewInvoiceForm({
           <Input
             $span="full"
             label="Client's Name"
-            {...register('clientName')}
+            errorMessage={errors.clientName?.message}
+            {...register('clientName', { required: "can't be empty" })}
           />
           <Input
             $span="full"
             label="Client's Email"
-            {...register('clientEmail')}
+            type="email"
+            errorMessage={errors.clientEmail?.message}
+            {...register('clientEmail', {
+              required: "can't be empty",
+              pattern: {
+                value: emailRegex,
+                message: 'invalid email',
+              },
+            })}
           ></Input>
           <Input
             $span="full"
             label="Street Address"
-            {...register('clientAddress.street')}
+            errorMessage={errors.clientAddress?.street?.message}
+            {...register('clientAddress.street', {
+              required: "can't be empty",
+            })}
           />
           <Input
             $span="third"
             label="City"
-            {...register('clientAddress.city')}
+            errorMessage={errors.clientAddress?.city?.message}
+            {...register('clientAddress.city', {
+              required: "can't be empty",
+            })}
           />
           <Input
             $span="third"
             label="Post Code"
-            {...register('clientAddress.postcode')}
+            errorMessage={errors.clientAddress?.postcode?.message}
+            {...register('clientAddress.postcode', {
+              required: "can't be empty",
+            })}
           />
           <Input
             $span="third"
             label="Country"
-            {...register('clientAddress.country')}
+            errorMessage={errors.clientAddress?.country?.message}
+            {...register('clientAddress.country', {
+              required: "can't be empty",
+            })}
           />
         </GridWrapper>
       </Fieldset>
@@ -151,7 +187,8 @@ export function NewInvoiceForm({
           <Input
             $span="full"
             label="Project Description"
-            {...register('projectDescription')}
+            errorMessage={errors.projectDescription?.message}
+            {...register('projectDescription', { required: "can't be empty" })}
           />
         </GridWrapper>
       </Fieldset>
@@ -224,10 +261,17 @@ export function NewInvoiceForm({
         <Button type="submit" color="mono">
           Save as Draft
         </Button>
+        <Button type="submit" color="primary">
+          Save & Send
+        </Button>
       </ButtonGroup>
     </Form>
   )
 }
+
+const emailRegex = new RegExp(
+  "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
+)
 
 const Form = styled.form`
   max-width: 730px;
@@ -299,6 +343,7 @@ const TableInput = styled.input`
 
 const ButtonGroup = styled.div`
   display: flex;
+  gap: 8px;
 
   & > :first-child {
     margin-right: auto;

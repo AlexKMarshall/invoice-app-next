@@ -71,6 +71,82 @@ it('should not show new invoice form until button is clicked', () => {
     screen.queryByRole('form', { name: /new invoice/i })
   ).not.toBeInTheDocument()
 })
+it('should validate that fields are filled in when creating pending invoice', async () => {
+  render(<InvoiceSummaryScreen />)
+  userEvent.click(screen.getByRole('button', { name: /new invoice/i }))
+
+  userEvent.click(screen.getByRole('button', { name: /save & send/i }))
+
+  // wait for validation to complete
+  await waitFor(() => {
+    expect(
+      screen.getByRole('textbox', { name: /client's name/i })
+    ).toBeInvalid()
+  })
+
+  const elBillFromGroup = screen.getByRole('group', { name: /bill from/i })
+  const inBillFrom = within(elBillFromGroup)
+
+  const billFromStreet = inBillFrom.getByRole('textbox', {
+    name: /street address/i,
+  })
+  expect(billFromStreet).toBeInvalid()
+  expect(billFromStreet).toHaveAccessibleDescription(/can't be empty/i)
+  const billFromCity = inBillFrom.getByRole('textbox', {
+    name: /city/i,
+  })
+  expect(billFromCity).toBeInvalid()
+  expect(billFromCity).toHaveAccessibleDescription(/can't be empty/i)
+  const billFromPostcode = inBillFrom.getByRole('textbox', {
+    name: /post code/i,
+  })
+  expect(billFromPostcode).toBeInvalid()
+  expect(billFromPostcode).toHaveAccessibleDescription(/can't be empty/i)
+  const billFromCountry = inBillFrom.getByRole('textbox', {
+    name: /country/i,
+  })
+  expect(billFromCountry).toBeInvalid()
+  expect(billFromCountry).toHaveAccessibleDescription(/can't be empty/i)
+
+  const elBillToGroup = screen.getByRole('group', { name: /bill to/i })
+  const inBillTo = within(elBillToGroup)
+
+  const clientName = inBillTo.getByRole('textbox', { name: /client's name/i })
+  expect(clientName).toBeInvalid()
+  expect(clientName).toHaveAccessibleDescription(/can't be empty/i)
+  const clientEmail = inBillTo.getByRole('textbox', { name: /client's email/i })
+  expect(clientEmail).toBeInvalid()
+  expect(clientEmail).toHaveAccessibleDescription(/can't be empty/i)
+  const billToStreet = inBillTo.getByRole('textbox', {
+    name: /street address/i,
+  })
+  expect(billToStreet).toBeInvalid()
+  expect(billToStreet).toHaveAccessibleDescription(/can't be empty/i)
+  const billToCity = inBillTo.getByRole('textbox', {
+    name: /city/i,
+  })
+  expect(billToCity).toBeInvalid()
+  expect(billToCity).toHaveAccessibleDescription(/can't be empty/i)
+  const billToPostcode = inBillTo.getByRole('textbox', {
+    name: /post code/i,
+  })
+  expect(billToPostcode).toBeInvalid()
+  expect(billToPostcode).toHaveAccessibleDescription(/can't be empty/i)
+  const billToCountry = inBillTo.getByRole('textbox', {
+    name: /country/i,
+  })
+  expect(billToCountry).toBeInvalid()
+  expect(billToCountry).toHaveAccessibleDescription(/can't be empty/i)
+
+  const projectDescription = screen.getByRole('textbox', {
+    name: /project description/i,
+  })
+  expect(projectDescription).toBeInvalid()
+  expect(projectDescription).toHaveAccessibleDescription(/can't be empty/i)
+})
+it.todo('should check for valid email')
+it.todo('should check for valid issuedAt date')
+it.todo('should check there are invoice items')
 it('should allow new draft invoices to be creacted', async () => {
   const existingInvoice = buildMockInvoice()
   invoiceModel.initialise([existingInvoice])
