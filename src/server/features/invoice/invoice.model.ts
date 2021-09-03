@@ -62,7 +62,7 @@ const invoiceSummaryDbSchema = schemaForType<DbInvoiceSummary>()(
         }),
       })
     ),
-    status: z.enum(['draft', 'pending', 'paid']),
+    status: z.enum(['draft', 'pending']),
   })
 )
 
@@ -187,7 +187,7 @@ const addressSchema = z.object({
 const createInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
   z.object({
     id: z.string(),
-    status: z.enum(['draft', 'pending', 'paid']),
+    status: z.enum(['draft', 'pending']),
     issuedAt: z.date(),
     paymentTerms: z.number(),
     projectDescription: z.string(),

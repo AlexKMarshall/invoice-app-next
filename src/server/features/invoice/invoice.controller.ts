@@ -107,7 +107,7 @@ const addressSchema = z.object({
 
 const newInvoiceInputDtoSchema = schemaForType<NewInvoiceInputDTO>()(
   z.object({
-    status: z.enum(['draft', 'pending', 'paid']),
+    status: z.enum(['draft', 'pending']),
     senderAddress: addressSchema,
     clientName: z.string().min(1),
     clientEmail: z.string().email(),

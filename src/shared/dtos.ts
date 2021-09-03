@@ -17,15 +17,15 @@ export type GetInvoiceSummaryDTO = {
       paymentDue: Date
       clientName: string
       total: number
-      status: 'draft' | 'pending' | 'paid'
+      status: InvoiceStatus
     }>
   }
 }
 
-export type InvoiceStatus = 'draft' | 'pending' | 'paid'
+export type InvoiceStatus = 'draft' | 'pending'
 
-export type NewInvoiceInputDTO = {
-  status: InvoiceStatus
+type NewDraftInvoiceInputDTO = {
+  status: 'draft'
   senderAddress: {
     street: string
     city: string
@@ -45,6 +45,32 @@ export type NewInvoiceInputDTO = {
   projectDescription: string
   itemList: Array<{ name: string; quantity: number; price: number }>
 }
+
+type NewPendingInvoiceInputDTO = {
+  status: 'pending'
+  senderAddress: {
+    street: string
+    city: string
+    postcode: string
+    country: string
+  }
+  clientName: string
+  clientEmail: string
+  clientAddress: {
+    street: string
+    city: string
+    postcode: string
+    country: string
+  }
+  issuedAt: Date
+  paymentTerms: number
+  projectDescription: string
+  itemList: Array<{ name: string; quantity: number; price: number }>
+}
+
+export type NewInvoiceInputDTO =
+  | NewDraftInvoiceInputDTO
+  | NewPendingInvoiceInputDTO
 
 export type NewInvoiceReturnDTO = {
   data: {

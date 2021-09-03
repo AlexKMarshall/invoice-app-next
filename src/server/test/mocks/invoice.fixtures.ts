@@ -1,22 +1,17 @@
 import { Except, IterableElement, PartialDeep } from 'type-fest'
+import {
+  InvoiceDetail,
+  InvoiceSummary,
+} from 'src/server/features/invoice/invoice.types'
 
-import { InvoiceDetail } from 'src/server/features/invoice/invoice.types'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import faker from 'faker'
 import { generateId } from 'src/shared/identifier'
 
 function randomStatus() {
-  const statuses = ['draft', 'pending', 'paid'] as const
+  const statuses = ['draft', 'pending'] as const
   const randomIndex = Math.floor(Math.random() * statuses.length)
   return statuses[randomIndex]
-}
-
-type InvoiceSummary = {
-  id: string
-  paymentDue: Date
-  clientName: string
-  total: number
-  status: 'draft' | 'pending' | 'paid'
 }
 
 export function buildMockInvoiceSummary(): InvoiceSummary {
