@@ -3,6 +3,7 @@ import * as invoiceModel from 'src/client/test/mocks/invoice.model'
 import {
   buildMockDraftInvoiceInput,
   buildMockInvoice,
+  buildMockPendingInvoiceInput,
 } from 'src/client/test/mocks/invoice.fixtures'
 import {
   render,
@@ -251,6 +252,163 @@ it('should allow new draft invoices to be creacted', async () => {
   // save the draft invoice
 
   userEvent.click(screen.getByRole('button', { name: /save as draft/i }))
+
+  // Expect the new invoice to appear optimistically
+
+  const elInvoiceTable = await screen.findByRole('table', { name: /invoices/i })
+  const inInvoiceTable = within(elInvoiceTable)
+  const savingIdDisplay = '------'
+  const elNewInvoiceItem = inInvoiceTable.getByRole('row', {
+    name: savingIdDisplay,
+  })
+  const inNewInvoiceItem = within(elNewInvoiceItem)
+
+  // invoices don't get links til they're saved and have a real ID
+  expect(inNewInvoiceItem.queryByRole('link')).not.toBeInTheDocument()
+
+  expect(
+    inNewInvoiceItem.getByText(
+      `Due ${format(mockInvoiceSummary.paymentDue, 'dd MMM yyyy')}`
+    )
+  ).toBeInTheDocument()
+  expect(
+    inNewInvoiceItem.getByText(mockInvoiceSummary.clientName)
+  ).toBeInTheDocument()
+  expect(
+    inNewInvoiceItem.getByText(
+      currencyFormatter.format(mockInvoiceSummary.total / 100)
+    )
+  ).toBeInTheDocument()
+  expect(
+    inNewInvoiceItem.getByText(mockInvoiceSummary.status)
+  ).toBeInTheDocument()
+
+  // expect the id to be populated properly once the response from the server received
+
+  const elNotificationArea = screen.getByRole('status')
+
+  await waitFor(() =>
+    expect(elNotificationArea).toHaveTextContent(
+      /New invoice id .* successfully created/i
+    )
+  )
+
+  const invoiceIdMatch = elNotificationArea.textContent?.match(/[A-Z]{2}\d{4}/)
+  if (!invoiceIdMatch)
+    throw new Error(
+      `Failed to match invoice id of required format in ${elNotificationArea.textContent}`
+    )
+
+  const [savedInvoiceId] = invoiceIdMatch
+  // we should now have a link to that invoice
+  expect(
+    inInvoiceTable.getByRole('link', { name: savedInvoiceId })
+  ).toHaveAttribute('href', `/invoices/${savedInvoiceId}`)
+})
+it('should allow new pending invoices to be creacted', async () => {
+  const existingInvoice = buildMockInvoice()
+  invoiceModel.initialise([existingInvoice])
+  const mockPendingInvoiceInput = buildMockPendingInvoiceInput()
+  // we aren't validating the id here, so we can give it an empty string
+  const mockInvoiceSummary = invoiceModel.invoiceDetailToSummary({
+    id: '',
+    ...mockPendingInvoiceInput,
+  })
+  render(<InvoiceSummaryScreen />)
+
+  await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
+
+  userEvent.click(screen.getByRole('button', { name: /new invoice/i }))
+
+  expect(screen.getByRole('form', { name: /new invoice/i })).toBeInTheDocument()
+
+  const elBillFromGroup = screen.getByRole('group', { name: /bill from/i })
+  const inBillFrom = within(elBillFromGroup)
+
+  validateTextfieldEntry(
+    inBillFrom.getByLabelText(/street address/i),
+    mockPendingInvoiceInput.senderAddress.street
+  )
+  validateTextfieldEntry(
+    inBillFrom.getByLabelText(/city/i),
+    mockPendingInvoiceInput.senderAddress.city
+  )
+  validateTextfieldEntry(
+    inBillFrom.getByLabelText(/post code/i),
+    mockPendingInvoiceInput.senderAddress.postcode
+  )
+  validateTextfieldEntry(
+    inBillFrom.getByLabelText(/country/i),
+    mockPendingInvoiceInput.senderAddress.country
+  )
+
+  const elBillToGroup = screen.getByRole('group', { name: /bill to/i })
+  const inBillTo = within(elBillToGroup)
+
+  validateTextfieldEntry(
+    inBillTo.getByLabelText(/client's name/i),
+    mockPendingInvoiceInput.clientName
+  )
+  validateTextfieldEntry(
+    inBillTo.getByLabelText(/client's email/i),
+    mockPendingInvoiceInput.clientEmail
+  )
+  validateTextfieldEntry(
+    inBillTo.getByLabelText(/street address/i),
+    mockPendingInvoiceInput.senderAddress.street
+  )
+  validateTextfieldEntry(
+    inBillTo.getByLabelText(/city/i),
+    mockPendingInvoiceInput.senderAddress.city
+  )
+  validateTextfieldEntry(
+    inBillTo.getByLabelText(/post code/i),
+    mockPendingInvoiceInput.senderAddress.postcode
+  )
+  validateTextfieldEntry(
+    inBillTo.getByLabelText(/country/i),
+    mockPendingInvoiceInput.senderAddress.country
+  )
+
+  validateTextfieldEntry(
+    screen.getByLabelText(/issue date/i),
+    format(mockPendingInvoiceInput.issuedAt, 'yyyy-MM-dd')
+  )
+  validateTextfieldEntry(
+    screen.getByLabelText(/payment terms/i),
+    mockPendingInvoiceInput.paymentTerms.toString(),
+    mockPendingInvoiceInput.paymentTerms
+  )
+  validateTextfieldEntry(
+    screen.getByLabelText(/project description/i),
+    mockPendingInvoiceInput.projectDescription
+  )
+
+  const elItemList = screen.getByRole('table', { name: /item list/i })
+  const inItemList = within(elItemList)
+
+  mockPendingInvoiceInput.itemList.forEach((item) => {
+    userEvent.click(screen.getByRole('button', { name: /add new item/i }))
+
+    const [lastRow] = inItemList.getAllByRole('row').slice(-1)
+    const inLastRow = within(lastRow)
+
+    validateTextfieldEntry(inLastRow.getByLabelText(/item name/i), item.name)
+    validateTextfieldEntry(
+      inLastRow.getByLabelText(/quantity/i),
+      item.quantity.toString(),
+      item.quantity
+    )
+    validateTextfieldEntry(
+      inLastRow.getByLabelText(/price/i),
+      item.price.toString(),
+      item.price
+    )
+  })
+
+  // save the draft invoice
+
+  userEvent.click(screen.getByRole('button', { name: /save & send/i }))
 
   // Expect the new invoice to appear optimistically
 

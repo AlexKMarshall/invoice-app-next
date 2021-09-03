@@ -32,6 +32,10 @@ export function buildMockDraftInvoiceInput(): NewInvoiceInputDTO {
   return { ...buildMockInvoiceInput(), status: 'draft' }
 }
 
+export function buildMockPendingInvoiceInput(): NewInvoiceInputDTO {
+  return { ...buildMockInvoiceInput(), status: 'pending' }
+}
+
 function pickRandomStatus() {
   const statuses = ['draft', 'pending', 'paid'] as const
   const randomIndex = Math.floor(Math.random() * statuses.length)

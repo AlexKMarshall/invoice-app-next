@@ -18,7 +18,7 @@ type Props = {
   'aria-labelledby': string
 }
 
-type NewInvoiceFormFields = Omit<NewInvoiceInputDTO, 'status'>
+type NewInvoiceFormFields = NewInvoiceInputDTO
 
 const DEFAULT_ITEM_VALUES = { name: '', quantity: 0, price: 0 }
 const DEFAULT_FORM_VALUES = {
@@ -40,6 +40,7 @@ const DEFAULT_FORM_VALUES = {
   paymentTerms: 0,
   projectDescription: '',
   itemList: [],
+  status: 'draft' as const,
 }
 
 export function NewInvoiceForm({
@@ -61,6 +62,7 @@ export function NewInvoiceForm({
     handleSubmit,
     control,
     formState: { errors },
+    setValue,
   } = useForm<NewInvoiceFormFields>({
     defaultValues: DEFAULT_FORM_VALUES,
   })
@@ -72,8 +74,8 @@ export function NewInvoiceForm({
   return (
     <Form
       onSubmit={handleSubmit((data) => {
-        createInvoiceMutation.mutate({ status: 'draft', ...data })
-        onSubmit?.({ status: 'draft', ...data })
+        createInvoiceMutation.mutate(data)
+        onSubmit?.(data)
       })}
       {...delegatedProps}
     >
@@ -254,14 +256,27 @@ export function NewInvoiceForm({
           </Button>
         </GridWrapper>
       </Fieldset>
+      <input type="hidden" {...register('status')} />
       <ButtonGroup>
         <Button type="button" color="muted" onClick={() => onCancel?.()}>
           Discard
         </Button>
-        <Button type="submit" color="mono">
+        <Button
+          type="submit"
+          color="mono"
+          onClick={() => {
+            setValue('status', 'draft')
+          }}
+        >
           Save as Draft
         </Button>
-        <Button type="submit" color="primary">
+        <Button
+          type="submit"
+          color="primary"
+          onClick={() => {
+            setValue('status', 'pending')
+          }}
+        >
           Save & Send
         </Button>
       </ButtonGroup>
