@@ -1,5 +1,3 @@
-import { InvoiceStatus } from 'src/shared/dtos'
-
 export type DraftInvoiceDetail = {
   id: string
   status: 'draft'

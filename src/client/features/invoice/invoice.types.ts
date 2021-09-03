@@ -1,5 +1,3 @@
-type InvoiceStatus = 'draft' | 'pending'
-
 type DraftInvoiceDetail = {
   id: string
   status: 'draft'

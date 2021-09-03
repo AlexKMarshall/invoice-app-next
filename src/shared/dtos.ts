@@ -22,7 +22,7 @@ export type GetInvoiceSummaryDTO = {
   }
 }
 
-export type InvoiceStatus = 'draft' | 'pending'
+type InvoiceStatus = 'draft' | 'pending'
 
 type NewDraftInvoiceInputDTO = {
   status: 'draft'
