@@ -1,4 +1,4 @@
-import { currencyFormatter } from './currency'
+import { currencyFormatterGBP } from './currency'
 
 describe('currencyFormatter', () => {
   it('should format as GBP', () => {
@@ -13,7 +13,7 @@ describe('currencyFormatter', () => {
     ]
 
     testCases.forEach(({ input, expected }) => {
-      const result = currencyFormatter.format(input)
+      const result = currencyFormatterGBP.format(input)
       expect(result).toEqual(expected)
     })
   })

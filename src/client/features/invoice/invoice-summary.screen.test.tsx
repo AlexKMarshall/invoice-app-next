@@ -15,7 +15,7 @@ import {
 } from 'src/client/test/test-utils'
 
 import { InvoiceSummaryScreen } from './invoice-summary.screen'
-import { currencyFormatter } from 'src/client/shared/currency'
+import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { idRegex } from 'src/shared/identifier'
 
@@ -49,7 +49,7 @@ it('should show list of invoice summaries', async () => {
     ).toBeInTheDocument()
     expect(inInvoice.getByText(mockInvoice.clientName)).toBeInTheDocument()
     expect(
-      inInvoice.getByText(currencyFormatter.format(mockInvoice.total / 100))
+      inInvoice.getByText(currencyFormatterGBP.format(mockInvoice.total / 100))
     ).toBeInTheDocument()
     expect(inInvoice.getByText(mockInvoice.status)).toBeInTheDocument()
   })
@@ -277,7 +277,7 @@ it('should allow new draft invoices to be creacted', async () => {
   ).toBeInTheDocument()
   expect(
     inNewInvoiceItem.getByText(
-      currencyFormatter.format(mockInvoiceSummary.total / 100)
+      currencyFormatterGBP.format(mockInvoiceSummary.total / 100)
     )
   ).toBeInTheDocument()
   expect(
@@ -437,7 +437,7 @@ it('should allow new pending invoices to be creacted', async () => {
   ).toBeInTheDocument()
   expect(
     inNewInvoiceItem.getByText(
-      currencyFormatter.format(mockInvoiceSummary.total / 100)
+      currencyFormatterGBP.format(mockInvoiceSummary.total / 100)
     )
   ).toBeInTheDocument()
   expect(

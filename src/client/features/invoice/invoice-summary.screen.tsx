@@ -16,7 +16,7 @@ import Link from 'next/link'
 import { NewInvoiceForm } from './new-invoice-form'
 import { Sidebar } from 'src/client/shared/components/sidebar'
 import { StatusBadge } from 'src/client/shared/components/status-badge'
-import { currencyFormatter } from 'src/client/shared/currency'
+import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { inflect } from 'src/client/shared/grammar'
 import styled from 'styled-components'
@@ -218,7 +218,7 @@ function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
       <Cell>{invoice.clientName}</Cell>
       <Cell style={{ textAlign: 'right' }}>
         <Heading level={3} forwardedAs="span">
-          {currencyFormatter.format(invoice.total / 100)}
+          {currencyFormatterGBP.format(invoice.total / 100)}
         </Heading>
       </Cell>
       <Cell>
