@@ -2,7 +2,7 @@ import { GetInvoiceSummaryDTO, NewInvoiceReturnDTO } from 'src/shared/dtos'
 
 import { IterableElement } from 'msw/node_modules/type-fest'
 import { add } from 'date-fns'
-import { generateId } from 'src/client/shared/identifier'
+import { generateId } from 'src/shared/identifier'
 
 type InvoiceSummary = IterableElement<GetInvoiceSummaryDTO['data']['invoices']>
 type InvoiceDetail = NewInvoiceReturnDTO['data']['savedInvoice']

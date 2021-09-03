@@ -3,7 +3,7 @@ import { Except, IterableElement, PartialDeep } from 'type-fest'
 import { InvoiceDetail } from 'src/server/features/invoice/invoice.types'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import faker from 'faker'
-import { generateId } from 'src/client/shared/identifier'
+import { generateId } from 'src/shared/identifier'
 
 function randomStatus() {
   const statuses = ['draft', 'pending', 'paid'] as const

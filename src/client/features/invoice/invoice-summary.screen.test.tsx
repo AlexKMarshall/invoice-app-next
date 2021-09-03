@@ -17,6 +17,7 @@ import {
 import { InvoiceSummaryScreen } from './invoice-summary.screen'
 import { currencyFormatter } from 'src/client/shared/currency'
 import { format } from 'date-fns'
+import { idRegex } from 'src/shared/identifier'
 
 it('should show list of invoice summaries', async () => {
   const mockInvoiceDetails = [buildMockInvoice(), buildMockInvoice()]
@@ -287,13 +288,16 @@ it('should allow new draft invoices to be creacted', async () => {
 
   const elNotificationArea = screen.getByRole('status')
 
-  await waitFor(() =>
-    expect(elNotificationArea).toHaveTextContent(
-      /New invoice id .* successfully created/i
-    )
+  const notificationRegex = new RegExp(
+    `new invoice id ${idRegex.source} successfully created`,
+    'i'
   )
 
-  const invoiceIdMatch = elNotificationArea.textContent?.match(/[A-Z]{2}\d{4}/)
+  await waitFor(() =>
+    expect(elNotificationArea).toHaveTextContent(notificationRegex)
+  )
+
+  const invoiceIdMatch = elNotificationArea.textContent?.match(idRegex)
   if (!invoiceIdMatch)
     throw new Error(
       `Failed to match invoice id of required format in ${elNotificationArea.textContent}`
@@ -443,14 +447,16 @@ it('should allow new pending invoices to be creacted', async () => {
   // expect the id to be populated properly once the response from the server received
 
   const elNotificationArea = screen.getByRole('status')
-
-  await waitFor(() =>
-    expect(elNotificationArea).toHaveTextContent(
-      /New invoice id .* successfully created/i
-    )
+  const notificationRegex = new RegExp(
+    `new invoice id ${idRegex.source} successfully created`,
+    'i'
   )
 
-  const invoiceIdMatch = elNotificationArea.textContent?.match(/[A-Z]{2}\d{4}/)
+  await waitFor(() =>
+    expect(elNotificationArea).toHaveTextContent(notificationRegex)
+  )
+
+  const invoiceIdMatch = elNotificationArea.textContent?.match(idRegex)
   if (!invoiceIdMatch)
     throw new Error(
       `Failed to match invoice id of required format in ${elNotificationArea.textContent}`

@@ -5,6 +5,7 @@ import {
 import { database, prepareDbForTests } from 'src/server/test/test-utils'
 
 import handler from 'src/pages/api/invoices'
+import { idRegex } from 'src/shared/identifier'
 import { invoiceDetailToSummary } from 'src/server/features/invoice/invoice.mappers'
 import { testApiHandler } from 'next-test-api-route-handler'
 
@@ -78,7 +79,7 @@ it('should post a draft invoice', async () => {
             itemList: expect.arrayContaining(
               JSON.parse(JSON.stringify(newInvoiceInput.itemList))
             ),
-            id: expect.stringMatching(/[A-Z]{2}\d{4}/),
+            id: expect.stringMatching(idRegex),
           },
         },
       })

@@ -8,7 +8,7 @@ import {
   buildMockInvoiceSummary,
 } from '../../test/mocks/invoice.fixtures'
 
-import { generateId } from 'src/client/shared/identifier'
+import { generateId } from 'src/shared/identifier'
 import { mocked } from 'ts-jest/utils'
 
 jest.mock('./invoice.model')

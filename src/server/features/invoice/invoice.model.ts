@@ -8,7 +8,7 @@ import { InvoiceSummary } from './invoice.types'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { Prisma } from '@prisma/client'
 import { add } from 'date-fns'
-import { generateId } from 'src/client/shared/identifier'
+import { generateId } from 'src/shared/identifier'
 import prisma from 'src/server/prisma'
 
 function dbFindAllSummaries() {
