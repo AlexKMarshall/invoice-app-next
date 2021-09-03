@@ -1,15 +1,15 @@
-export function randomDigit(): number {
+function randomDigit(): number {
   return Math.floor(Math.random() * 10)
 }
 
-export function randomLetter(): string {
+function randomLetter(): string {
   const randomOffset = Math.floor(Math.random() * 26)
   const startCode = 'A'.charCodeAt(0)
   const charCode = startCode + randomOffset
   return String.fromCharCode(charCode)
 }
 
-export function generateInvoiceId(): string {
+export function generateId(): string {
   const characters = [
     randomLetter(),
     randomLetter(),
@@ -22,12 +22,4 @@ export function generateInvoiceId(): string {
   return characters.join('')
 }
 
-export const currencyFormatter = new Intl.NumberFormat('en-GB', {
-  style: 'currency',
-  currency: 'GBP',
-})
-
-export function inflect(singular: string, plural = `${singular}s`) {
-  return (quantity: number): string =>
-    Math.abs(quantity) === 1 ? singular : plural
-}
+export const idRegex = /[A-Z]{2}\d{4}/

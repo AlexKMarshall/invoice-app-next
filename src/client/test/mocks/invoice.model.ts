@@ -2,7 +2,7 @@ import { GetInvoiceSummaryDTO, NewInvoiceReturnDTO } from 'src/shared/dtos'
 
 import { IterableElement } from 'msw/node_modules/type-fest'
 import { add } from 'date-fns'
-import { generateInvoiceId } from 'src/client/shared/utils'
+import { generateId } from 'src/client/shared/identifier'
 
 type InvoiceSummary = IterableElement<GetInvoiceSummaryDTO['data']['invoices']>
 type InvoiceDetail = NewInvoiceReturnDTO['data']['savedInvoice']
@@ -21,7 +21,7 @@ export function findAll(): Promise<Array<InvoiceSummary>> {
 export function save(
   invoice: Omit<InvoiceDetail, 'id'>
 ): Promise<InvoiceDetail> {
-  const id = generateInvoiceId()
+  const id = generateId()
   const invoiceWithId = { ...invoice, id }
   store.invoiceDetails.push(invoiceWithId)
   return Promise.resolve(invoiceWithId)

@@ -1,7 +1,7 @@
 import { InvoiceDetail } from 'src/client/features/invoice/invoice.types'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import faker from 'faker'
-import { generateInvoiceId } from 'src/client/shared/utils'
+import { generateId } from 'src/client/shared/identifier'
 
 export function buildMockInvoiceInput(): NewInvoiceInputDTO {
   const itemsCount = faker.datatype.number({ min: 1, max: 3 })
@@ -52,7 +52,7 @@ function buildMockItem() {
 
 export function buildMockInvoice(): InvoiceDetail {
   return {
-    id: generateInvoiceId(),
+    id: generateId(),
     ...buildMockInvoiceInput(),
   }
 }

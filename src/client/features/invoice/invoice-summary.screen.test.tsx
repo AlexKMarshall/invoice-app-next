@@ -15,7 +15,7 @@ import {
 } from 'src/client/test/test-utils'
 
 import { InvoiceSummaryScreen } from './invoice-summary.screen'
-import { currencyFormatter } from 'src/client/shared/utils'
+import { currencyFormatter } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 
 it('should show list of invoice summaries', async () => {

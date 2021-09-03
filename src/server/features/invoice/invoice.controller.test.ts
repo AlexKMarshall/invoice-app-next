@@ -8,7 +8,7 @@ import {
   buildMockInvoiceSummary,
 } from '../../test/mocks/invoice.fixtures'
 
-import { generateInvoiceId } from 'src/client/shared/utils'
+import { generateId } from 'src/client/shared/identifier'
 import { mocked } from 'ts-jest/utils'
 
 jest.mock('./invoice.model')
@@ -63,7 +63,7 @@ describe('postInvoice', () => {
     ) as Stringify<NewInvoiceInputDTO>
     const mockSavedInvoice = {
       ...mockDraftInvoiceInput,
-      id: generateInvoiceId(),
+      id: generateId(),
     }
 
     mockInvoiceModel.create.mockResolvedValueOnce(mockSavedInvoice)

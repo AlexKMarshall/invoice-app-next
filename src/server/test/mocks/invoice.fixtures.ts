@@ -3,7 +3,7 @@ import { Except, IterableElement, PartialDeep } from 'type-fest'
 import { InvoiceDetail } from 'src/server/features/invoice/invoice.types'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import faker from 'faker'
-import { generateInvoiceId } from 'src/client/shared/utils'
+import { generateId } from 'src/client/shared/identifier'
 
 function randomStatus() {
   const statuses = ['draft', 'pending', 'paid'] as const
@@ -21,7 +21,7 @@ type InvoiceSummary = {
 
 export function buildMockInvoiceSummary(): InvoiceSummary {
   return {
-    id: generateInvoiceId(),
+    id: generateId(),
     paymentDue: faker.date.soon(),
     clientName: faker.name.findName(),
     total: faker.datatype.number(),
@@ -105,7 +105,7 @@ export function buildMockInvoiceDetail(
 ): InvoiceDetail {
   const { id: overrideId, ...otherOverrides } = overrides
 
-  const id = overrideId ?? generateInvoiceId()
+  const id = overrideId ?? generateId()
   return {
     id,
     ...buildMockInvoiceInput(otherOverrides),
