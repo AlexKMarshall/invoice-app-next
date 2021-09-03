@@ -6,7 +6,6 @@ import {
   useDrawer,
 } from 'src/client/shared/components/drawer'
 import { MouseEventHandler, TableHTMLAttributes, useRef, useState } from 'react'
-import { currencyFormatter, inflect } from 'src/client/shared/utils'
 
 import { ArrowRight } from 'src/client/shared/icons/arrow-right'
 import { Heading as BaseHeading } from 'src/client/shared/components/typography'
@@ -17,7 +16,9 @@ import Link from 'next/link'
 import { NewInvoiceForm } from './new-invoice-form'
 import { Sidebar } from 'src/client/shared/components/sidebar'
 import { StatusBadge } from 'src/client/shared/components/status-badge'
+import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
+import { inflect } from 'src/client/shared/grammar'
 import styled from 'styled-components'
 import { useId } from '@react-aria/utils'
 import { useInvoiceSummaries } from './invoice.queries'
@@ -217,7 +218,7 @@ function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
       <Cell>{invoice.clientName}</Cell>
       <Cell style={{ textAlign: 'right' }}>
         <Heading level={3} forwardedAs="span">
-          {currencyFormatter.format(invoice.total / 100)}
+          {currencyFormatterGBP.format(invoice.total / 100)}
         </Heading>
       </Cell>
       <Cell>

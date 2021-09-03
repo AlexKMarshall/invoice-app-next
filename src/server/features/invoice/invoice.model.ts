@@ -2,12 +2,13 @@ import * as z from 'zod'
 
 import { AsyncReturnType, IterableElement } from 'type-fest'
 
+// TODO this shouldn't come from client folder
 import { InvoiceDetail } from 'src/client/features/invoice/invoice.types'
 import { InvoiceSummary } from './invoice.types'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { Prisma } from '@prisma/client'
 import { add } from 'date-fns'
-import { generateInvoiceId } from 'src/client/shared/utils'
+import { generateId } from 'src/shared/identifier'
 import prisma from 'src/server/prisma'
 
 function dbFindAllSummaries() {
@@ -222,7 +223,7 @@ function prepareInvoiceForCreate(
     ...restInvoice
   } = newInvoice
 
-  const id = generateInvoiceId()
+  const id = generateId()
 
   const sender: Prisma.SenderCreateNestedOneWithoutInvoiceInput = {
     create: {

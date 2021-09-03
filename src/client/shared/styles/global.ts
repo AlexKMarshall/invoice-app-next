@@ -25,6 +25,7 @@ export const Global = createGlobalStyle`
     --sidebar-color: ${COLORS.sidebarColor.value};
     --divider-color: ${COLORS.dividerColor.value};
     --field-border-color: ${COLORS.fieldBorderColor.value};
+    --warning-color: ${COLORS.warningColor.value};
     /* TYPOGRAPHY */
     --h1-font-size: ${TYPOGRAPHY.h1.fontSize.value};
     --h1-line-height: ${TYPOGRAPHY.h1.lineHeight.value};

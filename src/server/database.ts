@@ -1,6 +1,6 @@
-import * as invoiceModel from './invoice.model'
+import * as invoiceModel from './features/invoice/invoice.model'
 
-import { InvoiceDetail } from './invoice.types'
+import { InvoiceDetail } from './features/invoice/invoice.types'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { Client as PGClient } from 'pg'
 import { execSync } from 'child_process'

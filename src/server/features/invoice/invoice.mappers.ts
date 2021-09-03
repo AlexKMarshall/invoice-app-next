@@ -1,4 +1,7 @@
-import { InvoiceDetail, InvoiceSummary } from 'src/server/invoice.types'
+import {
+  InvoiceDetail,
+  InvoiceSummary,
+} from 'src/server/features/invoice/invoice.types'
 
 import { add } from 'date-fns'
 
