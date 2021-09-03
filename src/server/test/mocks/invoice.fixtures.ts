@@ -7,11 +7,10 @@ import {
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import faker from 'faker'
 import { generateId } from 'src/shared/identifier'
+import { randomPick } from 'src/shared/random'
 
 function randomStatus() {
-  const statuses = ['draft', 'pending'] as const
-  const randomIndex = Math.floor(Math.random() * statuses.length)
-  return statuses[randomIndex]
+  return randomPick(['draft', 'pending'] as const)
 }
 
 export function buildMockInvoiceSummary(): InvoiceSummary {

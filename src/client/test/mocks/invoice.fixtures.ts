@@ -2,11 +2,12 @@ import { InvoiceDetail } from 'src/client/features/invoice/invoice.types'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import faker from 'faker'
 import { generateId } from 'src/shared/identifier'
+import { randomPick } from 'src/shared/random'
 
 export function buildMockInvoiceInput(): NewInvoiceInputDTO {
   const itemsCount = faker.datatype.number({ min: 1, max: 3 })
   return {
-    status: pickRandomStatus(),
+    status: randomStatus(),
     senderAddress: {
       street: faker.address.streetAddress(),
       city: faker.address.city(),
@@ -36,10 +37,9 @@ export function buildMockPendingInvoiceInput(): NewInvoiceInputDTO {
   return { ...buildMockInvoiceInput(), status: 'pending' }
 }
 
-function pickRandomStatus() {
+function randomStatus() {
   const statuses = ['draft', 'pending'] as const
-  const randomIndex = Math.floor(Math.random() * statuses.length)
-  return statuses[randomIndex]
+  return randomPick(statuses)
 }
 
 function buildMockItem() {
