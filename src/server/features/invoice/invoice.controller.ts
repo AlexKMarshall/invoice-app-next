@@ -3,8 +3,10 @@ import * as z from 'zod'
 
 import {
   GetInvoiceSummaryDTO,
+  NewDraftInvoiceInputDTO,
   NewInvoiceInputDTO,
   NewInvoiceReturnDTO,
+  NewPendingInvoiceInputDTO,
 } from 'src/shared/dtos'
 import { JsonArray, JsonObject } from 'type-fest'
 
@@ -105,16 +107,16 @@ const addressSchema = z.object({
   postcode: z.string().min(1),
 })
 
-const newInvoiceInputDtoSchema = schemaForType<NewInvoiceInputDTO>()(
+const newDraftInvoiceInputDtoSchema = schemaForType<NewDraftInvoiceInputDTO>()(
   z.object({
-    status: z.enum(['draft', 'pending']),
+    status: z.literal('draft'),
     senderAddress: addressSchema,
     clientName: z.string().min(1),
     clientEmail: z.string().email(),
     clientAddress: addressSchema,
     issuedAt: z.date(),
     paymentTerms: z.number().min(0),
-    projectDescription: z.string().min(1),
+    projectDescription: z.string().optional(),
     itemList: z.array(
       z.object({
         name: z.string().min(1),
@@ -124,6 +126,32 @@ const newInvoiceInputDtoSchema = schemaForType<NewInvoiceInputDTO>()(
     ),
   })
 )
+
+const newPendingInvoiceInputDtoSchema =
+  schemaForType<NewPendingInvoiceInputDTO>()(
+    z.object({
+      status: z.literal('pending'),
+      senderAddress: addressSchema,
+      clientName: z.string().min(1),
+      clientEmail: z.string().email(),
+      clientAddress: addressSchema,
+      issuedAt: z.date(),
+      paymentTerms: z.number().min(0),
+      projectDescription: z.string().min(1),
+      itemList: z.array(
+        z.object({
+          name: z.string().min(1),
+          quantity: z.number().min(1),
+          price: z.number().min(0),
+        })
+      ),
+    })
+  )
+
+const newInvoiceInputDtoSchema = z.union([
+  newDraftInvoiceInputDtoSchema,
+  newPendingInvoiceInputDtoSchema,
+])
 
 function flattenError(
   error: z.ZodError<z.infer<typeof newInvoiceInputDtoSchema>>

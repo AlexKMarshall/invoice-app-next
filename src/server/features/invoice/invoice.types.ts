@@ -17,7 +17,7 @@ export type DraftInvoiceDetail = {
   }
   issuedAt: Date
   paymentTerms: number
-  projectDescription: string
+  projectDescription?: string
   itemList: Array<{ name: string; quantity: number; price: number }>
 }
 

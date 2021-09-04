@@ -4,7 +4,7 @@ import faker from 'faker'
 import { generateId } from 'src/shared/identifier'
 import { randomPick } from 'src/shared/random'
 
-export function buildMockInvoiceInput(): NewInvoiceInputDTO {
+function buildMockInvoiceInput() {
   const itemsCount = faker.datatype.number({ min: 1, max: 3 })
   return {
     status: randomStatus(),

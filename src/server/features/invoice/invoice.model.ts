@@ -1,10 +1,8 @@
 import * as z from 'zod'
 
 import { AsyncReturnType, IterableElement } from 'type-fest'
+import { InvoiceDetail, InvoiceSummary } from './invoice.types'
 
-// TODO this shouldn't come from client folder
-import { InvoiceDetail } from 'src/client/features/invoice/invoice.types'
-import { InvoiceSummary } from './invoice.types'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { Prisma } from '@prisma/client'
 import { add } from 'date-fns'
@@ -178,33 +176,33 @@ function dbCreate(invoice: Prisma.InvoiceCreateInput) {
 type DBCreateInvoiceReturn = AsyncReturnType<typeof dbCreate>
 
 const addressSchema = z.object({
-  street: z.string(),
-  city: z.string(),
-  country: z.string(),
-  postcode: z.string(),
+  street: z.string().min(1),
+  city: z.string().min(1),
+  country: z.string().min(1),
+  postcode: z.string().min(1),
 })
 
 const createInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
   z.object({
-    id: z.string(),
+    id: z.string().min(1),
     status: z.enum(['draft', 'pending']),
     issuedAt: z.date(),
     paymentTerms: z.number(),
-    projectDescription: z.string(),
+    projectDescription: z.string().min(1),
     sender: z.object({
       address: addressSchema,
     }),
     client: z.object({
-      name: z.string(),
-      email: z.string(),
+      name: z.string().min(1),
+      email: z.string().min(1),
       address: addressSchema,
     }),
     invoiceItems: z.array(
       z.object({
-        quantity: z.number(),
+        quantity: z.number().min(1),
         item: z.object({
-          name: z.string(),
-          price: z.number(),
+          name: z.string().min(1),
+          price: z.number().min(0),
         }),
       })
     ),

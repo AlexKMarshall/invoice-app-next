@@ -1,10 +1,11 @@
-import { Except, IterableElement, PartialDeep } from 'type-fest'
+import { IterableElement, PartialDeep } from 'type-fest'
 import {
-  InvoiceDetail,
-  InvoiceSummary,
-} from 'src/server/features/invoice/invoice.types'
+  NewDraftInvoiceInputDTO,
+  NewInvoiceInputDTO,
+  NewPendingInvoiceInputDTO,
+} from 'src/shared/dtos'
 
-import { NewInvoiceInputDTO } from 'src/shared/dtos'
+import { InvoiceDetail } from 'src/server/features/invoice/invoice.types'
 import faker from 'faker'
 import { generateId } from 'src/shared/identifier'
 import { randomPick } from 'src/shared/random'
@@ -13,19 +14,9 @@ function randomStatus() {
   return randomPick(['draft', 'pending'] as const)
 }
 
-export function buildMockInvoiceSummary(): InvoiceSummary {
-  return {
-    id: generateId(),
-    paymentDue: faker.date.soon(),
-    clientName: faker.name.findName(),
-    total: faker.datatype.number(),
-    status: randomStatus(),
-  }
-}
-
-export function buildMockInvoiceInput(
+export function buildMockCompleteInvoiceInput(
   overrides: PartialDeep<NewInvoiceInputDTO> = {}
-): NewInvoiceInputDTO {
+): Required<NewInvoiceInputDTO> {
   const {
     senderAddress: overrideSenderAddress,
     clientAddress: overrideClientAddress,
@@ -85,13 +76,16 @@ function buildMockItem(overrides: PartialDeep<Item> = {}): Item {
   }
 }
 
-type NewDraftInvoiceInputDTO = Except<NewInvoiceInputDTO, 'status'> & {
-  status: 'draft'
-}
 export function buildMockDraftInvoiceInput(
   overrides?: PartialDeep<NewDraftInvoiceInputDTO>
 ): NewDraftInvoiceInputDTO {
-  return { ...buildMockInvoiceInput(overrides), status: 'draft' }
+  return { ...buildMockCompleteInvoiceInput(overrides), status: 'draft' }
+}
+
+export function buildMockPendingInvoiceInput(
+  overrides?: PartialDeep<NewPendingInvoiceInputDTO>
+): NewPendingInvoiceInputDTO {
+  return { ...buildMockCompleteInvoiceInput(overrides), status: 'pending' }
 }
 
 export function buildMockInvoiceDetail(
@@ -102,6 +96,6 @@ export function buildMockInvoiceDetail(
   const id = overrideId ?? generateId()
   return {
     id,
-    ...buildMockInvoiceInput(otherOverrides),
+    ...buildMockCompleteInvoiceInput(otherOverrides),
   }
 }

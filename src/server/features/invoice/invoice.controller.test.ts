@@ -3,12 +3,11 @@ import * as invoiceModel from './invoice.model'
 
 import { NewInvoiceInputDTO, Stringify } from 'src/shared/dtos'
 import {
+  buildMockCompleteInvoiceInput,
   buildMockDraftInvoiceInput,
-  buildMockInvoiceInput,
-  buildMockInvoiceSummary,
+  buildMockPendingInvoiceInput,
 } from '../../test/mocks/invoice.fixtures'
 
-import { generateId } from 'src/shared/identifier'
 import { mocked } from 'ts-jest/utils'
 
 jest.mock('./invoice.model')
@@ -20,28 +19,6 @@ afterEach(() => {
 })
 
 describe('getInvoices', () => {
-  it('should get invoices', async () => {
-    const mockInvoices = [
-      buildMockInvoiceSummary(),
-      buildMockInvoiceSummary(),
-      buildMockInvoiceSummary(),
-    ]
-
-    mockInvoiceModel.findAll.mockResolvedValueOnce(mockInvoices)
-
-    const result = await invoiceController.getInvoices()
-
-    expect(result.code).toBe(200)
-    expect(result.response).toMatchObject({
-      data: {
-        invoices: mockInvoices,
-      },
-    })
-
-    expect(mockInvoiceModel.findAll).toHaveBeenCalledTimes(1)
-    expect(mockInvoiceModel.findAll).toHaveBeenCalledWith()
-  })
-
   it('should handle an unexpected database error', async () => {
     const mockError = new Error('Some error message')
     mockInvoiceModel.findAll.mockRejectedValueOnce(mockError)
@@ -56,31 +33,6 @@ describe('getInvoices', () => {
 })
 
 describe('postInvoice', () => {
-  it('should post valid draft invoice', async () => {
-    const mockDraftInvoiceInput = buildMockDraftInvoiceInput()
-    const dtoInput = JSON.parse(
-      JSON.stringify(mockDraftInvoiceInput)
-    ) as Stringify<NewInvoiceInputDTO>
-    const mockSavedInvoice = {
-      ...mockDraftInvoiceInput,
-      id: generateId(),
-    }
-
-    mockInvoiceModel.create.mockResolvedValueOnce(mockSavedInvoice)
-
-    const result = await invoiceController.postInvoice(dtoInput)
-
-    expect(result.code).toBe(201)
-    expect(result.response).toMatchObject({
-      data: {
-        savedInvoice: mockSavedInvoice,
-      },
-    })
-
-    expect(mockInvoiceModel.create).toHaveBeenCalledTimes(1)
-    expect(mockInvoiceModel.create).toHaveBeenCalledWith(mockDraftInvoiceInput)
-  })
-
   it('should handle an unexpected database error', async () => {
     const mockError = new Error('Some error message')
     mockInvoiceModel.create.mockRejectedValueOnce(mockError)
@@ -98,7 +50,7 @@ describe('postInvoice', () => {
     })
   })
   it('should return error when input has empty strings', async () => {
-    const mockInput = buildMockInvoiceInput({
+    const mockInput = buildMockPendingInvoiceInput({
       clientName: '',
       clientEmail: '',
       clientAddress: {
@@ -150,7 +102,7 @@ describe('postInvoice', () => {
   })
 
   it('should return error on invalid numbers', async () => {
-    const mockInput = buildMockInvoiceInput({
+    const mockInput = buildMockCompleteInvoiceInput({
       paymentTerms: -1,
       itemList: [{ quantity: 0, price: -1 }],
     })

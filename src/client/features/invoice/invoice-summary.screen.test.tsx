@@ -308,7 +308,7 @@ it('should allow new draft invoices to be creacted', async () => {
   expect(
     inInvoiceTable.getByRole('link', { name: savedInvoiceId })
   ).toHaveAttribute('href', `/invoices/${savedInvoiceId}`)
-})
+}, 10000)
 it('should allow new pending invoices to be creacted', async () => {
   const existingInvoice = buildMockInvoice()
   invoiceModel.initialise([existingInvoice])
@@ -467,7 +467,7 @@ it('should allow new pending invoices to be creacted', async () => {
   expect(
     inInvoiceTable.getByRole('link', { name: savedInvoiceId })
   ).toHaveAttribute('href', `/invoices/${savedInvoiceId}`)
-})
+}, 10000)
 it('should default invoice issue date to today', () => {
   const today = new Date()
   render(<InvoiceSummaryScreen />)
@@ -499,9 +499,10 @@ it('should be possible to cancel the new invoice form', () => {
 
 function validateTextfieldEntry(
   field: HTMLElement,
-  entryValue: string,
-  expectedValue: string | number = entryValue
+  entryValue: string | undefined,
+  expectedValue: string | number | undefined = entryValue
 ) {
+  if (entryValue === undefined) return
   userEvent.type(field, entryValue)
   expect(field).toHaveValue(expectedValue)
 }
