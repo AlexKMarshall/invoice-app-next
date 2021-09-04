@@ -1,8 +1,12 @@
+import {
+  NewDraftInvoiceInputDTO,
+  NewPendingInvoiceInputDTO,
+} from 'src/shared/dtos'
+import { maybeUndefined, randomPick } from 'src/shared/random'
+
 import { InvoiceDetail } from 'src/client/features/invoice/invoice.types'
-import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import faker from 'faker'
 import { generateId } from 'src/shared/identifier'
-import { randomPick } from 'src/shared/random'
 
 function buildMockInvoiceInput() {
   const itemsCount = faker.datatype.number({ min: 1, max: 3 })
@@ -29,11 +33,32 @@ function buildMockInvoiceInput() {
   }
 }
 
-export function buildMockDraftInvoiceInput(): NewInvoiceInputDTO {
-  return { ...buildMockInvoiceInput(), status: 'draft' }
+export function buildMockDraftInvoiceInput(): NewDraftInvoiceInputDTO {
+  const itemsCount = faker.datatype.number({ min: 1, max: 3 })
+  return {
+    status: 'draft',
+    senderAddress: {
+      street: faker.address.streetAddress(),
+      city: faker.address.city(),
+      postcode: faker.address.zipCode(),
+      country: faker.address.country(),
+    },
+    clientName: faker.name.findName(),
+    clientEmail: faker.internet.email(),
+    clientAddress: {
+      street: faker.address.streetAddress(),
+      city: faker.address.city(),
+      postcode: faker.address.zipCode(),
+      country: faker.address.country(),
+    },
+    issuedAt: faker.date.recent(),
+    paymentTerms: faker.datatype.number({ max: 30 }),
+    projectDescription: maybeUndefined(faker.commerce.productDescription()),
+    itemList: new Array(itemsCount).fill(undefined).map(() => buildMockItem()),
+  }
 }
 
-export function buildMockPendingInvoiceInput(): NewInvoiceInputDTO {
+export function buildMockPendingInvoiceInput(): NewPendingInvoiceInputDTO {
   return { ...buildMockInvoiceInput(), status: 'pending' }
 }
 

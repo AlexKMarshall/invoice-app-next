@@ -188,7 +188,10 @@ const createInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
     status: z.enum(['draft', 'pending']),
     issuedAt: z.date(),
     paymentTerms: z.number(),
-    projectDescription: z.string().min(1),
+    projectDescription: z
+      .string()
+      .nullable()
+      .transform((val) => val ?? ''),
     sender: z.object({
       address: addressSchema,
     }),

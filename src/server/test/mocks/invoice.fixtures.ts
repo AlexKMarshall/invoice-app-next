@@ -4,11 +4,11 @@ import {
   NewInvoiceInputDTO,
   NewPendingInvoiceInputDTO,
 } from 'src/shared/dtos'
+import { maybeUndefined, randomPick } from 'src/shared/random'
 
 import { InvoiceDetail } from 'src/server/features/invoice/invoice.types'
 import faker from 'faker'
 import { generateId } from 'src/shared/identifier'
-import { randomPick } from 'src/shared/random'
 
 function randomStatus() {
   return randomPick(['draft', 'pending'] as const)
@@ -77,9 +77,45 @@ function buildMockItem(overrides: PartialDeep<Item> = {}): Item {
 }
 
 export function buildMockDraftInvoiceInput(
-  overrides?: PartialDeep<NewDraftInvoiceInputDTO>
+  overrides: PartialDeep<NewDraftInvoiceInputDTO> = {}
 ): NewDraftInvoiceInputDTO {
-  return { ...buildMockCompleteInvoiceInput(overrides), status: 'draft' }
+  const {
+    senderAddress: overrideSenderAddress,
+    clientAddress: overrideClientAddress,
+    itemList: overrideItemList,
+    issuedAt: overrideIssuedAt,
+    ...otherOverrides
+  } = overrides
+
+  const itemList = buildMockItemList(overrideItemList)
+
+  const issuedAt =
+    overrideIssuedAt instanceof Date ? overrideIssuedAt : faker.date.recent()
+
+  return {
+    status: 'draft',
+    senderAddress: {
+      street: faker.address.streetAddress(),
+      city: faker.address.city(),
+      postcode: faker.address.zipCode(),
+      country: faker.address.country(),
+      ...overrideSenderAddress,
+    },
+    clientName: faker.name.findName(),
+    clientEmail: faker.internet.email(),
+    clientAddress: {
+      street: faker.address.streetAddress(),
+      city: faker.address.city(),
+      postcode: faker.address.zipCode(),
+      country: faker.address.country(),
+      ...overrideClientAddress,
+    },
+    issuedAt,
+    paymentTerms: faker.datatype.number({ max: 30 }),
+    projectDescription: maybeUndefined(faker.commerce.productDescription()),
+    itemList,
+    ...otherOverrides,
+  }
 }
 
 export function buildMockPendingInvoiceInput(

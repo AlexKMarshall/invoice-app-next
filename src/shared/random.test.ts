@@ -1,4 +1,4 @@
-import { randomPick } from './random'
+import { maybeUndefinedFactory, randomPick } from './random'
 
 describe('randomPick', () => {
   it('should return a random member of an array of literals', () => {
@@ -14,5 +14,16 @@ describe('randomPick', () => {
     const regularResult: string = randomPick(regularValues)
 
     expect(regularValues.includes(regularResult)).toBe(true)
+  })
+})
+describe('maybeUndefined', () => {
+  it('should return undefined based on probability', () => {
+    const maybeUndefined = maybeUndefinedFactory(1)
+    expect(maybeUndefined('any value')).toBeUndefined()
+  })
+  it('should return passed in value based on inverse of probability', () => {
+    const maybeUndefined = maybeUndefinedFactory(0)
+    const expectedValue = { a: 'any value' }
+    expect(maybeUndefined(expectedValue)).toBe(expectedValue)
   })
 })

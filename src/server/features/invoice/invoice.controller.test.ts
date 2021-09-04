@@ -76,24 +76,24 @@ describe('postInvoice', () => {
     expect(result.response).toEqual({
       error: {
         fieldErrors: {
-          clientName: ['Should be at least 1 characters'],
-          clientEmail: ['Invalid email'],
+          clientName: ["can't be empty"],
+          clientEmail: ["can't be empty", 'Invalid email'],
           clientAddress: {
-            street: ['Should be at least 1 characters'],
-            city: ['Should be at least 1 characters'],
-            country: ['Should be at least 1 characters'],
-            postcode: ['Should be at least 1 characters'],
+            street: ["can't be empty"],
+            city: ["can't be empty"],
+            country: ["can't be empty"],
+            postcode: ["can't be empty"],
           },
           senderAddress: {
-            street: ['Should be at least 1 characters'],
-            city: ['Should be at least 1 characters'],
-            country: ['Should be at least 1 characters'],
-            postcode: ['Should be at least 1 characters'],
+            street: ["can't be empty"],
+            city: ["can't be empty"],
+            country: ["can't be empty"],
+            postcode: ["can't be empty"],
           },
-          projectDescription: ['Should be at least 1 characters'],
+          projectDescription: ["can't be empty"],
           itemList: {
             '0': {
-              name: ['Should be at least 1 characters'],
+              name: ["can't be empty"],
             },
           },
         },
