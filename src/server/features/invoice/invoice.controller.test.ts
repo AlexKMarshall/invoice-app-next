@@ -5,6 +5,7 @@ import { NewInvoiceInputDTO, Stringify } from 'src/shared/dtos'
 import {
   buildMockCompleteInvoiceInput,
   buildMockDraftInvoiceInput,
+  buildMockInvoiceDetail,
   buildMockPendingInvoiceInput,
 } from '../../test/mocks/invoice.fixtures'
 
@@ -49,7 +50,24 @@ describe('postInvoice', () => {
       error: JSON.stringify(mockError),
     })
   })
-  it('should return error when input has empty strings', async () => {
+  it('should allow draft input with optional fields', async () => {
+    mockInvoiceModel.create.mockResolvedValueOnce(buildMockInvoiceDetail())
+    const mockInput = buildMockDraftInvoiceInput({
+      clientName: '',
+      clientEmail: '',
+      projectDescription: '',
+    })
+    const dtoInput = JSON.parse(JSON.stringify(mockInput))
+
+    const result = await invoiceController.postInvoice(dtoInput)
+    expect(result.code).toBe(201)
+    expect(result.response).toMatchObject({
+      data: {
+        savedInvoice: expect.objectContaining({}),
+      },
+    })
+  })
+  it('should return error when pending input has empty strings', async () => {
     const mockInput = buildMockPendingInvoiceInput({
       clientName: '',
       clientEmail: '',

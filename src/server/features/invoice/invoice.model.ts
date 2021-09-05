@@ -182,16 +182,70 @@ const addressSchema = z.object({
   postcode: z.string().min(1),
 })
 
-const createInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
+const draftAddressSchema = z.object({
+  street: z
+    .string()
+    .nullable()
+    .transform((val) => val ?? ''),
+  city: z
+    .string()
+    .nullable()
+    .transform((val) => val ?? ''),
+  country: z
+    .string()
+    .nullable()
+    .transform((val) => val ?? ''),
+  postcode: z
+    .string()
+    .nullable()
+    .transform((val) => val ?? ''),
+})
+
+const createDraftInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
   z.object({
     id: z.string().min(1),
-    status: z.enum(['draft', 'pending']),
+    status: z.literal('draft'),
     issuedAt: z.date(),
     paymentTerms: z.number(),
     projectDescription: z
       .string()
       .nullable()
       .transform((val) => val ?? ''),
+    sender: z.object({
+      address: draftAddressSchema,
+    }),
+    client: z.object({
+      name: z
+        .string()
+        .nullable()
+        .transform((val) => val ?? ''),
+      email: z
+        .string()
+        .nullable()
+        .transform((val) => val ?? ''),
+      address: draftAddressSchema,
+    }),
+    invoiceItems: z.array(
+      z.object({
+        quantity: z.number().min(1),
+        item: z.object({
+          name: z
+            .string()
+            .nullable()
+            .transform((val) => val ?? ''),
+          price: z.number().min(0),
+        }),
+      })
+    ),
+  })
+)
+const createPendingInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
+  z.object({
+    id: z.string().min(1),
+    status: z.literal('pending'),
+    issuedAt: z.date(),
+    paymentTerms: z.number(),
+    projectDescription: z.string(),
     sender: z.object({
       address: addressSchema,
     }),
@@ -211,6 +265,11 @@ const createInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
     ),
   })
 )
+
+const createInvoiceReturnSchema = z.union([
+  createDraftInvoiceReturnSchema,
+  createPendingInvoiceReturnSchema,
+])
 
 function prepareInvoiceForCreate(
   newInvoice: NewInvoiceInputDTO

@@ -265,10 +265,6 @@ export function NewInvoiceForm({
   )
 }
 
-const emailRegex = new RegExp(
-  "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
-)
-
 const Form = styled.form`
   max-width: 730px;
   display: flex;

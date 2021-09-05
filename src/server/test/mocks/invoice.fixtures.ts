@@ -101,8 +101,8 @@ export function buildMockDraftInvoiceInput(
       country: faker.address.country(),
       ...overrideSenderAddress,
     },
-    clientName: faker.name.findName(),
-    clientEmail: faker.internet.email(),
+    clientName: maybeUndefined(faker.name.findName()),
+    clientEmail: maybeUndefined(faker.internet.email()),
     clientAddress: {
       street: faker.address.streetAddress(),
       city: faker.address.city(),

@@ -32,8 +32,8 @@ export type NewDraftInvoiceInputDTO = {
     postcode: string
     country: string
   }
-  clientName: string
-  clientEmail: string
+  clientName?: string
+  clientEmail?: string
   clientAddress: {
     street: string
     city: string
@@ -91,7 +91,7 @@ type DraftInvoiceDetail = {
   }
   issuedAt: Date
   paymentTerms: number
-  projectDescription?: string
+  projectDescription: string
   itemList: Array<{ name: string; quantity: number; price: number }>
 }
 

@@ -43,8 +43,8 @@ export function buildMockDraftInvoiceInput(): NewDraftInvoiceInputDTO {
       postcode: faker.address.zipCode(),
       country: faker.address.country(),
     },
-    clientName: faker.name.findName(),
-    clientEmail: faker.internet.email(),
+    clientName: maybeUndefined(faker.name.findName()),
+    clientEmail: maybeUndefined(faker.internet.email()),
     clientAddress: {
       street: faker.address.streetAddress(),
       city: faker.address.city(),

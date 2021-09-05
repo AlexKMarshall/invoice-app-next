@@ -1,6 +1,6 @@
 import {
-  buildMockDraftInvoiceInput,
   buildMockInvoiceDetail,
+  buildMockPendingInvoiceInput,
 } from 'src/server/test/mocks/invoice.fixtures'
 import { database, prepareDbForTests } from 'src/server/test/test-utils'
 
@@ -35,7 +35,7 @@ it('should get invoices', async () => {
   })
 })
 
-it('should post a draft invoice', async () => {
+it('should post a pending invoice', async () => {
   expect.hasAssertions()
 
   const initialInvoices = [buildMockInvoiceDetail(), buildMockInvoiceDetail()]
@@ -59,7 +59,7 @@ it('should post a draft invoice', async () => {
         },
       })
 
-      const newInvoiceInput = buildMockDraftInvoiceInput()
+      const newInvoiceInput = buildMockPendingInvoiceInput()
 
       const response = await fetch({
         method: 'POST',
