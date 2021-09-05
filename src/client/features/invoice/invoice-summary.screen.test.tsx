@@ -273,9 +273,13 @@ it('should allow new draft invoices to be creacted', async () => {
       `Due ${format(mockInvoiceSummary.paymentDue, 'dd MMM yyyy')}`
     )
   ).toBeInTheDocument()
-  expect(
-    inNewInvoiceItem.getByText(mockInvoiceSummary.clientName)
-  ).toBeInTheDocument()
+  // if we haven't given a client name, don't try and find it
+  // searching for an empty string will not do anything useful
+  if (mockInvoiceSummary.clientName) {
+    expect(
+      inNewInvoiceItem.getByText(mockInvoiceSummary.clientName)
+    ).toBeInTheDocument()
+  }
   expect(
     inNewInvoiceItem.getByText(
       currencyFormatterGBP.format(mockInvoiceSummary.total / 100)
@@ -411,7 +415,7 @@ it('should allow new pending invoices to be creacted', async () => {
     )
   })
 
-  // save the draft invoice
+  // save the pending invoice
 
   userEvent.click(screen.getByRole('button', { name: /save & send/i }))
 
