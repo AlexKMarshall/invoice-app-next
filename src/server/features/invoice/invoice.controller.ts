@@ -2,6 +2,7 @@ import * as invoiceModel from './invoice.model'
 import * as z from 'zod'
 
 import {
+  GetInvoiceDetailDTO,
   GetInvoiceSummaryDTO,
   NewInvoiceInputDTO,
   NewInvoiceReturnDTO,
@@ -27,10 +28,22 @@ type ControllerErrorResponse<TError = unknown> = {
   }
 }
 
-export function getInvoices(): ControllerResponse<GetInvoiceSummaryDTO> {
+export function getInvoiceSummaries(): ControllerResponse<GetInvoiceSummaryDTO> {
   return invoiceModel
     .findAll()
     .then((invoices) => ({ code: 200, response: { data: { invoices } } }))
+    .catch((error) => ({
+      code: 500,
+      response: { error: JSON.stringify(error) },
+    }))
+}
+
+export function getInvoiceDetail(
+  id: string
+): ControllerResponse<GetInvoiceDetailDTO> {
+  return invoiceModel
+    .findInvoiceDetail(id)
+    .then((invoice) => ({ code: 200, response: { data: { invoice } } }))
     .catch((error) => ({
       code: 500,
       response: { error: JSON.stringify(error) },

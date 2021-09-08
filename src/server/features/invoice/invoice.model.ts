@@ -98,12 +98,12 @@ export function create(newInvoice: NewInvoiceInputDTO): Promise<InvoiceDetail> {
   const invoiceToSave = prepareInvoiceForCreate(newInvoice)
 
   return dbCreate(invoiceToSave)
-    .then(createInvoiceReturnSchema.parse)
+    .then(invoiceDetailSchema.parse)
     .then(flattenInvoiceDetail)
 }
 
 function flattenInvoiceDetail(
-  invoice: z.infer<typeof createInvoiceReturnSchema>
+  invoice: z.infer<typeof invoiceDetailSchema>
 ): InvoiceDetail {
   const { sender, client, invoiceItems, ...restInvoice } = invoice
 
@@ -201,7 +201,7 @@ const draftAddressSchema = z.object({
     .transform((val) => val ?? ''),
 })
 
-const createDraftInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
+const draftInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
   z.object({
     id: z.string().min(1),
     status: z.literal('draft'),
@@ -239,7 +239,7 @@ const createDraftInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
     ),
   })
 )
-const createPendingInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
+const pendingInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
   z.object({
     id: z.string().min(1),
     status: z.literal('pending'),
@@ -266,9 +266,9 @@ const createPendingInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
   })
 )
 
-const createInvoiceReturnSchema = z.union([
-  createDraftInvoiceReturnSchema,
-  createPendingInvoiceReturnSchema,
+const invoiceDetailSchema = z.union([
+  draftInvoiceDetailSchema,
+  pendingInvoiceDetailSchema,
 ])
 
 function prepareInvoiceForCreate(
@@ -324,4 +324,66 @@ function prepareInvoiceForCreate(
   }
 
   return invoiceToSave
+}
+
+function dbFindInvoiceDetail(id: InvoiceDetail['id']) {
+  return prisma.invoice.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      status: true,
+      issuedAt: true,
+      paymentTerms: true,
+      projectDescription: true,
+      sender: {
+        select: {
+          address: {
+            select: {
+              street: true,
+              city: true,
+              country: true,
+              postcode: true,
+            },
+          },
+        },
+      },
+      client: {
+        select: {
+          name: true,
+          email: true,
+          address: {
+            select: {
+              street: true,
+              city: true,
+              country: true,
+              postcode: true,
+            },
+          },
+        },
+      },
+      invoiceItems: {
+        select: {
+          quantity: true,
+          item: {
+            select: {
+              name: true,
+              price: true,
+            },
+          },
+        },
+      },
+    },
+  })
+}
+
+export function findInvoiceDetail(
+  id: InvoiceDetail['id']
+): Promise<InvoiceDetail> {
+  return dbFindInvoiceDetail(id)
+    .then((dbInvoice) => {
+      if (!dbInvoice) return Promise.reject(`cannot find invoice with id ${id}`)
+      return dbInvoice
+    })
+    .then(invoiceDetailSchema.parse)
+    .then(flattenInvoiceDetail)
 }

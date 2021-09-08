@@ -11,7 +11,7 @@ import { testApiHandler } from 'next-test-api-route-handler'
 
 prepareDbForTests()
 
-it('should get invoices', async () => {
+it('should get invoice summaries', async () => {
   expect.hasAssertions()
 
   const mockInvoices = [buildMockInvoiceDetail(), buildMockInvoiceDetail()]

@@ -22,6 +22,12 @@ export type GetInvoiceSummaryDTO = {
   }
 }
 
+export type GetInvoiceDetailDTO = {
+  data: {
+    invoice: InvoiceDetail
+  }
+}
+
 type InvoiceStatus = 'draft' | 'pending'
 
 export type NewDraftInvoiceInputDTO = {
