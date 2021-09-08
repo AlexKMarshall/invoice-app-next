@@ -24,7 +24,7 @@ export function InvoiceSummaryScreen(): JSX.Element {
   const { open, close, titleId: drawerTitleId } = useDrawer()
 
   return (
-    <Main>
+    <>
       <Header>
         <div>
           <Heading level={1} id={headingId}>
@@ -77,15 +77,9 @@ export function InvoiceSummaryScreen(): JSX.Element {
       <div role="status" aria-live="polite">
         {notificationMessage}
       </div>
-    </Main>
+    </>
   )
 }
-
-const Main = styled.main`
-  max-width: 730px;
-  margin-left: auto;
-  margin-right: auto;
-`
 
 const Header = styled.header`
   display: flex;
