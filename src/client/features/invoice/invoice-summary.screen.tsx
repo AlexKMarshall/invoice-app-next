@@ -1,10 +1,5 @@
 import { COLORS, TYPOGRAPHY } from 'src/client/shared/styles/theme'
-import {
-  Drawer,
-  DrawerContainer,
-  DrawerOverlayContainer,
-  useDrawer,
-} from 'src/client/shared/components/drawer'
+import { Drawer, useDrawer } from 'src/client/shared/components/drawer'
 import { MouseEventHandler, TableHTMLAttributes, useRef, useState } from 'react'
 
 import { ArrowRight } from 'src/client/shared/icons/arrow-right'
@@ -14,7 +9,6 @@ import Image from 'next/image'
 import { InvoiceSummary } from './invoice.types'
 import Link from 'next/link'
 import { NewInvoiceForm } from './new-invoice-form'
-import { Sidebar } from 'src/client/shared/components/sidebar'
 import { StatusBadge } from 'src/client/shared/components/status-badge'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
@@ -23,15 +17,6 @@ import styled from 'styled-components'
 import { useId } from '@react-aria/utils'
 import { useInvoiceSummaries } from './invoice.queries'
 
-const LayoutWrapper = styled.div`
-  display: grid;
-  grid-template-areas: 'screen';
-
-  & > * {
-    grid-area: screen;
-  }
-`
-
 export function InvoiceSummaryScreen(): JSX.Element {
   const listQuery = useInvoiceSummaries()
   const [notificationMessage, setNotificationMessage] = useState('')
@@ -39,66 +24,60 @@ export function InvoiceSummaryScreen(): JSX.Element {
   const { open, close, titleId: drawerTitleId } = useDrawer()
 
   return (
-    <LayoutWrapper>
-      <DrawerOverlayContainer>
-        <Main>
-          <Header>
-            <div>
-              <Heading level={1} id={headingId}>
-                Invoices
-              </Heading>
-              <TotalInvoiceCount />
-            </div>
-            <Button type="button" icon="plus" onClick={() => open()}>
-              New Invoice
-            </Button>
-          </Header>
-          {listQuery.isLoading ? <div>Loading...</div> : null}
-          {listQuery.isSuccess ? (
-            <Table
-              aria-labelledby={headingId}
-              collection={listQuery.data}
-              renderItem={(invoice) => (
-                <InvoiceSummaryItem key={invoice.id} invoice={invoice} />
-              )}
-              emptyState={
-                <EmptyStateWrapper>
-                  <Image
-                    src="/illustration-empty.svg"
-                    alt="Illustration of woman with a megaphone emerging from an open envelope, with a paper aeroplane flying around her"
-                    width="241"
-                    height="200"
-                  />
-                  <Heading level={2}>There is nothing here</Heading>
-                  <p>
-                    Create an invoice by clicking the{' '}
-                    <strong>New Invoice</strong> button and get started
-                  </p>
-                </EmptyStateWrapper>
-              }
-            />
-          ) : null}
-          <Drawer>
-            <DrawerTitle id={drawerTitleId}>New Invoice</DrawerTitle>
-            <NewInvoiceForm
-              aria-labelledby={drawerTitleId}
-              onCancel={close}
-              onSubmit={close}
-              onSubmitSuccess={(savedInvoice) => {
-                setNotificationMessage(
-                  `New invoice id ${savedInvoice.id} successfully created`
-                )
-              }}
-            />
-          </Drawer>
-          <div role="status" aria-live="polite">
-            {notificationMessage}
-          </div>
-        </Main>
-      </DrawerOverlayContainer>
-      <DrawerContainer />
-      <Sidebar />
-    </LayoutWrapper>
+    <Main>
+      <Header>
+        <div>
+          <Heading level={1} id={headingId}>
+            Invoices
+          </Heading>
+          <TotalInvoiceCount />
+        </div>
+        <Button type="button" icon="plus" onClick={() => open()}>
+          New Invoice
+        </Button>
+      </Header>
+      {listQuery.isLoading ? <div>Loading...</div> : null}
+      {listQuery.isSuccess ? (
+        <Table
+          aria-labelledby={headingId}
+          collection={listQuery.data}
+          renderItem={(invoice) => (
+            <InvoiceSummaryItem key={invoice.id} invoice={invoice} />
+          )}
+          emptyState={
+            <EmptyStateWrapper>
+              <Image
+                src="/illustration-empty.svg"
+                alt="Illustration of woman with a megaphone emerging from an open envelope, with a paper aeroplane flying around her"
+                width="241"
+                height="200"
+              />
+              <Heading level={2}>There is nothing here</Heading>
+              <p>
+                Create an invoice by clicking the <strong>New Invoice</strong>{' '}
+                button and get started
+              </p>
+            </EmptyStateWrapper>
+          }
+        />
+      ) : null}
+      <Drawer>
+        <DrawerTitle id={drawerTitleId}>New Invoice</DrawerTitle>
+        <NewInvoiceForm
+          aria-labelledby={drawerTitleId}
+          onCancel={close}
+          onSubmit={close}
+          onSubmitSuccess={(savedInvoice) => {
+            setNotificationMessage(
+              `New invoice id ${savedInvoice.id} successfully created`
+            )
+          }}
+        />
+      </Drawer>
+      <div role="status" aria-live="polite">
+        {notificationMessage}
+      </div>
+    </Main>
   )
 }
 
