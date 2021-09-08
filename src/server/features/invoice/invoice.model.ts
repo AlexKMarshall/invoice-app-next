@@ -4,6 +4,7 @@ import { AsyncReturnType, IterableElement } from 'type-fest'
 import { InvoiceDetail, InvoiceSummary } from './invoice.types'
 
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
+import { NotFoundError } from 'src/server/errors'
 import { Prisma } from '@prisma/client'
 import { add } from 'date-fns'
 import { generateId } from 'src/shared/identifier'
@@ -381,7 +382,10 @@ export function findInvoiceDetail(
 ): Promise<InvoiceDetail> {
   return dbFindInvoiceDetail(id)
     .then((dbInvoice) => {
-      if (!dbInvoice) return Promise.reject(`cannot find invoice with id ${id}`)
+      if (!dbInvoice)
+        return Promise.reject(
+          new NotFoundError(`Cannot find invoice with id '${id}'`)
+        )
       return dbInvoice
     })
     .then(invoiceDetailSchema.parse)

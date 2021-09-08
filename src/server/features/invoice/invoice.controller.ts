@@ -9,6 +9,7 @@ import {
 } from 'src/shared/dtos'
 import { JsonArray, JsonObject } from 'type-fest'
 
+import { NotFoundError } from 'src/server/errors'
 import { newInvoiceInputDtoSchema } from 'src/shared/invoice.schema'
 import { parseJSON } from 'date-fns'
 
@@ -44,10 +45,16 @@ export function getInvoiceDetail(
   return invoiceModel
     .findInvoiceDetail(id)
     .then((invoice) => ({ code: 200, response: { data: { invoice } } }))
-    .catch((error) => ({
-      code: 500,
-      response: { error: JSON.stringify(error) },
-    }))
+    .catch((error) => {
+      if (error instanceof NotFoundError) {
+        return { code: 404, response: { error: error.message } }
+      }
+
+      return {
+        code: 500,
+        response: { error: JSON.stringify(error) },
+      }
+    })
 }
 
 export function postInvoice(

@@ -22,6 +22,9 @@ it('should get invoice summaries', async () => {
     handler,
     test: async ({ fetch }) => {
       const response = await fetch({ method: 'GET' })
+
+      expect(response.status).toBe(200)
+
       const data = await response.json()
 
       expect(data).toEqual({
@@ -68,6 +71,8 @@ it('should post a pending invoice', async () => {
           'content-type': 'application/json',
         },
       })
+
+      expect(response.status).toBe(201)
 
       const result = await response.json()
 

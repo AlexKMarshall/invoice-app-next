@@ -19,6 +19,9 @@ it('should get individual invoice detail', async () => {
     params: { id: mockInvoice.id },
     test: async ({ fetch }) => {
       const response = await fetch({ method: 'GET' })
+
+      expect(response.status).toBe(200)
+
       const data = await response.json()
 
       expect(data).toEqual({
@@ -29,6 +32,27 @@ it('should get individual invoice detail', async () => {
             itemList: expect.toIncludeSameMembers(mockInvoice.itemList),
           },
         },
+      })
+    },
+  })
+})
+it('should return 404 if no invoice for given id', async () => {
+  expect.hasAssertions()
+
+  await database.seedInvoices(buildMockInvoiceDetail())
+
+  await testApiHandler({
+    handler,
+    params: { id: 'bad-id' },
+    test: async ({ fetch }) => {
+      const response = await fetch({ method: 'GET' })
+
+      expect(response.status).toBe(404)
+
+      const data = await response.json()
+
+      expect(data).toEqual({
+        error: expect.stringMatching(/cannot find invoice with id 'bad-id'/i),
       })
     },
   })
