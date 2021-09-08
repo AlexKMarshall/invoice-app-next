@@ -3,9 +3,8 @@ import * as invoiceModel from './invoice.model'
 
 import { NewInvoiceInputDTO, Stringify } from 'src/shared/dtos'
 import {
-  buildMockCompleteInvoiceInput,
-  buildMockDraftInvoiceInput,
   buildMockInvoiceDetail,
+  buildMockInvoiceInput,
   buildMockPendingInvoiceInput,
 } from '../../test/mocks/invoice.fixtures'
 
@@ -38,7 +37,7 @@ describe('postInvoice', () => {
     const mockError = new Error('Some error message')
     mockInvoiceModel.create.mockRejectedValueOnce(mockError)
 
-    const mockDraftInvoiceInput = buildMockDraftInvoiceInput()
+    const mockDraftInvoiceInput = buildMockInvoiceInput({ status: 'draft' })
     const dtoInput = JSON.parse(
       JSON.stringify(mockDraftInvoiceInput)
     ) as Stringify<NewInvoiceInputDTO>
@@ -52,7 +51,8 @@ describe('postInvoice', () => {
   })
   it('should allow draft input with optional fields', async () => {
     mockInvoiceModel.create.mockResolvedValueOnce(buildMockInvoiceDetail())
-    const mockInput = buildMockDraftInvoiceInput({
+    const mockInput = buildMockInvoiceInput({
+      status: 'draft',
       senderAddress: {
         street: '',
         city: '',
@@ -126,7 +126,7 @@ describe('postInvoice', () => {
   })
 
   it('should return error on invalid numbers', async () => {
-    const mockInput = buildMockCompleteInvoiceInput({
+    const mockInput = buildMockInvoiceInput({
       paymentTerms: -1,
       itemList: [{ quantity: 0, price: -1 }],
     })

@@ -1,8 +1,8 @@
 import * as invoiceModel from 'src/client/test/mocks/invoice.model'
 
 import {
-  buildMockDraftInvoiceInput,
-  buildMockInvoice,
+  buildMockInvoiceDetail,
+  buildMockInvoiceInput,
   buildMockPendingInvoiceInput,
 } from 'src/client/test/mocks/invoice.fixtures'
 import {
@@ -21,7 +21,10 @@ import { format } from 'date-fns'
 import { idRegex } from 'src/shared/identifier'
 
 it('should show list of invoice summaries', async () => {
-  const mockInvoiceDetails = [buildMockInvoice(), buildMockInvoice()]
+  const mockInvoiceDetails = [
+    buildMockInvoiceDetail(),
+    buildMockInvoiceDetail(),
+  ]
   invoiceModel.initialise(mockInvoiceDetails)
   const mockInvoiceSummaries = mockInvoiceDetails.map(
     invoiceModel.invoiceDetailToSummary
@@ -151,9 +154,9 @@ it.todo('should check for valid email')
 it.todo('should check for valid issuedAt date')
 it.todo('should check there are invoice items')
 it('should allow new draft invoices to be creacted', async () => {
-  const existingInvoice = buildMockInvoice()
+  const existingInvoice = buildMockInvoiceDetail()
   invoiceModel.initialise([existingInvoice])
-  const mockDraftInvoiceInput = buildMockDraftInvoiceInput()
+  const mockDraftInvoiceInput = buildMockInvoiceInput({ status: 'draft' })
   // we aren't validating the id here, so we can give it an empty string
   const mockInvoiceSummary = invoiceModel.invoiceDetailToSummary(
     addInvoiceDefaults({ ...mockDraftInvoiceInput, id: '' })
@@ -314,7 +317,7 @@ it('should allow new draft invoices to be creacted', async () => {
   ).toHaveAttribute('href', `/invoices/${savedInvoiceId}`)
 }, 10000)
 it('should allow new pending invoices to be creacted', async () => {
-  const existingInvoice = buildMockInvoice()
+  const existingInvoice = buildMockInvoiceDetail()
   invoiceModel.initialise([existingInvoice])
   const mockPendingInvoiceInput = buildMockPendingInvoiceInput()
   // we aren't validating the id here, so we can give it an empty string
