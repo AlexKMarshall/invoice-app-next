@@ -18,6 +18,7 @@ module.exports = {
     '<rootDir>/src/server/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/src/pages/api/**/*.*',
     '!<rootDir>/src/**/*.{spec,test,stories}.{js,tsx,ts}',
+    '!<rootDir>/src/**/test/**/*.*',
     '!**/node_modules/**',
   ],
   coveragePathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/.next'],
