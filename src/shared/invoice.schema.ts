@@ -26,9 +26,7 @@ const newDraftInvoiceInputDtoSchema = schemaForType<NewDraftInvoiceInputDTO>()(
     status: z.literal('draft'),
     senderAddress: draftAddressSchema,
     clientName: z.string().optional(),
-    clientEmail: z
-      .union([z.string().email(), z.string().max(0, 'Invalid email')])
-      .optional(),
+    clientEmail: z.union([z.string().email(), z.literal('')]).optional(),
     clientAddress: draftAddressSchema,
     issuedAt: z.date(),
     paymentTerms: z.number().min(0),

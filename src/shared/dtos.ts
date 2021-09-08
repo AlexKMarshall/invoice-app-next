@@ -1,4 +1,4 @@
-import { Jsonify } from 'type-fest'
+import { Except, Jsonify } from 'type-fest'
 
 type DateStringify<T> = T extends Date
   ? string
@@ -26,47 +26,20 @@ type InvoiceStatus = 'draft' | 'pending'
 
 export type NewDraftInvoiceInputDTO = {
   status: 'draft'
-  senderAddress: {
-    street?: string
-    city?: string
-    postcode?: string
-    country?: string
-  }
-  clientName?: string
-  clientEmail?: string
-  clientAddress: {
-    street?: string
-    city?: string
-    postcode?: string
-    country?: string
-  }
-  issuedAt: Date
-  paymentTerms: number
-  projectDescription?: string
-  itemList: Array<{ name: string; quantity: number; price: number }>
+  senderAddress: Partial<InvoiceDetail['senderAddress']>
+  clientName?: InvoiceDetail['clientName']
+  clientEmail?: InvoiceDetail['clientEmail']
+  clientAddress: Partial<InvoiceDetail['clientAddress']>
+  issuedAt: InvoiceDetail['issuedAt']
+  paymentTerms: InvoiceDetail['paymentTerms']
+  projectDescription?: InvoiceDetail['projectDescription']
+  itemList: InvoiceDetail['itemList']
 }
 
-export type NewPendingInvoiceInputDTO = {
-  status: 'pending'
-  senderAddress: {
-    street: string
-    city: string
-    postcode: string
-    country: string
-  }
-  clientName: string
-  clientEmail: string
-  clientAddress: {
-    street: string
-    city: string
-    postcode: string
-    country: string
-  }
-  issuedAt: Date
-  paymentTerms: number
-  projectDescription: string
-  itemList: Array<{ name: string; quantity: number; price: number }>
-}
+export type NewPendingInvoiceInputDTO = Except<
+  InvoiceDetail,
+  'id' | 'status'
+> & { status: 'pending' }
 
 export type NewInvoiceInputDTO =
   | NewDraftInvoiceInputDTO
@@ -74,7 +47,7 @@ export type NewInvoiceInputDTO =
 
 type InvoiceDetail = {
   id: string
-  status: 'pending' | 'draft'
+  status: InvoiceStatus
   senderAddress: {
     street: string
     city: string

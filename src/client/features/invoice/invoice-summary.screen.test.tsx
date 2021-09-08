@@ -15,7 +15,7 @@ import {
 } from 'src/client/test/test-utils'
 
 import { InvoiceSummaryScreen } from './invoice-summary.screen'
-import { addInvoiceDefaults } from './invoice.utils'
+import { addInvoiceDefaults } from './invoice.mappers'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { idRegex } from 'src/shared/identifier'

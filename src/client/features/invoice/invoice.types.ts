@@ -1,11 +1,9 @@
-import { NewInvoiceReturnDTO } from 'src/shared/dtos'
+import { GetInvoiceSummaryDTO, NewInvoiceReturnDTO } from 'src/shared/dtos'
+
+import { IterableElement } from 'type-fest'
 
 export type InvoiceDetail = NewInvoiceReturnDTO['data']['savedInvoice']
 
-export type InvoiceSummary = {
-  id: InvoiceDetail['id']
-  paymentDue: Date
-  clientName: InvoiceDetail['clientName']
-  total: number
-  status: InvoiceDetail['status']
-}
+export type InvoiceSummary = IterableElement<
+  GetInvoiceSummaryDTO['data']['invoices']
+>

@@ -1,16 +1,12 @@
 import {
-  GetInvoiceSummaryDTO,
-  NewInvoiceInputDTO,
-  NewInvoiceReturnDTO,
-} from 'src/shared/dtos'
+  InvoiceDetail,
+  InvoiceSummary,
+} from 'src/client/features/invoice/invoice.types'
+import { NewInvoiceInputDTO, NewInvoiceReturnDTO } from 'src/shared/dtos'
 
-import { InvoiceDetail } from 'src/client/features/invoice/invoice.types'
-import { IterableElement } from 'msw/node_modules/type-fest'
 import { add } from 'date-fns'
-import { addInvoiceDefaults } from 'src/client/features/invoice/invoice.utils'
+import { addInvoiceDefaults } from 'src/client/features/invoice/invoice.mappers'
 import { generateId } from 'src/shared/identifier'
-
-type InvoiceSummary = IterableElement<GetInvoiceSummaryDTO['data']['invoices']>
 
 type Store = {
   invoices: Array<InvoiceDetail>

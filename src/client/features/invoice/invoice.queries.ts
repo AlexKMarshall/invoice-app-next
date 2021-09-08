@@ -7,7 +7,7 @@ import {
   useQuery,
   useQueryClient,
 } from 'react-query'
-import { addInvoiceDefaults, invoiceDetailToSummary } from './invoice.utils'
+import { addInvoiceDefaults, invoiceDetailToSummary } from './invoice.mappers'
 import { getInvoices, postInvoice } from './invoice.api-client'
 
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
