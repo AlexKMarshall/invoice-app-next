@@ -1,7 +1,6 @@
-import { IterableElement, PartialDeep } from 'type-fest'
+import { IterableElement, Merge, PartialDeep } from 'type-fest'
 import {
   NewDraftInvoiceInputDTO,
-  NewInvoiceInputDTO,
   NewPendingInvoiceInputDTO,
 } from 'src/shared/dtos'
 import { maybeUndefined, randomPick } from 'src/shared/random'
@@ -15,8 +14,11 @@ function randomStatus() {
 }
 
 export function buildMockCompleteInvoiceInput(
-  overrides: PartialDeep<NewInvoiceInputDTO> = {}
-): Required<NewInvoiceInputDTO> {
+  overrides: Merge<
+    PartialDeep<NewPendingInvoiceInputDTO>,
+    { status?: 'draft' | 'pending' }
+  > = {}
+): Merge<Required<NewPendingInvoiceInputDTO>, { status: 'draft' | 'pending' }> {
   const {
     senderAddress: overrideSenderAddress,
     clientAddress: overrideClientAddress,

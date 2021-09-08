@@ -53,6 +53,12 @@ describe('postInvoice', () => {
   it('should allow draft input with optional fields', async () => {
     mockInvoiceModel.create.mockResolvedValueOnce(buildMockInvoiceDetail())
     const mockInput = buildMockDraftInvoiceInput({
+      senderAddress: {
+        street: '',
+        city: '',
+        country: '',
+        postcode: '',
+      },
       clientName: '',
       clientEmail: '',
       projectDescription: '',

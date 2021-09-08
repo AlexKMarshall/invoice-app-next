@@ -3,12 +3,13 @@ export function randomPick<T>(array: ReadonlyArray<T>): T {
   return array[randomIndex]
 }
 
-export function maybeUndefinedFactory(
-  probUndefined: number
-): <T>(value: T) => T | undefined {
+export function maybeFactory<U extends unknown>(
+  probability: number,
+  alternate: U
+): <T>(value: T) => T | U {
   return <T>(value: T) => {
-    return Math.random() < probUndefined ? undefined : value
+    return Math.random() < probability ? alternate : value
   }
 }
 
-export const maybeUndefined = maybeUndefinedFactory(0.5)
+export const maybeUndefined = maybeFactory(0.5, undefined)

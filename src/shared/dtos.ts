@@ -27,18 +27,18 @@ type InvoiceStatus = 'draft' | 'pending'
 export type NewDraftInvoiceInputDTO = {
   status: 'draft'
   senderAddress: {
-    street: string
-    city: string
-    postcode: string
-    country: string
+    street?: string
+    city?: string
+    postcode?: string
+    country?: string
   }
   clientName?: string
   clientEmail?: string
   clientAddress: {
-    street: string
-    city: string
-    postcode: string
-    country: string
+    street?: string
+    city?: string
+    postcode?: string
+    country?: string
   }
   issuedAt: Date
   paymentTerms: number
@@ -72,32 +72,9 @@ export type NewInvoiceInputDTO =
   | NewDraftInvoiceInputDTO
   | NewPendingInvoiceInputDTO
 
-type DraftInvoiceDetail = {
+type InvoiceDetail = {
   id: string
-  status: 'draft'
-  senderAddress: {
-    street: string
-    city: string
-    postcode: string
-    country: string
-  }
-  clientName: string
-  clientEmail: string
-  clientAddress: {
-    street: string
-    city: string
-    postcode: string
-    country: string
-  }
-  issuedAt: Date
-  paymentTerms: number
-  projectDescription: string
-  itemList: Array<{ name: string; quantity: number; price: number }>
-}
-
-type PendingInvoiceDetail = {
-  id: string
-  status: 'pending'
+  status: 'pending' | 'draft'
   senderAddress: {
     street: string
     city: string
@@ -120,6 +97,6 @@ type PendingInvoiceDetail = {
 
 export type NewInvoiceReturnDTO = {
   data: {
-    savedInvoice: DraftInvoiceDetail | PendingInvoiceDetail
+    savedInvoice: InvoiceDetail
   }
 }

@@ -26,8 +26,9 @@ export function save(
   invoice: NewInvoiceInputDTO
 ): Promise<NewInvoiceReturnDTO['data']['savedInvoice']> {
   const id = generateId()
-  const invoiceWithId = { ...addInvoiceDefaults(invoice), id }
+  const invoiceWithId = addInvoiceDefaults({ ...invoice, id })
   store.invoices.push(invoiceWithId)
+
   return Promise.resolve(invoiceWithId)
 }
 

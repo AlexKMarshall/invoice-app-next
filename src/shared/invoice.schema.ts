@@ -14,15 +14,22 @@ const addressSchema = z.object({
   postcode: z.string().min(1, { message: "can't be empty" }),
 })
 
+const draftAddressSchema = z.object({
+  street: z.string().optional(),
+  city: z.string().optional(),
+  country: z.string().optional(),
+  postcode: z.string().optional(),
+})
+
 const newDraftInvoiceInputDtoSchema = schemaForType<NewDraftInvoiceInputDTO>()(
   z.object({
     status: z.literal('draft'),
-    senderAddress: addressSchema,
+    senderAddress: draftAddressSchema,
     clientName: z.string().optional(),
     clientEmail: z
       .union([z.string().email(), z.string().max(0, 'Invalid email')])
       .optional(),
-    clientAddress: addressSchema,
+    clientAddress: draftAddressSchema,
     issuedAt: z.date(),
     paymentTerms: z.number().min(0),
     projectDescription: z.string().optional(),

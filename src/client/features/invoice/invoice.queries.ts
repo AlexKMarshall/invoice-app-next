@@ -63,8 +63,7 @@ export function useCreateInvoice({
         if (previousInvoices) {
           queryClient.setQueryData<Array<InvoiceSummary>>(invoiceKeys.list(), [
             invoiceDetailToSummary({
-              ...addInvoiceDefaults(newInvoice),
-              id: pendingId,
+              ...addInvoiceDefaults({ ...newInvoice, id: pendingId }),
             }),
             ...previousInvoices,
           ])

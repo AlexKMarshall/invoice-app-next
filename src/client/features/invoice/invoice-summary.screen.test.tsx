@@ -155,10 +155,9 @@ it('should allow new draft invoices to be creacted', async () => {
   invoiceModel.initialise([existingInvoice])
   const mockDraftInvoiceInput = buildMockDraftInvoiceInput()
   // we aren't validating the id here, so we can give it an empty string
-  const mockInvoiceSummary = invoiceModel.invoiceDetailToSummary({
-    ...addInvoiceDefaults(mockDraftInvoiceInput),
-    id: '',
-  })
+  const mockInvoiceSummary = invoiceModel.invoiceDetailToSummary(
+    addInvoiceDefaults({ ...mockDraftInvoiceInput, id: '' })
+  )
   render(<InvoiceSummaryScreen />)
 
   await waitForElementToBeRemoved(() => screen.getByText(/loading/i))

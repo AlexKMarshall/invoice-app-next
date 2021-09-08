@@ -1,7 +1,7 @@
 import { InvoiceDetail, InvoiceSummary } from './invoice.types'
+import { Merge, PartialDeep, SetRequired } from 'type-fest'
 
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
-import { SetRequired } from 'type-fest'
 import { add } from 'date-fns'
 
 export function invoiceDetailToSummary(invoice: InvoiceDetail): InvoiceSummary {
@@ -16,16 +16,39 @@ export function invoiceDetailToSummary(invoice: InvoiceDetail): InvoiceSummary {
   }
 }
 
+const defaultAddressValues = {
+  street: '',
+  city: '',
+  postcode: '',
+  country: '',
+}
+
+const defaultInvoiceValues = {
+  projectDescription: '',
+  clientName: '',
+  clientEmail: '',
+  senderAddress: defaultAddressValues,
+  clientAddress: defaultAddressValues,
+}
+
 export function addInvoiceDefaults(
-  invoice: NewInvoiceInputDTO
-): SetRequired<
-  NewInvoiceInputDTO,
-  'projectDescription' | 'clientName' | 'clientEmail'
-> {
+  invoice: NewInvoiceInputDTO & { id: string }
+): InvoiceDetail {
+  const senderAddress = {
+    ...defaultInvoiceValues.senderAddress,
+    ...invoice.senderAddress,
+  }
+  const clientAddress = {
+    ...defaultInvoiceValues.clientAddress,
+    ...invoice.clientAddress,
+  }
+
   const { projectDescription = '', clientName = '', clientEmail = '' } = invoice
   return Object.assign({}, invoice, {
     projectDescription,
     clientName,
     clientEmail,
+    senderAddress,
+    clientAddress,
   })
 }
