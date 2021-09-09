@@ -18,5 +18,5 @@ it('should go to invoice detail page when clicking on invoice link', async () =>
   await waitForElementToBeRemoved(() => screen.queryByText(/loading/i))
   userEvent.click(screen.getByRole('row'))
 
-  expect(await screen.findByText(/invoice detail page/i)).toBeInTheDocument()
+  expect(await screen.findByText(/mark as paid/i)).toBeInTheDocument()
 })

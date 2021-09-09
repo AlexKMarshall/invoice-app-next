@@ -18,6 +18,13 @@ export function findAll(): Promise<Array<InvoiceSummary>> {
   return Promise.resolve(store.invoices.map(invoiceDetailToSummary))
 }
 
+export function findById(id: InvoiceDetail['id']): Promise<InvoiceDetail> {
+  const foundInvoice = store.invoices.find((invoice) => invoice.id === id)
+  if (!foundInvoice)
+    return Promise.reject(new Error(`cannot find invoice with id '${id}`))
+  return Promise.resolve(foundInvoice)
+}
+
 export function save(
   invoice: NewInvoiceInputDTO
 ): Promise<NewInvoiceReturnDTO['data']['savedInvoice']> {

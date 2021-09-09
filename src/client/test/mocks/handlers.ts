@@ -1,6 +1,7 @@
 import * as invoiceModel from './invoice.model'
 
 import {
+  GetInvoiceDetailDTO,
   GetInvoiceSummaryDTO,
   NewInvoiceInputDTO,
   NewInvoiceReturnDTO,
@@ -23,6 +24,13 @@ export const handlers = [
       return res(ctx.status(200), ctx.json({ data: { invoices } }))
     }
   ),
+  rest.get<EmptyObject, GetInvoiceDetailDTO, { id: string }>(
+    '/api/invoices/:id',
+    async (req, res, ctx) => {
+      const invoice = await invoiceModel.findById(req.params.id)
+      return res(ctx.status(200), ctx.json({ data: { invoice } }))
+    }
+  ),
   rest.post<Stringify<NewInvoiceInputDTO>, NewInvoiceReturnDTO, EmptyObject>(
     '/api/invoices',
     async (req, res, ctx) => {
@@ -32,7 +40,7 @@ export const handlers = [
         issuedAt: parseJSON(newInvoice.issuedAt),
       })
       return res(
-        ctx.status(200),
+        ctx.status(201),
         ctx.json({
           data: {
             savedInvoice,

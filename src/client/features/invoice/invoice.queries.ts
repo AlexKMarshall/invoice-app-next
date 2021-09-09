@@ -8,7 +8,11 @@ import {
   useQueryClient,
 } from 'react-query'
 import { addInvoiceDefaults, invoiceDetailToSummary } from './invoice.mappers'
-import { getInvoices, postInvoice } from './invoice.api-client'
+import {
+  getInvoiceDetail,
+  getInvoices,
+  postInvoice,
+} from './invoice.api-client'
 
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { nanoid } from 'nanoid'
@@ -31,6 +35,17 @@ export function useInvoiceSummaries<TData = Array<InvoiceSummary>>({
   select,
 }: UseInvoiceSummariesProps<TData> = {}): UseQueryResult<TData> {
   return useQuery(invoiceKeys.list(filters), getInvoices, { select })
+}
+
+type useInvoiceDetailOptions = {
+  enabled?: boolean
+}
+
+export function useInvoiceDetail(
+  id: InvoiceDetail['id'],
+  options: useInvoiceDetailOptions = {}
+): UseQueryResult<InvoiceDetail> {
+  return useQuery(invoiceKeys.detail(id), () => getInvoiceDetail(id), options)
 }
 
 type UseCreateInvoiceProps = {

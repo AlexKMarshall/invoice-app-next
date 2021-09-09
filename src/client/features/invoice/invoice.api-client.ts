@@ -1,4 +1,5 @@
 import {
+  GetInvoiceDetailDTO,
   GetInvoiceSummaryDTO,
   NewInvoiceInputDTO,
   NewInvoiceReturnDTO,
@@ -15,6 +16,15 @@ export async function getInvoices(): Promise<Array<InvoiceSummary>> {
     ...invoice,
     paymentDue: parseJSON(paymentDue),
   }))
+}
+
+export async function getInvoiceDetail(
+  id: InvoiceDetail['id']
+): Promise<InvoiceDetail> {
+  const res = await fetch(`/api/invoices/${id}`)
+  const { data } = (await res.json()) as Stringify<GetInvoiceDetailDTO>
+
+  return { ...data.invoice, issuedAt: parseJSON(data.invoice.issuedAt) }
 }
 
 export async function postInvoice(
