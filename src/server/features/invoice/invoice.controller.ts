@@ -8,6 +8,7 @@ import {
 } from 'src/shared/dtos'
 import { JsonArray, JsonObject } from 'type-fest'
 
+import { newInvoiceInputDtoSchema } from 'src/shared/invoice.schema'
 import { parseJSON } from 'date-fns'
 
 export type ControllerResponse<TData = unknown> = Promise<
@@ -92,38 +93,6 @@ function parseNewInvoiceInputDto(
 
   return result
 }
-
-function schemaForType<T>() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return <S extends z.ZodType<T, any, any>>(arg: S) => arg
-}
-
-const addressSchema = z.object({
-  street: z.string().min(1),
-  city: z.string().min(1),
-  country: z.string().min(1),
-  postcode: z.string().min(1),
-})
-
-const newInvoiceInputDtoSchema = schemaForType<NewInvoiceInputDTO>()(
-  z.object({
-    status: z.enum(['draft', 'pending', 'paid']),
-    senderAddress: addressSchema,
-    clientName: z.string().min(1),
-    clientEmail: z.string().email(),
-    clientAddress: addressSchema,
-    issuedAt: z.date(),
-    paymentTerms: z.number().min(0),
-    projectDescription: z.string().min(1),
-    itemList: z.array(
-      z.object({
-        name: z.string().min(1),
-        quantity: z.number().min(1),
-        price: z.number().min(0),
-      })
-    ),
-  })
-)
 
 function flattenError(
   error: z.ZodError<z.infer<typeof newInvoiceInputDtoSchema>>

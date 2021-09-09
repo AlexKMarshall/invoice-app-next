@@ -7,9 +7,11 @@ import { Input as InputBase } from 'src/client/shared/components/input'
 import { InvoiceDetail } from './invoice.types'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { format } from 'date-fns'
+import { newInvoiceInputDtoSchema } from 'src/shared/invoice.schema'
 import styled from 'styled-components'
 import { useCreateInvoice } from './invoice.queries'
 import { useId } from '@react-aria/utils'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 type Props = {
   onCancel?: () => void
@@ -17,8 +19,6 @@ type Props = {
   onSubmitSuccess?: (data: InvoiceDetail) => void
   'aria-labelledby': string
 }
-
-type NewInvoiceFormFields = NewInvoiceInputDTO
 
 const DEFAULT_ITEM_VALUES = { name: '', quantity: 0, price: 0 }
 const DEFAULT_FORM_VALUES = {
@@ -63,8 +63,9 @@ export function NewInvoiceForm({
     control,
     formState: { errors },
     setValue,
-  } = useForm<NewInvoiceFormFields>({
+  } = useForm<NewInvoiceInputDTO>({
     defaultValues: DEFAULT_FORM_VALUES,
+    resolver: zodResolver(newInvoiceInputDtoSchema),
   })
   const itemsFieldArray = useFieldArray({
     control,
@@ -86,31 +87,25 @@ export function NewInvoiceForm({
             $span="full"
             label="Street Address"
             errorMessage={errors.senderAddress?.street?.message}
-            {...register('senderAddress.street', {
-              required: "can't be empty",
-            })}
+            {...register('senderAddress.street')}
           />
           <Input
             $span="third"
             label="City"
             errorMessage={errors.senderAddress?.city?.message}
-            {...register('senderAddress.city', { required: "can't be empty" })}
+            {...register('senderAddress.city')}
           />
           <Input
             $span="third"
             label="Post Code"
             errorMessage={errors.senderAddress?.postcode?.message}
-            {...register('senderAddress.postcode', {
-              required: "can't be empty",
-            })}
+            {...register('senderAddress.postcode')}
           />
           <Input
             $span="third"
             label="Country"
             errorMessage={errors.senderAddress?.country?.message}
-            {...register('senderAddress.country', {
-              required: "can't be empty",
-            })}
+            {...register('senderAddress.country')}
           />
         </GridWrapper>
       </Fieldset>
@@ -121,52 +116,38 @@ export function NewInvoiceForm({
             $span="full"
             label="Client's Name"
             errorMessage={errors.clientName?.message}
-            {...register('clientName', { required: "can't be empty" })}
+            {...register('clientName')}
           />
           <Input
             $span="full"
             label="Client's Email"
             type="email"
             errorMessage={errors.clientEmail?.message}
-            {...register('clientEmail', {
-              required: "can't be empty",
-              pattern: {
-                value: emailRegex,
-                message: 'invalid email',
-              },
-            })}
+            {...register('clientEmail')}
           ></Input>
           <Input
             $span="full"
             label="Street Address"
             errorMessage={errors.clientAddress?.street?.message}
-            {...register('clientAddress.street', {
-              required: "can't be empty",
-            })}
+            {...register('clientAddress.street')}
           />
           <Input
             $span="third"
             label="City"
             errorMessage={errors.clientAddress?.city?.message}
-            {...register('clientAddress.city', {
-              required: "can't be empty",
-            })}
+            {...register('clientAddress.city')}
           />
           <Input
             $span="third"
             label="Post Code"
             errorMessage={errors.clientAddress?.postcode?.message}
-            {...register('clientAddress.postcode', {
-              required: "can't be empty",
-            })}
+            {...register('clientAddress.postcode')}
           />
           <Input
             $span="third"
             label="Country"
             errorMessage={errors.clientAddress?.country?.message}
-            {...register('clientAddress.country', {
-              required: "can't be empty",
-            })}
+            {...register('clientAddress.country')}
           />
         </GridWrapper>
       </Fieldset>
@@ -190,7 +171,7 @@ export function NewInvoiceForm({
             $span="full"
             label="Project Description"
             errorMessage={errors.projectDescription?.message}
-            {...register('projectDescription', { required: "can't be empty" })}
+            {...register('projectDescription')}
           />
         </GridWrapper>
       </Fieldset>
@@ -283,10 +264,6 @@ export function NewInvoiceForm({
     </Form>
   )
 }
-
-const emailRegex = new RegExp(
-  "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
-)
 
 const Form = styled.form`
   max-width: 730px;

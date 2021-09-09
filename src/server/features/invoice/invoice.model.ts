@@ -1,10 +1,8 @@
 import * as z from 'zod'
 
 import { AsyncReturnType, IterableElement } from 'type-fest'
+import { InvoiceDetail, InvoiceSummary } from './invoice.types'
 
-// TODO this shouldn't come from client folder
-import { InvoiceDetail } from 'src/client/features/invoice/invoice.types'
-import { InvoiceSummary } from './invoice.types'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { Prisma } from '@prisma/client'
 import { add } from 'date-fns'
@@ -62,7 +60,7 @@ const invoiceSummaryDbSchema = schemaForType<DbInvoiceSummary>()(
         }),
       })
     ),
-    status: z.enum(['draft', 'pending', 'paid']),
+    status: z.enum(['draft', 'pending']),
   })
 )
 
@@ -178,16 +176,73 @@ function dbCreate(invoice: Prisma.InvoiceCreateInput) {
 type DBCreateInvoiceReturn = AsyncReturnType<typeof dbCreate>
 
 const addressSchema = z.object({
-  street: z.string(),
-  city: z.string(),
-  country: z.string(),
-  postcode: z.string(),
+  street: z.string().min(1),
+  city: z.string().min(1),
+  country: z.string().min(1),
+  postcode: z.string().min(1),
 })
 
-const createInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
+const draftAddressSchema = z.object({
+  street: z
+    .string()
+    .nullable()
+    .transform((val) => val ?? ''),
+  city: z
+    .string()
+    .nullable()
+    .transform((val) => val ?? ''),
+  country: z
+    .string()
+    .nullable()
+    .transform((val) => val ?? ''),
+  postcode: z
+    .string()
+    .nullable()
+    .transform((val) => val ?? ''),
+})
+
+const createDraftInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
   z.object({
-    id: z.string(),
-    status: z.enum(['draft', 'pending', 'paid']),
+    id: z.string().min(1),
+    status: z.literal('draft'),
+    issuedAt: z.date(),
+    paymentTerms: z.number(),
+    projectDescription: z
+      .string()
+      .nullable()
+      .transform((val) => val ?? ''),
+    sender: z.object({
+      address: draftAddressSchema,
+    }),
+    client: z.object({
+      name: z
+        .string()
+        .nullable()
+        .transform((val) => val ?? ''),
+      email: z
+        .string()
+        .nullable()
+        .transform((val) => val ?? ''),
+      address: draftAddressSchema,
+    }),
+    invoiceItems: z.array(
+      z.object({
+        quantity: z.number().min(1),
+        item: z.object({
+          name: z
+            .string()
+            .nullable()
+            .transform((val) => val ?? ''),
+          price: z.number().min(0),
+        }),
+      })
+    ),
+  })
+)
+const createPendingInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
+  z.object({
+    id: z.string().min(1),
+    status: z.literal('pending'),
     issuedAt: z.date(),
     paymentTerms: z.number(),
     projectDescription: z.string(),
@@ -195,21 +250,26 @@ const createInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
       address: addressSchema,
     }),
     client: z.object({
-      name: z.string(),
-      email: z.string(),
+      name: z.string().min(1),
+      email: z.string().min(1),
       address: addressSchema,
     }),
     invoiceItems: z.array(
       z.object({
-        quantity: z.number(),
+        quantity: z.number().min(1),
         item: z.object({
-          name: z.string(),
-          price: z.number(),
+          name: z.string().min(1),
+          price: z.number().min(0),
         }),
       })
     ),
   })
 )
+
+const createInvoiceReturnSchema = z.union([
+  createDraftInvoiceReturnSchema,
+  createPendingInvoiceReturnSchema,
+])
 
 function prepareInvoiceForCreate(
   newInvoice: NewInvoiceInputDTO

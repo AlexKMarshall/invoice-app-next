@@ -1,17 +1,39 @@
+import { IterableElement, Merge, PartialDeep } from 'type-fest'
+import {
+  NewDraftInvoiceInputDTO,
+  NewInvoiceInputDTO,
+  NewPendingInvoiceInputDTO,
+} from 'src/shared/dtos'
+import { maybeUndefined, randomPick } from 'src/shared/random'
+
 import { InvoiceDetail } from 'src/client/features/invoice/invoice.types'
-import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import faker from 'faker'
 import { generateId } from 'src/shared/identifier'
 
-export function buildMockInvoiceInput(): NewInvoiceInputDTO {
-  const itemsCount = faker.datatype.number({ min: 1, max: 3 })
+export function buildMockPendingInvoiceInput(
+  overrides: PartialDeep<NewPendingInvoiceInputDTO> = {}
+): NewPendingInvoiceInputDTO {
+  const {
+    senderAddress: overrideSenderAddress,
+    clientAddress: overrideClientAddress,
+    itemList: overrideItemList,
+    issuedAt: overrideIssuedAt,
+    ...otherOverrides
+  } = overrides
+
+  const itemList = buildMockItemList(overrideItemList)
+
+  const issuedAt =
+    overrideIssuedAt instanceof Date ? overrideIssuedAt : faker.date.recent()
+
   return {
-    status: pickRandomStatus(),
+    status: 'pending',
     senderAddress: {
       street: faker.address.streetAddress(),
       city: faker.address.city(),
       postcode: faker.address.zipCode(),
       country: faker.address.country(),
+      ...overrideSenderAddress,
     },
     clientName: faker.name.findName(),
     clientEmail: faker.internet.email(),
@@ -20,46 +42,140 @@ export function buildMockInvoiceInput(): NewInvoiceInputDTO {
       city: faker.address.city(),
       postcode: faker.address.zipCode(),
       country: faker.address.country(),
+      ...overrideClientAddress,
     },
-    issuedAt: faker.date.recent(),
+    issuedAt,
     paymentTerms: faker.datatype.number({ max: 30 }),
     projectDescription: faker.commerce.productDescription(),
-    itemList: new Array(itemsCount).fill(undefined).map(() => buildMockItem()),
+    itemList,
+    ...otherOverrides,
   }
 }
 
-export function buildMockDraftInvoiceInput(): NewInvoiceInputDTO {
-  return { ...buildMockInvoiceInput(), status: 'draft' }
+export function buildMockDraftInvoiceInput(
+  overrides: PartialDeep<NewDraftInvoiceInputDTO> = {}
+): NewDraftInvoiceInputDTO {
+  const {
+    senderAddress: overrideSenderAddress,
+    clientAddress: overrideClientAddress,
+    itemList: overrideItemList,
+    issuedAt: overrideIssuedAt,
+    ...otherOverrides
+  } = overrides
+
+  const itemList = buildMockItemList(overrideItemList)
+
+  const issuedAt =
+    overrideIssuedAt instanceof Date ? overrideIssuedAt : faker.date.recent()
+
+  return {
+    status: 'draft',
+    senderAddress: {
+      street: maybeUndefined(faker.address.streetAddress()),
+      city: maybeUndefined(faker.address.city()),
+      postcode: maybeUndefined(faker.address.zipCode()),
+      country: maybeUndefined(faker.address.country()),
+      ...overrideSenderAddress,
+    },
+    clientName: maybeUndefined(faker.name.findName()),
+    clientEmail: maybeUndefined(faker.internet.email()),
+    clientAddress: {
+      street: maybeUndefined(faker.address.streetAddress()),
+      city: maybeUndefined(faker.address.city()),
+      postcode: maybeUndefined(faker.address.zipCode()),
+      country: maybeUndefined(faker.address.country()),
+      ...overrideClientAddress,
+    },
+    issuedAt,
+    paymentTerms: faker.datatype.number({ max: 30 }),
+    projectDescription: maybeUndefined(faker.commerce.productDescription()),
+    itemList,
+    ...otherOverrides,
+  }
 }
 
-export function buildMockPendingInvoiceInput(): NewInvoiceInputDTO {
-  return { ...buildMockInvoiceInput(), status: 'pending' }
+export function buildMockInvoiceInput(
+  overrides: Merge<
+    PartialDeep<NewPendingInvoiceInputDTO>,
+    { status?: 'draft' | 'pending' }
+  > = {}
+): NewInvoiceInputDTO {
+  const { status: overrideStatus, ...rest } = overrides
+
+  const status = overrideStatus ?? randomStatus()
+
+  if (status === 'draft') return buildMockDraftInvoiceInput(rest)
+  if (status === 'pending') return buildMockPendingInvoiceInput(rest)
+  else {
+    const _exhaustiveCheck: never = status
+    return _exhaustiveCheck
+  }
 }
 
-function pickRandomStatus() {
-  const statuses = ['draft', 'pending', 'paid'] as const
-  const randomIndex = Math.floor(Math.random() * statuses.length)
-  return statuses[randomIndex]
+type ItemList = InvoiceDetail['itemList']
+function buildMockItemList(overrides?: PartialDeep<ItemList>): ItemList {
+  const randomLength = faker.datatype.number({ min: 1, max: 3 })
+
+  const partialItems =
+    overrides ?? Array.from({ length: randomLength }, () => undefined)
+
+  return partialItems.map((override) => ({ ...buildMockItem(override) }))
 }
 
-function buildMockItem() {
+type Item = IterableElement<ItemList>
+function buildMockItem(overrides: PartialDeep<Item> = {}): Item {
   return {
     name: faker.commerce.product(),
     quantity: faker.datatype.number({ min: 1, max: 9 }),
     price: faker.datatype.number({ min: 100, max: 100000 }),
+    ...overrides,
   }
 }
 
-export function buildMockInvoice(): InvoiceDetail {
+export function buildMockInvoiceDetail(
+  overrides: PartialDeep<InvoiceDetail> = {}
+): InvoiceDetail {
+  const {
+    senderAddress: overrideSenderAddress,
+    clientAddress: overrideClientAddress,
+    itemList: overrideItemList,
+    issuedAt: overrideIssuedAt,
+    ...otherOverrides
+  } = overrides
+
+  const itemList = buildMockItemList(overrideItemList)
+
+  const issuedAt =
+    overrideIssuedAt instanceof Date ? overrideIssuedAt : faker.date.recent()
+
   return {
     id: generateId(),
-    ...buildMockInvoiceInput(),
+    status: 'pending',
+    senderAddress: {
+      street: faker.address.streetAddress(),
+      city: faker.address.city(),
+      postcode: faker.address.zipCode(),
+      country: faker.address.country(),
+      ...overrideSenderAddress,
+    },
+    clientName: faker.name.findName(),
+    clientEmail: faker.internet.email(),
+    clientAddress: {
+      street: faker.address.streetAddress(),
+      city: faker.address.city(),
+      postcode: faker.address.zipCode(),
+      country: faker.address.country(),
+      ...overrideClientAddress,
+    },
+    issuedAt,
+    paymentTerms: faker.datatype.number({ max: 30 }),
+    projectDescription: faker.commerce.productDescription(),
+    itemList,
+    ...otherOverrides,
   }
 }
 
-export function buildMockDraftInvoice(): InvoiceDetail {
-  return {
-    ...buildMockInvoice(),
-    status: 'draft',
-  }
+function randomStatus() {
+  const statuses = ['draft', 'pending'] as const
+  return randomPick(statuses)
 }

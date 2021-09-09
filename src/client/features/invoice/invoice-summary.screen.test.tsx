@@ -1,8 +1,8 @@
 import * as invoiceModel from 'src/client/test/mocks/invoice.model'
 
 import {
-  buildMockDraftInvoiceInput,
-  buildMockInvoice,
+  buildMockInvoiceDetail,
+  buildMockInvoiceInput,
   buildMockPendingInvoiceInput,
 } from 'src/client/test/mocks/invoice.fixtures'
 import {
@@ -15,12 +15,16 @@ import {
 } from 'src/client/test/test-utils'
 
 import { InvoiceSummaryScreen } from './invoice-summary.screen'
+import { addInvoiceDefaults } from './invoice.mappers'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { idRegex } from 'src/shared/identifier'
 
 it('should show list of invoice summaries', async () => {
-  const mockInvoiceDetails = [buildMockInvoice(), buildMockInvoice()]
+  const mockInvoiceDetails = [
+    buildMockInvoiceDetail(),
+    buildMockInvoiceDetail(),
+  ]
   invoiceModel.initialise(mockInvoiceDetails)
   const mockInvoiceSummaries = mockInvoiceDetails.map(
     invoiceModel.invoiceDetailToSummary
@@ -150,14 +154,13 @@ it.todo('should check for valid email')
 it.todo('should check for valid issuedAt date')
 it.todo('should check there are invoice items')
 it('should allow new draft invoices to be creacted', async () => {
-  const existingInvoice = buildMockInvoice()
+  const existingInvoice = buildMockInvoiceDetail()
   invoiceModel.initialise([existingInvoice])
-  const mockDraftInvoiceInput = buildMockDraftInvoiceInput()
+  const mockDraftInvoiceInput = buildMockInvoiceInput({ status: 'draft' })
   // we aren't validating the id here, so we can give it an empty string
-  const mockInvoiceSummary = invoiceModel.invoiceDetailToSummary({
-    id: '',
-    ...mockDraftInvoiceInput,
-  })
+  const mockInvoiceSummary = invoiceModel.invoiceDetailToSummary(
+    addInvoiceDefaults({ ...mockDraftInvoiceInput, id: '' })
+  )
   render(<InvoiceSummaryScreen />)
 
   await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
@@ -272,9 +275,13 @@ it('should allow new draft invoices to be creacted', async () => {
       `Due ${format(mockInvoiceSummary.paymentDue, 'dd MMM yyyy')}`
     )
   ).toBeInTheDocument()
-  expect(
-    inNewInvoiceItem.getByText(mockInvoiceSummary.clientName)
-  ).toBeInTheDocument()
+  // if we haven't given a client name, don't try and find it
+  // searching for an empty string will not do anything useful
+  if (mockInvoiceSummary.clientName) {
+    expect(
+      inNewInvoiceItem.getByText(mockInvoiceSummary.clientName)
+    ).toBeInTheDocument()
+  }
   expect(
     inNewInvoiceItem.getByText(
       currencyFormatterGBP.format(mockInvoiceSummary.total / 100)
@@ -308,9 +315,9 @@ it('should allow new draft invoices to be creacted', async () => {
   expect(
     inInvoiceTable.getByRole('link', { name: savedInvoiceId })
   ).toHaveAttribute('href', `/invoices/${savedInvoiceId}`)
-})
+}, 10000)
 it('should allow new pending invoices to be creacted', async () => {
-  const existingInvoice = buildMockInvoice()
+  const existingInvoice = buildMockInvoiceDetail()
   invoiceModel.initialise([existingInvoice])
   const mockPendingInvoiceInput = buildMockPendingInvoiceInput()
   // we aren't validating the id here, so we can give it an empty string
@@ -410,7 +417,7 @@ it('should allow new pending invoices to be creacted', async () => {
     )
   })
 
-  // save the draft invoice
+  // save the pending invoice
 
   userEvent.click(screen.getByRole('button', { name: /save & send/i }))
 
@@ -467,7 +474,7 @@ it('should allow new pending invoices to be creacted', async () => {
   expect(
     inInvoiceTable.getByRole('link', { name: savedInvoiceId })
   ).toHaveAttribute('href', `/invoices/${savedInvoiceId}`)
-})
+}, 10000)
 it('should default invoice issue date to today', () => {
   const today = new Date()
   render(<InvoiceSummaryScreen />)
@@ -499,9 +506,10 @@ it('should be possible to cancel the new invoice form', () => {
 
 function validateTextfieldEntry(
   field: HTMLElement,
-  entryValue: string,
-  expectedValue: string | number = entryValue
+  entryValue: string | undefined,
+  expectedValue: string | number | undefined = entryValue
 ) {
+  if (entryValue === undefined) return
   userEvent.type(field, entryValue)
   expect(field).toHaveValue(expectedValue)
 }
