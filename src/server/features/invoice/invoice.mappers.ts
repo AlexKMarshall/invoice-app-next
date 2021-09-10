@@ -22,18 +22,6 @@ export function invoiceDetailToSummary(invoice: InvoiceDetail): InvoiceSummary {
   }
 }
 
-export function addPaymentDue<
-  T extends { issuedAt: Date; paymentTerms: number }
->(invoiceInput: T): T & { paymentDue: Date } {
-  const paymentDue = add(invoiceInput.issuedAt, {
-    days: invoiceInput.paymentTerms,
-  })
-  return {
-    ...invoiceInput,
-    paymentDue,
-  }
-}
-
 export function invoiceDetailFromInput(
   input: NewInvoiceInputDTO,
   invoiceId = generateAlphanumericId()
