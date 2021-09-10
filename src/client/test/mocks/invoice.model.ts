@@ -2,11 +2,11 @@ import {
   InvoiceDetail,
   InvoiceSummary,
 } from 'src/client/features/invoice/invoice.types'
-import { NewInvoiceInputDTO, NewInvoiceReturnDTO } from 'src/shared/dtos'
 
+import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { add } from 'date-fns'
-import { addInvoiceDefaults } from 'src/client/features/invoice/invoice.mappers'
 import { generateId } from 'src/shared/identifier'
+import { invoiceDetailFromInput } from 'src/client/features/invoice/invoice.mappers'
 
 type Store = {
   invoices: Array<InvoiceDetail>
@@ -25,11 +25,8 @@ export function findById(id: InvoiceDetail['id']): Promise<InvoiceDetail> {
   return Promise.resolve(foundInvoice)
 }
 
-export function save(
-  invoice: NewInvoiceInputDTO
-): Promise<NewInvoiceReturnDTO['data']['savedInvoice']> {
-  const id = generateId()
-  const invoiceWithId = addInvoiceDefaults({ ...invoice, id })
+export function save(invoice: NewInvoiceInputDTO): Promise<InvoiceDetail> {
+  const invoiceWithId = invoiceDetailFromInput(invoice, generateId())
   store.invoices.push(invoiceWithId)
 
   return Promise.resolve(invoiceWithId)

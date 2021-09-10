@@ -13,18 +13,18 @@ generator client {
 
 model Address {
   id       Int     @id @default(autoincrement())
-  street   String?
-  city     String?
-  country  String?
-  postcode String?
+  street   String
+  city     String
+  country  String
+  postcode String
   client   Client?
   sender   Sender?
 }
 
 model Client {
   id        Int       @id @default(autoincrement())
-  name      String?
-  email     String?
+  name      String
+  email     String
   address   Address   @relation(fields: [addressId], references: [id])
   addressId Int
   invoice   Invoice[]
@@ -39,7 +39,7 @@ model Sender {
 
 model Item {
   id           Int           @id @default(autoincrement())
-  name         String?
+  name         String
   price        Int
   invoiceItems InvoiceItem[]
 }
@@ -57,7 +57,7 @@ model Invoice {
   id                 String        @id
   status             String
   issuedAt           DateTime
-  projectDescription String?
+  projectDescription String
   paymentTerms       Int
   sender             Sender        @relation(fields: [senderId], references: [id])
   senderId           Int

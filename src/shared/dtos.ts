@@ -30,26 +30,17 @@ export type GetInvoiceDetailDTO = {
 
 type InvoiceStatus = 'draft' | 'pending'
 
-export type NewDraftInvoiceInputDTO = {
-  status: 'draft'
-  senderAddress: Partial<InvoiceDetail['senderAddress']>
-  clientName?: InvoiceDetail['clientName']
-  clientEmail?: InvoiceDetail['clientEmail']
-  clientAddress: Partial<InvoiceDetail['clientAddress']>
-  issuedAt: InvoiceDetail['issuedAt']
-  paymentTerms: InvoiceDetail['paymentTerms']
-  projectDescription?: InvoiceDetail['projectDescription']
-  itemList: InvoiceDetail['itemList']
-}
+// export type NewDraftInvoiceInputDTO = Except<
+//   InvoiceDetail,
+//   'id' | 'status' | 'paymentDue'
+// > & { status: 'draft' }
 
-export type NewPendingInvoiceInputDTO = Except<
-  InvoiceDetail,
-  'id' | 'status' | 'paymentDue'
-> & { status: 'pending' }
+// export type NewPendingInvoiceInputDTO = Except<
+//   InvoiceDetail,
+//   'id' | 'status' | 'paymentDue'
+// > & { status: 'pending' }
 
-export type NewInvoiceInputDTO =
-  | NewDraftInvoiceInputDTO
-  | NewPendingInvoiceInputDTO
+export type NewInvoiceInputDTO = Except<InvoiceDetail, 'id' | 'paymentDue'>
 
 type InvoiceDetail = {
   id: string

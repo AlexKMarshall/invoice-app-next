@@ -15,10 +15,10 @@ import {
 } from 'src/client/test/test-utils'
 
 import { InvoiceSummaryScreen } from './invoice-summary.screen'
-import { addInvoiceDefaults } from './invoice.mappers'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { idRegex } from 'src/shared/identifier'
+import { invoiceDetailFromInput } from './invoice.mappers'
 
 it('should show list of invoice summaries', async () => {
   const mockInvoiceDetails = [
@@ -51,7 +51,9 @@ it('should show list of invoice summaries', async () => {
         `Due ${format(mockInvoice.paymentDue, 'dd MMM yyyy')}`
       )
     ).toBeInTheDocument()
-    expect(inInvoice.getByText(mockInvoice.clientName)).toBeInTheDocument()
+    if (mockInvoice.clientName) {
+      expect(inInvoice.getByText(mockInvoice.clientName)).toBeInTheDocument()
+    }
     expect(
       inInvoice.getByText(currencyFormatterGBP.format(mockInvoice.total / 100))
     ).toBeInTheDocument()
@@ -157,9 +159,9 @@ it('should allow new draft invoices to be creacted', async () => {
   const existingInvoice = buildMockInvoiceDetail()
   invoiceModel.initialise([existingInvoice])
   const mockDraftInvoiceInput = buildMockInvoiceInput({ status: 'draft' })
-  // we aren't validating the id here, so we can give it an empty string
+
   const mockInvoiceSummary = invoiceModel.invoiceDetailToSummary(
-    addInvoiceDefaults({ ...mockDraftInvoiceInput, id: '' })
+    invoiceDetailFromInput(mockDraftInvoiceInput)
   )
   render(<InvoiceSummaryScreen />)
 
@@ -320,9 +322,9 @@ it('should allow new pending invoices to be creacted', async () => {
   const existingInvoice = buildMockInvoiceDetail()
   invoiceModel.initialise([existingInvoice])
   const mockPendingInvoiceInput = buildMockPendingInvoiceInput()
-  // we aren't validating the id here, so we can give it an empty string
+
   const mockInvoiceSummary = invoiceModel.invoiceDetailToSummary(
-    addInvoiceDefaults({ ...mockPendingInvoiceInput, id: '' })
+    invoiceDetailFromInput(mockPendingInvoiceInput)
   )
   render(<InvoiceSummaryScreen />)
 
@@ -508,7 +510,7 @@ function validateTextfieldEntry(
   entryValue: string | undefined,
   expectedValue: string | number | undefined = entryValue
 ) {
-  if (entryValue === undefined) return
+  if (!entryValue) return
   userEvent.type(field, entryValue)
   expect(field).toHaveValue(expectedValue)
 }

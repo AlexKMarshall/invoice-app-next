@@ -2,11 +2,12 @@ import { InvoiceDetail, InvoiceSummary } from './invoice.types'
 
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { add } from 'date-fns'
+import { generateId } from 'src/shared/identifier'
 
 export function invoiceDetailToSummary(invoice: InvoiceDetail): InvoiceSummary {
   return {
     id: invoice.id,
-    paymentDue: add(invoice.issuedAt, { days: invoice.paymentTerms }),
+    paymentDue: invoice.paymentDue,
     clientName: invoice.clientName,
     total: invoice.itemList
       .map((item) => item.quantity * item.price)
@@ -15,35 +16,13 @@ export function invoiceDetailToSummary(invoice: InvoiceDetail): InvoiceSummary {
   }
 }
 
-const defaultAddressValues = {
-  street: '',
-  city: '',
-  postcode: '',
-  country: '',
-}
-
-const defaultInvoiceValues = {
-  projectDescription: '',
-  clientName: '',
-  clientEmail: '',
-  senderAddress: defaultAddressValues,
-  clientAddress: defaultAddressValues,
-}
-
-export function addInvoiceDefaults(
-  invoice: NewInvoiceInputDTO & { id: string }
+export function invoiceDetailFromInput(
+  input: NewInvoiceInputDTO,
+  id = generateId()
 ): InvoiceDetail {
   return {
-    ...defaultInvoiceValues,
-    ...invoice,
-    senderAddress: {
-      ...defaultInvoiceValues.senderAddress,
-      ...invoice.senderAddress,
-    },
-    clientAddress: {
-      ...defaultInvoiceValues.clientAddress,
-      ...invoice.clientAddress,
-    },
-    paymentDue: add(invoice.issuedAt, { days: invoice.paymentTerms }),
+    ...input,
+    paymentDue: add(input.issuedAt, { days: input.paymentTerms }),
+    id,
   }
 }

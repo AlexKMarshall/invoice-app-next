@@ -7,12 +7,15 @@ import {
   useQuery,
   useQueryClient,
 } from 'react-query'
-import { addInvoiceDefaults, invoiceDetailToSummary } from './invoice.mappers'
 import {
   getInvoiceDetail,
   getInvoices,
   postInvoice,
 } from './invoice.api-client'
+import {
+  invoiceDetailFromInput,
+  invoiceDetailToSummary,
+} from './invoice.mappers'
 
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { nanoid } from 'nanoid'
@@ -77,9 +80,9 @@ export function useCreateInvoice({
         const pendingId = `SAVING-${nanoid()}`
         if (previousInvoices) {
           queryClient.setQueryData<Array<InvoiceSummary>>(invoiceKeys.list(), [
-            invoiceDetailToSummary({
-              ...addInvoiceDefaults({ ...newInvoice, id: pendingId }),
-            }),
+            invoiceDetailToSummary(
+              invoiceDetailFromInput(newInvoice, pendingId)
+            ),
             ...previousInvoices,
           ])
         }

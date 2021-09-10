@@ -24,31 +24,32 @@ it('should show invoice details', async () => {
   ).toBeInTheDocument()
 
   expect(screen.getByText(mockInvoice.id)).toBeInTheDocument()
-  expect(screen.getByText(mockInvoice.projectDescription)).toBeInTheDocument()
-  expect(screen.getByText(mockInvoice.senderAddress.street)).toBeInTheDocument()
-  expect(screen.getByText(mockInvoice.senderAddress.city)).toBeInTheDocument()
-  expect(
-    screen.getByText(mockInvoice.senderAddress.postcode)
-  ).toBeInTheDocument()
-  expect(
-    screen.getByText(mockInvoice.senderAddress.country)
-  ).toBeInTheDocument()
+  validateTextIfNonEmpty(mockInvoice.projectDescription)
+
+  validateTextIfNonEmpty(mockInvoice.senderAddress.street)
+  validateTextIfNonEmpty(mockInvoice.senderAddress.city)
+  validateTextIfNonEmpty(mockInvoice.senderAddress.postcode)
+  validateTextIfNonEmpty(mockInvoice.senderAddress.country)
+
   expect(
     screen.getByText(format(mockInvoice.issuedAt, 'dd MMM yyyy'))
   ).toBeInTheDocument()
   expect(
     screen.getByText(format(mockInvoice.paymentDue, 'dd MMM yyyy'))
   ).toBeInTheDocument()
-  expect(screen.getByText(mockInvoice.clientName)).toBeInTheDocument()
-  expect(screen.getByText(mockInvoice.clientAddress.street)).toBeInTheDocument()
-  expect(screen.getByText(mockInvoice.clientAddress.city)).toBeInTheDocument()
-  expect(
-    screen.getByText(mockInvoice.clientAddress.postcode)
-  ).toBeInTheDocument()
-  expect(
-    screen.getByText(mockInvoice.clientAddress.country)
-  ).toBeInTheDocument()
-  expect(screen.getByText(mockInvoice.clientEmail)).toBeInTheDocument()
+
+  validateTextIfNonEmpty(mockInvoice.clientName)
+  validateTextIfNonEmpty(mockInvoice.clientAddress.street)
+  validateTextIfNonEmpty(mockInvoice.clientAddress.city)
+  validateTextIfNonEmpty(mockInvoice.clientAddress.postcode)
+  validateTextIfNonEmpty(mockInvoice.clientAddress.country)
+  validateTextIfNonEmpty(mockInvoice.clientEmail)
 })
 
 it.todo('should handle fetch errors')
+
+function validateTextIfNonEmpty(text: string) {
+  if (text) {
+    expect(screen.getByText(text)).toBeInTheDocument()
+  }
+}
