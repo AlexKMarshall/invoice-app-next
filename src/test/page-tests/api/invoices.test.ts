@@ -3,11 +3,13 @@ import {
   buildMockPendingInvoiceInput,
 } from 'src/server/test/mocks/invoice.fixtures'
 import { database, prepareDbForTests } from 'src/server/test/test-utils'
+import {
+  invoiceDetailFromInput,
+  invoiceDetailToSummary,
+} from 'src/server/features/invoice/invoice.mappers'
 
-import { add } from 'date-fns'
 import handler from 'src/pages/api/invoices'
 import { idRegex } from 'src/shared/identifier'
-import { invoiceDetailToSummary } from 'src/server/features/invoice/invoice.mappers'
 import { testApiHandler } from 'next-test-api-route-handler'
 
 prepareDbForTests()
@@ -78,23 +80,17 @@ it('should post a pending invoice', async () => {
       const result = await response.json()
 
       // a post request should give us back the full saved invoice object
+      const mockInvoiceDetail = invoiceDetailFromInput(newInvoiceInput)
       expect(result).toMatchObject({
         data: {
           savedInvoice: {
-            ...JSON.parse(JSON.stringify(newInvoiceInput)),
-            itemList: expect.arrayContaining(
-              newInvoiceInput.itemList.map((mockItem) => ({
+            ...JSON.parse(JSON.stringify(mockInvoiceDetail)),
+            id: expect.stringMatching(idRegex),
+            itemList: expect.toIncludeSameMembers(
+              mockInvoiceDetail.itemList.map((mockItem) => ({
                 ...mockItem,
                 id: expect.any(Number),
               }))
-            ),
-            id: expect.stringMatching(idRegex),
-            paymentDue: JSON.parse(
-              JSON.stringify(
-                add(newInvoiceInput.issuedAt, {
-                  days: newInvoiceInput.paymentTerms,
-                })
-              )
             ),
           },
         },

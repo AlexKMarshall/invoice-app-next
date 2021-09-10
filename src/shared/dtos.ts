@@ -34,8 +34,10 @@ export type NewInvoiceInputDTO = Except<
   InvoiceDetail,
   'id' | 'paymentDue' | 'itemList'
 > & {
-  itemList: Array<{ name: string; quantity: number; price: number }>
+  itemList: Array<NewInvoiceItemInput>
 }
+
+type NewInvoiceItemInput = Except<InvoiceItem, 'id' | 'total'>
 
 type InvoiceDetail = {
   id: string
@@ -58,7 +60,15 @@ type InvoiceDetail = {
   paymentTerms: number
   paymentDue: Date
   projectDescription: string
-  itemList: Array<{ name: string; quantity: number; price: number; id: number }>
+  itemList: Array<InvoiceItem>
+}
+
+type InvoiceItem = {
+  id: number
+  name: string
+  quantity: number
+  price: number
+  total: number
 }
 
 export type NewInvoiceReturnDTO = {

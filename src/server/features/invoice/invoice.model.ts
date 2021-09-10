@@ -121,6 +121,7 @@ function flattenInvoiceDetail(
       name,
       quantity,
       price,
+      total: price * quantity,
     })
   )
 

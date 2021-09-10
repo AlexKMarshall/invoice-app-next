@@ -51,16 +51,45 @@ it('should show invoice details', async () => {
   validateTextIfNonEmpty(mockInvoice.clientAddress.country)
   validateTextIfNonEmpty(mockInvoice.clientEmail)
 
-  // get all rows except header
-  const itemRows = screen.getAllByRole('row').slice(1)
+  const [headerRow, ...itemRows] = screen.getAllByRole('row')
+
+  const columnHeaders = within(headerRow).getAllByRole('columnheader')
+  const itemNameHeader = within(headerRow).getByRole('columnheader', {
+    name: /item name/i,
+  })
+  const itemNameIndex = columnHeaders.indexOf(itemNameHeader)
+  const itemQtyHeader = within(headerRow).getByRole('columnheader', {
+    name: /qty\./i,
+  })
+  const itemQtyIndex = columnHeaders.indexOf(itemQtyHeader)
+  const itemPriceHeader = within(headerRow).getByRole('columnheader', {
+    name: /price/i,
+  })
+  const itemPriceIndex = columnHeaders.indexOf(itemPriceHeader)
+  const itemTotalHeader = within(headerRow).getByRole('columnheader', {
+    name: /total/i,
+  })
+  const itemTotalIndex = columnHeaders.indexOf(itemTotalHeader)
+
   expect(itemRows).toHaveLength(mockInvoice.itemList.length)
 
   mockInvoice.itemList.forEach((mockItem, index) => {
     const itemRow = itemRows[index]
-    const withinRow = within(itemRow)
-    validateTextIfNonEmpty(mockItem.name, withinRow)
-    validateTextIfNonEmpty(mockItem.quantity.toString(), withinRow)
-    validateTextIfNonEmpty(mockItem.price.toString(), withinRow)
+    const rowCells = within(itemRow).getAllByRole('cell')
+
+    validateTextIfNonEmpty(mockItem.name, within(rowCells[itemNameIndex]))
+    validateTextIfNonEmpty(
+      mockItem.quantity.toString(),
+      within(rowCells[itemQtyIndex])
+    )
+    validateTextIfNonEmpty(
+      mockItem.price.toString(),
+      within(rowCells[itemPriceIndex])
+    )
+    validateTextIfNonEmpty(
+      mockItem.total.toString(),
+      within(rowCells[itemTotalIndex])
+    )
   })
 })
 

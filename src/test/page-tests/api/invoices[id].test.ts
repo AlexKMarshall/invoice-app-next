@@ -1,9 +1,9 @@
 import { database, prepareDbForTests } from 'src/server/test/test-utils'
 
-import { addPaymentDue } from 'src/server/features/invoice/invoice.mappers'
 import { buildMockInvoiceInput } from 'src/server/test/mocks/invoice.fixtures'
 import { generateAlphanumericId } from 'src/shared/identifier'
 import handler from 'src/pages/api/invoices/[id]'
+import { invoiceDetailFromInput } from 'src/server/features/invoice/invoice.mappers'
 import { testApiHandler } from 'next-test-api-route-handler'
 
 prepareDbForTests()
@@ -12,10 +12,14 @@ it('should get individual invoice detail', async () => {
   expect.hasAssertions()
 
   const mockInvoiceInput = {
-    id: generateAlphanumericId(),
     ...buildMockInvoiceInput(),
+    id: generateAlphanumericId(),
   }
-  const mockInvoiceDetail = addPaymentDue(mockInvoiceInput)
+  const mockInvoiceDetail = invoiceDetailFromInput(
+    mockInvoiceInput,
+    mockInvoiceInput.id
+  )
+
   const mockInvoices = [mockInvoiceInput, buildMockInvoiceInput()]
 
   await database.seedInvoices(...mockInvoices)

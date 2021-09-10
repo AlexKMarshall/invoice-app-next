@@ -29,6 +29,7 @@ export function invoiceDetailFromInput(
     itemList: input.itemList.map((itemInput) => ({
       ...itemInput,
       id: generateNumericId(),
+      total: itemInput.quantity * itemInput.price,
     })),
     id,
   }
