@@ -294,7 +294,8 @@ function TotalInvoiceCount() {
 
   return (
     <div>
-      There are {count} total {inflect('invoice')(count)}
+      There {inflect('is', 'are')(count)} {count} total{' '}
+      {inflect('invoice')(count)}
     </div>
   )
 }
