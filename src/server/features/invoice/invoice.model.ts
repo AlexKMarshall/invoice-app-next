@@ -7,7 +7,7 @@ import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { NotFoundError } from 'src/server/errors'
 import { Prisma } from '@prisma/client'
 import { add } from 'date-fns'
-import { generateId } from 'src/shared/identifier'
+import { generateAlphanumericId } from 'src/shared/identifier'
 import prisma from 'src/server/prisma'
 
 function dbFindAllSummaries() {
@@ -115,11 +115,14 @@ function flattenInvoiceDetail(
     ...restInvoice
   } = invoice
 
-  const itemList = invoiceItems.map(({ item: { name, price }, quantity }) => ({
-    name,
-    quantity,
-    price,
-  }))
+  const itemList = invoiceItems.map(
+    ({ item: { name, price }, quantity, id }) => ({
+      id,
+      name,
+      quantity,
+      price,
+    })
+  )
 
   const paymentDue = add(issuedAt, { days: paymentTerms })
 
@@ -173,6 +176,7 @@ function dbCreate(invoice: Prisma.InvoiceCreateInput) {
       },
       invoiceItems: {
         select: {
+          id: true,
           quantity: true,
           item: {
             select: {
@@ -240,6 +244,7 @@ const draftInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
     }),
     invoiceItems: z.array(
       z.object({
+        id: z.number(),
         quantity: z.number().min(1),
         item: z.object({
           name: z
@@ -269,6 +274,7 @@ const pendingInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
     }),
     invoiceItems: z.array(
       z.object({
+        id: z.number(),
         quantity: z.number().min(1),
         item: z.object({
           name: z.string().min(1),
@@ -296,7 +302,7 @@ function prepareInvoiceForCreate(
     ...restInvoice
   } = newInvoice
 
-  const id = generateId()
+  const id = generateAlphanumericId()
 
   const sender: Prisma.SenderCreateNestedOneWithoutInvoiceInput = {
     create: {
@@ -376,6 +382,7 @@ function dbFindInvoiceDetail(id: InvoiceDetail['id']) {
       },
       invoiceItems: {
         select: {
+          id: true,
           quantity: true,
           item: {
             select: {

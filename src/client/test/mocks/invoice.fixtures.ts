@@ -4,7 +4,7 @@ import { maybeEmpty, randomPick } from 'src/shared/random'
 import { InvoiceDetail } from 'src/client/features/invoice/invoice.types'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import faker from 'faker'
-import { generateId } from 'src/shared/identifier'
+import { generateAlphanumericId } from 'src/shared/identifier'
 import { invoiceDetailFromInput } from 'src/client/features/invoice/invoice.mappers'
 
 export function buildMockPendingInvoiceInput(
@@ -106,8 +106,10 @@ export function buildMockInvoiceInput(
   }
 }
 
-type ItemList = InvoiceDetail['itemList']
-function buildMockItemList(overrides?: PartialDeep<ItemList>): ItemList {
+type NewItemListInput = NewInvoiceInputDTO['itemList']
+function buildMockItemList(
+  overrides?: PartialDeep<NewItemListInput>
+): NewItemListInput {
   const randomLength = faker.datatype.number({ min: 1, max: 3 })
 
   const partialItems =
@@ -116,8 +118,10 @@ function buildMockItemList(overrides?: PartialDeep<ItemList>): ItemList {
   return partialItems.map((override) => ({ ...buildMockItem(override) }))
 }
 
-type Item = IterableElement<ItemList>
-function buildMockItem(overrides: PartialDeep<Item> = {}): Item {
+type NewItemInput = IterableElement<NewItemListInput>
+function buildMockItem(
+  overrides: PartialDeep<NewItemInput> = {}
+): NewItemInput {
   return {
     name: faker.commerce.product(),
     quantity: faker.datatype.number({ min: 1, max: 9 }),
@@ -143,7 +147,7 @@ export function buildMockInvoiceDetail(
     return _exhaustiveCheck
   }
 
-  return invoiceDetailFromInput(input, generateId())
+  return invoiceDetailFromInput(input, generateAlphanumericId())
 }
 
 function randomStatus() {

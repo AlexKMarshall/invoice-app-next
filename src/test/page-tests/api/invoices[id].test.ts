@@ -2,7 +2,7 @@ import { database, prepareDbForTests } from 'src/server/test/test-utils'
 
 import { addPaymentDue } from 'src/server/features/invoice/invoice.mappers'
 import { buildMockInvoiceInput } from 'src/server/test/mocks/invoice.fixtures'
-import { generateId } from 'src/shared/identifier'
+import { generateAlphanumericId } from 'src/shared/identifier'
 import handler from 'src/pages/api/invoices/[id]'
 import { testApiHandler } from 'next-test-api-route-handler'
 
@@ -11,7 +11,10 @@ prepareDbForTests()
 it('should get individual invoice detail', async () => {
   expect.hasAssertions()
 
-  const mockInvoiceInput = { id: generateId(), ...buildMockInvoiceInput() }
+  const mockInvoiceInput = {
+    id: generateAlphanumericId(),
+    ...buildMockInvoiceInput(),
+  }
   const mockInvoiceDetail = addPaymentDue(mockInvoiceInput)
   const mockInvoices = [mockInvoiceInput, buildMockInvoiceInput()]
 
@@ -31,8 +34,13 @@ it('should get individual invoice detail', async () => {
         data: {
           invoice: {
             ...JSON.parse(JSON.stringify(mockInvoiceDetail)),
-            // we don't care about the order of the itemList array
-            itemList: expect.toIncludeSameMembers(mockInvoiceDetail.itemList),
+            // we don't care about the order of the itemList array or their ids
+            itemList: expect.toIncludeSameMembers(
+              mockInvoiceDetail.itemList.map((mockItem) => ({
+                ...mockItem,
+                id: expect.any(Number),
+              }))
+            ),
           },
         },
       })

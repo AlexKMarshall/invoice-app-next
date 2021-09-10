@@ -67,7 +67,7 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
             </thead>
             <tbody>
               {invoice.itemList.map((item) => (
-                <tr key={item.name}>
+                <tr key={item.id}>
                   <td>{item.name}</td>
                   <td>{item.quantity}</td>
                   <td>{item.price}</td>

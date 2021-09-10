@@ -30,17 +30,12 @@ export type GetInvoiceDetailDTO = {
 
 type InvoiceStatus = 'draft' | 'pending'
 
-// export type NewDraftInvoiceInputDTO = Except<
-//   InvoiceDetail,
-//   'id' | 'status' | 'paymentDue'
-// > & { status: 'draft' }
-
-// export type NewPendingInvoiceInputDTO = Except<
-//   InvoiceDetail,
-//   'id' | 'status' | 'paymentDue'
-// > & { status: 'pending' }
-
-export type NewInvoiceInputDTO = Except<InvoiceDetail, 'id' | 'paymentDue'>
+export type NewInvoiceInputDTO = Except<
+  InvoiceDetail,
+  'id' | 'paymentDue' | 'itemList'
+> & {
+  itemList: Array<{ name: string; quantity: number; price: number }>
+}
 
 type InvoiceDetail = {
   id: string
@@ -63,7 +58,7 @@ type InvoiceDetail = {
   paymentTerms: number
   paymentDue: Date
   projectDescription: string
-  itemList: Array<{ name: string; quantity: number; price: number }>
+  itemList: Array<{ name: string; quantity: number; price: number; id: number }>
 }
 
 export type NewInvoiceReturnDTO = {

@@ -1,8 +1,11 @@
 import { InvoiceDetail, InvoiceSummary } from './invoice.types'
+import {
+  generateAlphanumericId,
+  generateNumericId,
+} from 'src/shared/identifier'
 
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { add } from 'date-fns'
-import { generateId } from 'src/shared/identifier'
 
 export function invoiceDetailToSummary(invoice: InvoiceDetail): InvoiceSummary {
   return {
@@ -18,11 +21,15 @@ export function invoiceDetailToSummary(invoice: InvoiceDetail): InvoiceSummary {
 
 export function invoiceDetailFromInput(
   input: NewInvoiceInputDTO,
-  id = generateId()
+  id = generateAlphanumericId()
 ): InvoiceDetail {
   return {
     ...input,
     paymentDue: add(input.issuedAt, { days: input.paymentTerms }),
+    itemList: input.itemList.map((itemInput) => ({
+      ...itemInput,
+      id: generateNumericId(),
+    })),
     id,
   }
 }

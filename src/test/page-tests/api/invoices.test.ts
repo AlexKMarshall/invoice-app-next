@@ -83,7 +83,10 @@ it('should post a pending invoice', async () => {
           savedInvoice: {
             ...JSON.parse(JSON.stringify(newInvoiceInput)),
             itemList: expect.arrayContaining(
-              JSON.parse(JSON.stringify(newInvoiceInput.itemList))
+              newInvoiceInput.itemList.map((mockItem) => ({
+                ...mockItem,
+                id: expect.any(Number),
+              }))
             ),
             id: expect.stringMatching(idRegex),
             paymentDue: JSON.parse(
