@@ -51,7 +51,10 @@ it('should show invoice details', async () => {
   validateTextIfNonEmpty(mockInvoice.clientAddress.country)
   validateTextIfNonEmpty(mockInvoice.clientEmail)
 
-  const [headerRow, ...itemRows] = screen.getAllByRole('row')
+  const allRows = screen.getAllByRole('row')
+  const [headerRow] = allRows
+  const itemRows = allRows.slice(1, -1)
+  const [footerRow] = allRows.slice(-1)
 
   const columnHeaders = within(headerRow).getAllByRole('columnheader')
   const itemNameHeader = within(headerRow).getByRole('columnheader', {
@@ -91,6 +94,10 @@ it('should show invoice details', async () => {
       within(rowCells[itemTotalIndex])
     )
   })
+
+  expect(
+    within(footerRow).getByText(mockInvoice.amountDue.toString())
+  ).toBeInTheDocument()
 })
 
 it.todo('should handle fetch errors')

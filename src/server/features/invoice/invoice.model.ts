@@ -79,12 +79,12 @@ function dbSummaryToInvoiceSummary(
 
   const paymentDue = add(issuedAt, { days: paymentTerms })
 
-  const total = invoiceItems.reduce(
+  const amountDue = invoiceItems.reduce(
     (acc, cur) => acc + cur.quantity * cur.item.price,
     0
   )
 
-  return { id, paymentDue, clientName, total, status }
+  return { id, paymentDue, clientName, amountDue, status }
 }
 
 export function findAll(): Promise<Array<InvoiceSummary>> {
@@ -127,6 +127,11 @@ function flattenInvoiceDetail(
 
   const paymentDue = add(issuedAt, { days: paymentTerms })
 
+  const amountDue = itemList.reduce(
+    (acc, { total: itemTotal }) => acc + itemTotal,
+    0
+  )
+
   return {
     senderAddress: sender.address,
     clientName: client.name,
@@ -136,6 +141,7 @@ function flattenInvoiceDetail(
     issuedAt,
     paymentTerms,
     paymentDue,
+    amountDue,
     ...restInvoice,
   }
 }

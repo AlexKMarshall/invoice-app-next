@@ -16,7 +16,7 @@ export type GetInvoiceSummaryDTO = {
       id: string
       paymentDue: Date
       clientName: string
-      total: number
+      amountDue: number
       status: InvoiceStatus
     }>
   }
@@ -32,7 +32,7 @@ type InvoiceStatus = 'draft' | 'pending'
 
 export type NewInvoiceInputDTO = Except<
   InvoiceDetail,
-  'id' | 'paymentDue' | 'itemList'
+  'id' | 'paymentDue' | 'itemList' | 'amountDue'
 > & {
   itemList: Array<NewInvoiceItemInput>
 }
@@ -61,6 +61,7 @@ type InvoiceDetail = {
   paymentDue: Date
   projectDescription: string
   itemList: Array<InvoiceItem>
+  amountDue: number
 }
 
 type InvoiceItem = {

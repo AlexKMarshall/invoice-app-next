@@ -12,12 +12,9 @@ import {
   getInvoices,
   postInvoice,
 } from './invoice.api-client'
-import {
-  invoiceDetailFromInput,
-  invoiceDetailToSummary,
-} from './invoice.mappers'
 
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
+import { invoiceDetailFromInput } from './invoice.mappers'
 import { nanoid } from 'nanoid'
 
 const invoiceKeys = {
@@ -80,9 +77,8 @@ export function useCreateInvoice({
         const pendingId = `SAVING-${nanoid()}`
         if (previousInvoices) {
           queryClient.setQueryData<Array<InvoiceSummary>>(invoiceKeys.list(), [
-            invoiceDetailToSummary(
-              invoiceDetailFromInput(newInvoice, pendingId)
-            ),
+            invoiceDetailFromInput(newInvoice, pendingId),
+
             ...previousInvoices,
           ])
         }
@@ -102,9 +98,7 @@ export function useCreateInvoice({
 
         if (previousInvoices) {
           const updatedInvoices = previousInvoices.map((invoice) =>
-            invoice.id === pendingId
-              ? invoiceDetailToSummary(savedInvoiceDetail)
-              : invoice
+            invoice.id === pendingId ? savedInvoiceDetail : invoice
           )
 
           queryClient.setQueryData<Array<InvoiceSummary>>(

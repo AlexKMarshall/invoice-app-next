@@ -44,7 +44,7 @@ export function invoiceDetailToSummary(invoice: InvoiceDetail): InvoiceSummary {
     id: invoice.id,
     paymentDue: add(invoice.issuedAt, { days: invoice.paymentTerms }),
     clientName: invoice.clientName,
-    total: invoice.itemList
+    amountDue: invoice.itemList
       .map((item) => item.quantity * item.price)
       .reduce((acc, cur) => acc + cur),
     status: invoice.status,

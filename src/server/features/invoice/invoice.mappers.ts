@@ -10,15 +10,19 @@ import {
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { add } from 'date-fns'
 
-export function invoiceDetailToSummary(invoice: InvoiceDetail): InvoiceSummary {
+export function invoiceDetailToSummary({
+  id,
+  paymentDue,
+  clientName,
+  amountDue,
+  status,
+}: InvoiceDetail): InvoiceSummary {
   return {
-    id: invoice.id,
-    paymentDue: invoice.paymentDue,
-    clientName: invoice.clientName,
-    total: invoice.itemList
-      .map((item) => item.quantity * item.price)
-      .reduce((acc, cur) => acc + cur),
-    status: invoice.status,
+    id,
+    paymentDue,
+    clientName,
+    amountDue,
+    status,
   }
 }
 
@@ -35,5 +39,9 @@ export function invoiceDetailFromInput(
       id: generateNumericId(),
       total: itemInput.quantity * itemInput.price,
     })),
+    amountDue: input.itemList.reduce(
+      (acc, { quantity, price }) => acc + quantity * price,
+      0
+    ),
   }
 }

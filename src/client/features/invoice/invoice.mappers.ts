@@ -1,23 +1,11 @@
-import { InvoiceDetail, InvoiceSummary } from './invoice.types'
 import {
   generateAlphanumericId,
   generateNumericId,
 } from 'src/shared/identifier'
 
+import { InvoiceDetail } from './invoice.types'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { add } from 'date-fns'
-
-export function invoiceDetailToSummary(invoice: InvoiceDetail): InvoiceSummary {
-  return {
-    id: invoice.id,
-    paymentDue: invoice.paymentDue,
-    clientName: invoice.clientName,
-    total: invoice.itemList
-      .map((item) => item.quantity * item.price)
-      .reduce((acc, cur) => acc + cur, 0),
-    status: invoice.status,
-  }
-}
 
 export function invoiceDetailFromInput(
   input: NewInvoiceInputDTO,
@@ -31,6 +19,10 @@ export function invoiceDetailFromInput(
       id: generateNumericId(),
       total: itemInput.quantity * itemInput.price,
     })),
+    amountDue: input.itemList.reduce(
+      (acc, { quantity, price }) => acc + quantity * price,
+      0
+    ),
     id,
   }
 }

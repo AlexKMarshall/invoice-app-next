@@ -76,6 +76,12 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
                 </tr>
               ))}
             </tbody>
+            <tfoot>
+              <tr>
+                <th scope="row">Amount Due</th>
+                <td>{invoice.amountDue}</td>
+              </tr>
+            </tfoot>
           </table>
         </Details>
       </>

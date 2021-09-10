@@ -27,7 +27,10 @@ export class Database {
   ): Promise<InvoiceDetail[]> {
     const savePromises = invoices.map((invoice) => {
       if ('paymentDue' in invoice) {
-        const cleanInvoice = removeProperty('paymentDue', invoice)
+        const cleanInvoice = removeProperty(
+          'amountDue',
+          removeProperty('paymentDue', invoice)
+        )
         return invoiceModel.create(cleanInvoice)
       }
       return invoiceModel.create(invoice)
