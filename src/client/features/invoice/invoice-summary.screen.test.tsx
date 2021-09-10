@@ -321,10 +321,9 @@ it('should allow new pending invoices to be creacted', async () => {
   invoiceModel.initialise([existingInvoice])
   const mockPendingInvoiceInput = buildMockPendingInvoiceInput()
   // we aren't validating the id here, so we can give it an empty string
-  const mockInvoiceSummary = invoiceModel.invoiceDetailToSummary({
-    id: '',
-    ...mockPendingInvoiceInput,
-  })
+  const mockInvoiceSummary = invoiceModel.invoiceDetailToSummary(
+    addInvoiceDefaults({ ...mockPendingInvoiceInput, id: '' })
+  )
   render(<InvoiceSummaryScreen />)
 
   await waitForElementToBeRemoved(() => screen.getByText(/loading/i))

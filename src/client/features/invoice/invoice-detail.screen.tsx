@@ -45,6 +45,10 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
             <p>{format(invoice.issuedAt, 'dd MMM yyyy')}</p>
           </section>
           <section>
+            <h2>Payment Due</h2>
+            <p>{format(invoice.paymentDue, 'dd MMM yyyy')}</p>
+          </section>
+          <section>
             <h2>Bill To</h2>
             <p>{invoice.clientName}</p>
             <Address address={invoice.clientAddress} />

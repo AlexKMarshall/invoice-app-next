@@ -44,5 +44,6 @@ export function addInvoiceDefaults(
       ...defaultInvoiceValues.clientAddress,
       ...invoice.clientAddress,
     },
+    paymentDue: add(invoice.issuedAt, { days: invoice.paymentTerms }),
   }
 }

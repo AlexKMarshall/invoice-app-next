@@ -1,6 +1,8 @@
 import { database, prepareDbForTests } from 'src/server/test/test-utils'
 
-import { buildMockInvoiceDetail } from 'src/server/test/mocks/invoice.fixtures'
+import { addPaymentDue } from 'src/server/features/invoice/invoice.mappers'
+import { buildMockInvoiceInput } from 'src/server/test/mocks/invoice.fixtures'
+import { generateId } from 'src/shared/identifier'
 import handler from 'src/pages/api/invoices/[id]'
 import { testApiHandler } from 'next-test-api-route-handler'
 
@@ -9,14 +11,15 @@ prepareDbForTests()
 it('should get individual invoice detail', async () => {
   expect.hasAssertions()
 
-  const mockInvoice = buildMockInvoiceDetail()
-  const mockInvoices = [mockInvoice, buildMockInvoiceDetail()]
+  const mockInvoiceInput = { id: generateId(), ...buildMockInvoiceInput() }
+  const mockInvoiceDetail = addPaymentDue(mockInvoiceInput)
+  const mockInvoices = [mockInvoiceInput, buildMockInvoiceInput()]
 
   await database.seedInvoices(...mockInvoices)
 
   await testApiHandler({
     handler,
-    params: { id: mockInvoice.id },
+    params: { id: mockInvoiceDetail.id },
     test: async ({ fetch }) => {
       const response = await fetch({ method: 'GET' })
 
@@ -27,9 +30,9 @@ it('should get individual invoice detail', async () => {
       expect(data).toEqual({
         data: {
           invoice: {
-            ...JSON.parse(JSON.stringify(mockInvoice)),
+            ...JSON.parse(JSON.stringify(mockInvoiceDetail)),
             // we don't care about the order of the itemList array
-            itemList: expect.toIncludeSameMembers(mockInvoice.itemList),
+            itemList: expect.toIncludeSameMembers(mockInvoiceDetail.itemList),
           },
         },
       })
@@ -39,7 +42,7 @@ it('should get individual invoice detail', async () => {
 it('should return 404 if no invoice for given id', async () => {
   expect.hasAssertions()
 
-  await database.seedInvoices(buildMockInvoiceDetail())
+  await database.seedInvoices(buildMockInvoiceInput())
 
   await testApiHandler({
     handler,

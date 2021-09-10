@@ -22,9 +22,15 @@ export async function getInvoiceDetail(
   id: InvoiceDetail['id']
 ): Promise<InvoiceDetail> {
   const res = await fetch(`/api/invoices/${id}`)
-  const { data } = (await res.json()) as Stringify<GetInvoiceDetailDTO>
+  const {
+    data: { invoice },
+  } = (await res.json()) as Stringify<GetInvoiceDetailDTO>
 
-  return { ...data.invoice, issuedAt: parseJSON(data.invoice.issuedAt) }
+  return {
+    ...invoice,
+    issuedAt: parseJSON(invoice.issuedAt),
+    paymentDue: parseJSON(invoice.paymentDue),
+  }
 }
 
 export async function postInvoice(
@@ -41,5 +47,9 @@ export async function postInvoice(
     data: { savedInvoice },
   } = (await res.json()) as Stringify<NewInvoiceReturnDTO>
 
-  return { ...savedInvoice, issuedAt: parseJSON(savedInvoice.issuedAt) }
+  return {
+    ...savedInvoice,
+    issuedAt: parseJSON(savedInvoice.issuedAt),
+    paymentDue: parseJSON(savedInvoice.paymentDue),
+  }
 }

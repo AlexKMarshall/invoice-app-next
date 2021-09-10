@@ -4,6 +4,7 @@ import {
 } from 'src/server/test/mocks/invoice.fixtures'
 import { database, prepareDbForTests } from 'src/server/test/test-utils'
 
+import { add } from 'date-fns'
 import handler from 'src/pages/api/invoices'
 import { idRegex } from 'src/shared/identifier'
 import { invoiceDetailToSummary } from 'src/server/features/invoice/invoice.mappers'
@@ -77,7 +78,7 @@ it('should post a pending invoice', async () => {
       const result = await response.json()
 
       // a post request should give us back the full saved invoice object
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         data: {
           savedInvoice: {
             ...JSON.parse(JSON.stringify(newInvoiceInput)),
@@ -85,6 +86,13 @@ it('should post a pending invoice', async () => {
               JSON.parse(JSON.stringify(newInvoiceInput.itemList))
             ),
             id: expect.stringMatching(idRegex),
+            paymentDue: JSON.parse(
+              JSON.stringify(
+                add(newInvoiceInput.issuedAt, {
+                  days: newInvoiceInput.paymentTerms,
+                })
+              )
+            ),
           },
         },
       })

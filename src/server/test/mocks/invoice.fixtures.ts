@@ -4,9 +4,10 @@ import {
   NewInvoiceInputDTO,
   NewPendingInvoiceInputDTO,
 } from 'src/shared/dtos'
-import { maybeFactory, maybeUndefined, randomPick } from 'src/shared/random'
+import { maybeFactory, randomPick } from 'src/shared/random'
 
 import { InvoiceDetail } from 'src/server/features/invoice/invoice.types'
+import { add } from 'date-fns'
 import faker from 'faker'
 import { generateId } from 'src/shared/identifier'
 
@@ -56,9 +57,7 @@ export function buildMockPendingInvoiceInput(
   }
 }
 
-function maybeEmpty<T>(value: T) {
-  return maybeFactory(0.5, '')(maybeUndefined(value))
-}
+const maybeEmpty = maybeFactory(0.5, '')
 
 export function buildMockDraftInvoiceInput(
   overrides: PartialDeep<NewDraftInvoiceInputDTO> = {}
@@ -148,6 +147,8 @@ export function buildMockInvoiceDetail(
     clientAddress: overrideClientAddress,
     itemList: overrideItemList,
     issuedAt: overrideIssuedAt,
+    paymentTerms: overridePaymentTerms,
+    paymentDue: overridePaymentDue,
     ...otherOverrides
   } = overrides
 
@@ -155,6 +156,14 @@ export function buildMockInvoiceDetail(
 
   const issuedAt =
     overrideIssuedAt instanceof Date ? overrideIssuedAt : faker.date.recent()
+
+  const paymentTerms =
+    overridePaymentTerms ?? faker.datatype.number({ max: 30 })
+
+  const paymentDue =
+    overridePaymentDue instanceof Date
+      ? overridePaymentDue
+      : add(issuedAt, { days: paymentTerms })
 
   return {
     id: generateId(),
@@ -176,7 +185,8 @@ export function buildMockInvoiceDetail(
       ...overrideClientAddress,
     },
     issuedAt,
-    paymentTerms: faker.datatype.number({ max: 30 }),
+    paymentTerms,
+    paymentDue,
     projectDescription: faker.commerce.productDescription(),
     itemList,
     ...otherOverrides,

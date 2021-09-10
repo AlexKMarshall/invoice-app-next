@@ -23,9 +23,15 @@ export class Database {
   }
 
   seedInvoices(
-    ...invoices: Array<NewInvoiceInputDTO>
+    ...invoices: Array<NewInvoiceInputDTO | InvoiceDetail>
   ): Promise<InvoiceDetail[]> {
-    const savePromises = invoices.map((invoice) => invoiceModel.create(invoice))
+    const savePromises = invoices.map((invoice) => {
+      if ('paymentDue' in invoice) {
+        const cleanInvoice = removeProperty('paymentDue', invoice)
+        return invoiceModel.create(cleanInvoice)
+      }
+      return invoiceModel.create(invoice)
+    })
 
     return Promise.all(savePromises)
   }
@@ -38,4 +44,12 @@ export class Database {
   disconnect(): Promise<void> {
     return prisma.$disconnect()
   }
+}
+
+function removeProperty<T, K extends keyof T>(
+  property: K,
+  object: T
+): Omit<T, K> {
+  const { [property]: _, ...rest } = object
+  return rest
 }

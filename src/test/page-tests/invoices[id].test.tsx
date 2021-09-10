@@ -36,6 +36,9 @@ it('should show invoice details', async () => {
   expect(
     screen.getByText(format(mockInvoice.issuedAt, 'dd MMM yyyy'))
   ).toBeInTheDocument()
+  expect(
+    screen.getByText(format(mockInvoice.paymentDue, 'dd MMM yyyy'))
+  ).toBeInTheDocument()
   expect(screen.getByText(mockInvoice.clientName)).toBeInTheDocument()
   expect(screen.getByText(mockInvoice.clientAddress.street)).toBeInTheDocument()
   expect(screen.getByText(mockInvoice.clientAddress.city)).toBeInTheDocument()

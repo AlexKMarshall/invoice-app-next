@@ -44,7 +44,7 @@ export type NewDraftInvoiceInputDTO = {
 
 export type NewPendingInvoiceInputDTO = Except<
   InvoiceDetail,
-  'id' | 'status'
+  'id' | 'status' | 'paymentDue'
 > & { status: 'pending' }
 
 export type NewInvoiceInputDTO =
@@ -70,6 +70,7 @@ type InvoiceDetail = {
   }
   issuedAt: Date
   paymentTerms: number
+  paymentDue: Date
   projectDescription: string
   itemList: Array<{ name: string; quantity: number; price: number }>
 }

@@ -7,6 +7,7 @@ import {
 import { maybeUndefined, randomPick } from 'src/shared/random'
 
 import { InvoiceDetail } from 'src/client/features/invoice/invoice.types'
+import { add } from 'date-fns'
 import faker from 'faker'
 import { generateId } from 'src/shared/identifier'
 
@@ -140,6 +141,8 @@ export function buildMockInvoiceDetail(
     clientAddress: overrideClientAddress,
     itemList: overrideItemList,
     issuedAt: overrideIssuedAt,
+    paymentTerms: overridePaymentTerms,
+    paymentDue: overridePaymentDue,
     ...otherOverrides
   } = overrides
 
@@ -147,6 +150,14 @@ export function buildMockInvoiceDetail(
 
   const issuedAt =
     overrideIssuedAt instanceof Date ? overrideIssuedAt : faker.date.recent()
+
+  const paymentTerms =
+    overridePaymentTerms ?? faker.datatype.number({ min: 1, max: 30 })
+
+  const paymentDue =
+    overridePaymentDue instanceof Date
+      ? overridePaymentDue
+      : add(issuedAt, { days: paymentTerms })
 
   return {
     id: generateId(),
@@ -168,7 +179,8 @@ export function buildMockInvoiceDetail(
       ...overrideClientAddress,
     },
     issuedAt,
-    paymentTerms: faker.datatype.number({ max: 30 }),
+    paymentTerms,
+    paymentDue,
     projectDescription: faker.commerce.productDescription(),
     itemList,
     ...otherOverrides,

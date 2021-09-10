@@ -106,7 +106,14 @@ export function create(newInvoice: NewInvoiceInputDTO): Promise<InvoiceDetail> {
 function flattenInvoiceDetail(
   invoice: z.infer<typeof invoiceDetailSchema>
 ): InvoiceDetail {
-  const { sender, client, invoiceItems, ...restInvoice } = invoice
+  const {
+    sender,
+    client,
+    invoiceItems,
+    issuedAt,
+    paymentTerms,
+    ...restInvoice
+  } = invoice
 
   const itemList = invoiceItems.map(({ item: { name, price }, quantity }) => ({
     name,
@@ -114,12 +121,17 @@ function flattenInvoiceDetail(
     price,
   }))
 
+  const paymentDue = add(issuedAt, { days: paymentTerms })
+
   return {
     senderAddress: sender.address,
     clientName: client.name,
     clientEmail: client.email,
     clientAddress: client.address,
     itemList,
+    issuedAt,
+    paymentTerms,
+    paymentDue,
     ...restInvoice,
   }
 }
