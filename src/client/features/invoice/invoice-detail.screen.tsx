@@ -57,6 +57,24 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
             <h2>Sent To</h2>
             <p>{invoice.clientEmail}</p>
           </section>
+          <table>
+            <thead>
+              <tr>
+                <th>Item Name</th>
+                <th>QTY.</th>
+                <th>Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {invoice.itemList.map((item) => (
+                <tr key={item.name}>
+                  <td>{item.name}</td>
+                  <td>{item.quantity}</td>
+                  <td>{item.price}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </Details>
       </>
     )

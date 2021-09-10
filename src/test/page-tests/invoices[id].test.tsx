@@ -1,6 +1,12 @@
 import * as invoiceModel from 'src/client/test/mocks/invoice.model'
 
-import { screen, waitForElementToBeRemoved } from '@testing-library/react'
+import {
+  BoundFunctions,
+  queries,
+  screen,
+  waitForElementToBeRemoved,
+  within,
+} from '@testing-library/react'
 
 import { buildMockInvoiceDetail } from 'src/client/test/mocks/invoice.fixtures'
 import { format } from 'date-fns'
@@ -44,12 +50,28 @@ it('should show invoice details', async () => {
   validateTextIfNonEmpty(mockInvoice.clientAddress.postcode)
   validateTextIfNonEmpty(mockInvoice.clientAddress.country)
   validateTextIfNonEmpty(mockInvoice.clientEmail)
+
+  // get all rows except header
+  const itemRows = screen.getAllByRole('row').slice(1)
+  expect(itemRows).toHaveLength(mockInvoice.itemList.length)
+
+  mockInvoice.itemList.forEach((mockItem, index) => {
+    const itemRow = itemRows[index]
+    const withinRow = within(itemRow)
+    validateTextIfNonEmpty(mockItem.name, withinRow)
+    validateTextIfNonEmpty(mockItem.quantity.toString(), withinRow)
+    validateTextIfNonEmpty(mockItem.price.toString(), withinRow)
+  })
 })
 
 it.todo('should handle fetch errors')
 
-function validateTextIfNonEmpty(text: string) {
+function validateTextIfNonEmpty(
+  text: string,
+  withinElement: BoundFunctions<typeof queries> = screen
+) {
   if (text) {
-    expect(screen.getByText(text)).toBeInTheDocument()
+    // eslint-disable-next-line testing-library/prefer-screen-queries
+    expect(withinElement.getByText(text)).toBeInTheDocument()
   }
 }
