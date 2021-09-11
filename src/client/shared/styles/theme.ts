@@ -150,4 +150,18 @@ export const TYPOGRAPHY = {
       prop: 'var(--body1-letter-spacing)',
     },
   },
+  body2: {
+    fontSize: {
+      value: `${11 / 16}rem`,
+      prop: 'var(--body2-font-size)',
+    },
+    letterSpacing: {
+      value: '-0.23px',
+      prop: 'var(--body2-letter-spacing)',
+    },
+    lineHeight: {
+      value: '18px',
+      prop: 'var(--body2-line-height)',
+    },
+  },
 }
