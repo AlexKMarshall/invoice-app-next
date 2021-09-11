@@ -24,6 +24,7 @@ const Wrapper = styled.div`
 `
 
 const Main = styled.main`
+  width: 100%;
   max-width: 730px;
   margin-left: auto;
   margin-right: auto;
