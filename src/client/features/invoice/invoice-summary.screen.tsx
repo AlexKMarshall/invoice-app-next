@@ -191,7 +191,7 @@ function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
       <Cell>{invoice.clientName}</Cell>
       <Cell style={{ textAlign: 'right' }}>
         <Heading level={3} forwardedAs="span">
-          {currencyFormatterGBP.format(invoice.amountDue)}
+          <GBPValue value={invoice.amountDue} />
         </Heading>
       </Cell>
       <Cell>
@@ -297,5 +297,19 @@ function TotalInvoiceCount() {
       There {inflect('is', 'are')(count)} {count} total{' '}
       {inflect('invoice')(count)}
     </div>
+  )
+}
+
+type GBPValueProps = {
+  value: number
+}
+function GBPValue({ value }: GBPValueProps) {
+  const [poundSign, ...rest] = currencyFormatterGBP.format(value).split('')
+  const formattedValue = rest.join('')
+
+  return (
+    <>
+      {poundSign}&nbsp;{formattedValue}
+    </>
   )
 }

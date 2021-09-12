@@ -15,10 +15,10 @@ import {
 } from 'src/client/test/test-utils'
 
 import { InvoiceSummaryScreen } from './invoice-summary.screen'
-import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { idRegex } from 'src/shared/identifier'
 import { invoiceDetailFromInput } from './invoice.mappers'
+import { validateGBPValue } from 'src/test/validators'
 
 it('should show list of invoice summaries', async () => {
   const mockInvoiceDetails = [
@@ -54,9 +54,7 @@ it('should show list of invoice summaries', async () => {
     if (mockInvoice.clientName) {
       expect(inInvoice.getByText(mockInvoice.clientName)).toBeInTheDocument()
     }
-    expect(
-      inInvoice.getByText(currencyFormatterGBP.format(mockInvoice.amountDue))
-    ).toBeInTheDocument()
+    validateGBPValue(mockInvoice.amountDue, inInvoice)
     expect(inInvoice.getByText(mockInvoice.status)).toBeInTheDocument()
   })
 })
@@ -284,11 +282,7 @@ it('should allow new draft invoices to be creacted', async () => {
       inNewInvoiceItem.getByText(mockInvoiceSummary.clientName)
     ).toBeInTheDocument()
   }
-  expect(
-    inNewInvoiceItem.getByText(
-      currencyFormatterGBP.format(mockInvoiceSummary.amountDue)
-    )
-  ).toBeInTheDocument()
+  validateGBPValue(mockInvoiceSummary.amountDue, inNewInvoiceItem)
   expect(
     inNewInvoiceItem.getByText(mockInvoiceSummary.status)
   ).toBeInTheDocument()
@@ -443,11 +437,7 @@ it('should allow new pending invoices to be creacted', async () => {
   expect(
     inNewInvoiceItem.getByText(mockInvoiceSummary.clientName)
   ).toBeInTheDocument()
-  expect(
-    inNewInvoiceItem.getByText(
-      currencyFormatterGBP.format(mockInvoiceSummary.amountDue)
-    )
-  ).toBeInTheDocument()
+  validateGBPValue(mockInvoiceSummary.amountDue, inNewInvoiceItem)
   expect(
     inNewInvoiceItem.getByText(mockInvoiceSummary.status)
   ).toBeInTheDocument()

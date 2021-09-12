@@ -87,8 +87,12 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
                 <tr key={item.id}>
                   <td>{item.name}</td>
                   <td>{item.quantity}</td>
-                  <td>{currencyFormatterGBP.format(item.price)}</td>
-                  <td>{currencyFormatterGBP.format(item.total)}</td>
+                  <td>
+                    <GBPValue value={item.price} />
+                  </td>
+                  <td>
+                    <GBPValue value={item.total} />
+                  </td>
                 </tr>
               ))}
             </TBody>
@@ -98,7 +102,7 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
                   Amount Due
                 </th>
                 <td colSpan={2}>
-                  {currencyFormatterGBP.format(invoice.amountDue)}
+                  <GBPValue value={invoice.amountDue} />
                 </td>
               </tr>
             </TFoot>
@@ -301,3 +305,17 @@ const TFoot = styled.tfoot`
     color: white;
   }
 `
+
+type GBPValueProps = {
+  value: number
+}
+function GBPValue({ value }: GBPValueProps) {
+  const [poundSign, ...rest] = currencyFormatterGBP.format(value).split('')
+  const formattedValue = rest.join('')
+
+  return (
+    <>
+      {poundSign}&nbsp;{formattedValue}
+    </>
+  )
+}

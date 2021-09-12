@@ -1,15 +1,13 @@
 import * as invoiceModel from 'src/client/test/mocks/invoice.model'
 
 import {
-  BoundFunctions,
-  queries,
   screen,
   waitForElementToBeRemoved,
   within,
 } from '@testing-library/react'
+import { validateGBPValue, validateTextIfNonEmpty } from '../validators'
 
 import { buildMockInvoiceDetail } from 'src/client/test/mocks/invoice.fixtures'
-import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { getPage } from 'next-page-tester'
 
@@ -86,31 +84,11 @@ it('should show invoice details', async () => {
       mockItem.quantity.toString(),
       within(rowCells[itemQtyIndex])
     )
-    validateTextIfNonEmpty(
-      currencyFormatterGBP.format(mockItem.price),
-      within(rowCells[itemPriceIndex])
-    )
-    validateTextIfNonEmpty(
-      currencyFormatterGBP.format(mockItem.total),
-      within(rowCells[itemTotalIndex])
-    )
+    validateGBPValue(mockItem.price, within(rowCells[itemPriceIndex]))
+    validateGBPValue(mockItem.total, within(rowCells[itemTotalIndex]))
   })
 
-  expect(
-    within(footerRow).getByText(
-      currencyFormatterGBP.format(mockInvoice.amountDue)
-    )
-  ).toBeInTheDocument()
+  validateGBPValue(mockInvoice.amountDue, within(footerRow))
 })
 
 it.todo('should handle fetch errors')
-
-function validateTextIfNonEmpty(
-  text: string,
-  withinElement: BoundFunctions<typeof queries> = screen
-) {
-  if (text) {
-    // eslint-disable-next-line testing-library/prefer-screen-queries
-    expect(withinElement.getByText(text)).toBeInTheDocument()
-  }
-}
