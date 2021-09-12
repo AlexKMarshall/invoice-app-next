@@ -19,7 +19,6 @@ type Props = {
 
 export function InvoiceDetailScreen({ id }: Props): JSX.Element {
   const invoiceDetailQuery = useInvoiceDetail(id)
-  const router = useRouter()
 
   if (invoiceDetailQuery.isLoading) return <div>Loading...</div>
   if (invoiceDetailQuery.isSuccess) {
@@ -227,6 +226,7 @@ const THead = styled.thead`
     padding-top: 32px;
     padding-bottom: 32px;
     font-weight: inherit;
+    box-sizing: content-box;
   }
 
   & th:nth-child(1) {

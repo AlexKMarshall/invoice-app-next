@@ -19,4 +19,4 @@ it('should go to invoice detail page when clicking on invoice link', async () =>
   userEvent.click(screen.getByRole('row'))
 
   expect(await screen.findByText(/mark as paid/i)).toBeInTheDocument()
-})
+}, 10000)
