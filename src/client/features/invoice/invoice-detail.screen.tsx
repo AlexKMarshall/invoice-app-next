@@ -5,11 +5,13 @@ import {
 import { COLORS, TYPOGRAPHY } from 'src/client/shared/styles/theme'
 import styled, { CSSProperties } from 'styled-components'
 
+import { ArrowLeft } from 'src/client/shared/icons/arrow-left'
 import { Button } from 'src/client/shared/components/button'
 import { StatusBadge } from 'src/client/shared/components/status-badge'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { useInvoiceDetail } from './invoice.queries'
+import { useRouter } from 'next/router'
 
 type Props = {
   id: InvoiceDetail['id']
@@ -17,12 +19,14 @@ type Props = {
 
 export function InvoiceDetailScreen({ id }: Props): JSX.Element {
   const invoiceDetailQuery = useInvoiceDetail(id)
+  const router = useRouter()
 
   if (invoiceDetailQuery.isLoading) return <div>Loading...</div>
   if (invoiceDetailQuery.isSuccess) {
     const invoice = invoiceDetailQuery.data
     return (
       <>
+        <BackButton />
         <StatusBar>
           <Status>
             Status
@@ -120,7 +124,6 @@ const StatusBar = styled.div`
   justify-content: space-between;
   align-items: baseline;
   padding: 20px 32px;
-  margin-top: 32px;
   margin-bottom: 24px;
   background-color: white;
   border-radius: 8px;
@@ -319,3 +322,33 @@ function GBPValue({ value }: GBPValueProps) {
     </>
   )
 }
+
+function BackButton() {
+  const router = useRouter()
+
+  return (
+    <BackButtonWrapper onClick={router.back}>
+      <ArrowLeft />
+      Go back
+    </BackButtonWrapper>
+  )
+}
+
+const BackButtonWrapper = styled.button`
+  margin-top: 64px;
+  margin-bottom: 32px;
+  border: none;
+  background-color: transparent;
+  display: flex;
+  justify-content: flex-start;
+  align-items: baseline;
+  gap: 24px;
+  font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
+  color: ${COLORS.textColor.strong.prop};
+  cursor: pointer;
+
+  & > svg {
+    height: ${TYPOGRAPHY.body1.fontSize.prop};
+    color: ${COLORS.textColor.prop};
+  }
+`
