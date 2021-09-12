@@ -12,4 +12,4 @@ export function maybeFactory<U extends unknown>(
   }
 }
 
-export const maybeUndefined = maybeFactory(0.5, undefined)
+export const maybeEmpty = maybeFactory(0.5, '')

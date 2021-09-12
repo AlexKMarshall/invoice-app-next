@@ -18,18 +18,22 @@ afterEach(() => {
   jest.resetAllMocks()
 })
 
-describe('getInvoices', () => {
+describe('getInvoiceSummaries', () => {
   it('should handle an unexpected database error', async () => {
     const mockError = new Error('Some error message')
     mockInvoiceModel.findAll.mockRejectedValueOnce(mockError)
 
-    const result = await invoiceController.getInvoices()
+    const result = await invoiceController.getInvoiceSummaries()
 
     expect(result.code).toBe(500)
     expect(result.response).toEqual({
       error: JSON.stringify(mockError),
     })
   })
+})
+
+describe('getInvoiceDetail', () => {
+  it.todo('should give 404 if no invoice with provided ID')
 })
 
 describe('postInvoice', () => {

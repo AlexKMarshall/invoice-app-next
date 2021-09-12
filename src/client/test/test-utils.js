@@ -1,6 +1,10 @@
+import {
+  DrawerContainer,
+  DrawerOverlayContainer,
+  DrawerProvider,
+} from '../shared/components/drawer'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
-import { DrawerProvider } from '../shared/components/drawer'
 import { render as rtlRender } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -15,7 +19,10 @@ function Providers({ children }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <DrawerProvider>{children}</DrawerProvider>
+      <DrawerProvider>
+        <DrawerOverlayContainer>{children}</DrawerOverlayContainer>
+        <DrawerContainer />
+      </DrawerProvider>
     </QueryClientProvider>
   )
 }

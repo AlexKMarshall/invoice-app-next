@@ -11,7 +11,7 @@ export default async function handler(
 ): Promise<void> {
   switch (req.method) {
     case 'GET': {
-      const { code, response } = await invoiceController.getInvoices()
+      const { code, response } = await invoiceController.getInvoiceSummaries()
       res.status(code).json(response)
       return
     }

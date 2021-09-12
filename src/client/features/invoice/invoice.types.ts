@@ -7,3 +7,10 @@ export type InvoiceDetail = NewInvoiceReturnDTO['data']['savedInvoice']
 export type InvoiceSummary = IterableElement<
   GetInvoiceSummaryDTO['data']['invoices']
 >
+
+export type Address = {
+  street: string
+  city: string
+  postcode: string
+  country: string
+}

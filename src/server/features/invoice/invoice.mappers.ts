@@ -2,17 +2,50 @@ import {
   InvoiceDetail,
   InvoiceSummary,
 } from 'src/server/features/invoice/invoice.types'
+import {
+  generateAlphanumericId,
+  generateNumericId,
+} from 'src/shared/identifier'
 
+import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { add } from 'date-fns'
+import { round2dp } from 'src/shared/number'
 
-export function invoiceDetailToSummary(invoice: InvoiceDetail): InvoiceSummary {
+export function invoiceDetailToSummary({
+  id,
+  paymentDue,
+  clientName,
+  amountDue,
+  status,
+}: InvoiceDetail): InvoiceSummary {
   return {
-    id: invoice.id,
-    paymentDue: add(invoice.issuedAt, { days: invoice.paymentTerms }),
-    clientName: invoice.clientName,
-    total: invoice.itemList
-      .map((item) => item.quantity * item.price)
-      .reduce((acc, cur) => acc + cur),
-    status: invoice.status,
+    id,
+    paymentDue,
+    clientName,
+    amountDue,
+    status,
+  }
+}
+
+export function invoiceDetailFromInput(
+  input: NewInvoiceInputDTO,
+  invoiceId = generateAlphanumericId()
+): InvoiceDetail {
+  return {
+    ...input,
+    paymentDue: add(input.issuedAt, { days: input.paymentTerms }),
+    id: invoiceId,
+    itemList: input.itemList.map((itemInput) => ({
+      ...itemInput,
+      id: generateNumericId(),
+      total: itemInput.quantity * itemInput.price,
+    })),
+    amountDue: round2dp(
+      input.itemList.reduce(
+        (acc, { quantity, price }) =>
+          round2dp(acc + round2dp(quantity * price)),
+        0
+      )
+    ),
   }
 }

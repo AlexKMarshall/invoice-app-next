@@ -16,34 +16,28 @@ export type GetInvoiceSummaryDTO = {
       id: string
       paymentDue: Date
       clientName: string
-      total: number
+      amountDue: number
       status: InvoiceStatus
     }>
   }
 }
 
-type InvoiceStatus = 'draft' | 'pending'
-
-export type NewDraftInvoiceInputDTO = {
-  status: 'draft'
-  senderAddress: Partial<InvoiceDetail['senderAddress']>
-  clientName?: InvoiceDetail['clientName']
-  clientEmail?: InvoiceDetail['clientEmail']
-  clientAddress: Partial<InvoiceDetail['clientAddress']>
-  issuedAt: InvoiceDetail['issuedAt']
-  paymentTerms: InvoiceDetail['paymentTerms']
-  projectDescription?: InvoiceDetail['projectDescription']
-  itemList: InvoiceDetail['itemList']
+export type GetInvoiceDetailDTO = {
+  data: {
+    invoice: InvoiceDetail
+  }
 }
 
-export type NewPendingInvoiceInputDTO = Except<
-  InvoiceDetail,
-  'id' | 'status'
-> & { status: 'pending' }
+type InvoiceStatus = 'draft' | 'pending'
 
-export type NewInvoiceInputDTO =
-  | NewDraftInvoiceInputDTO
-  | NewPendingInvoiceInputDTO
+export type NewInvoiceInputDTO = Except<
+  InvoiceDetail,
+  'id' | 'paymentDue' | 'itemList' | 'amountDue'
+> & {
+  itemList: Array<NewInvoiceItemInput>
+}
+
+type NewInvoiceItemInput = Except<InvoiceItem, 'id' | 'total'>
 
 type InvoiceDetail = {
   id: string
@@ -64,8 +58,18 @@ type InvoiceDetail = {
   }
   issuedAt: Date
   paymentTerms: number
+  paymentDue: Date
   projectDescription: string
-  itemList: Array<{ name: string; quantity: number; price: number }>
+  itemList: Array<InvoiceItem>
+  amountDue: number
+}
+
+type InvoiceItem = {
+  id: number
+  name: string
+  quantity: number
+  price: number
+  total: number
 }
 
 export type NewInvoiceReturnDTO = {

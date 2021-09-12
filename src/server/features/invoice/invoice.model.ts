@@ -4,10 +4,12 @@ import { AsyncReturnType, IterableElement } from 'type-fest'
 import { InvoiceDetail, InvoiceSummary } from './invoice.types'
 
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
+import { NotFoundError } from 'src/server/errors'
 import { Prisma } from '@prisma/client'
 import { add } from 'date-fns'
-import { generateId } from 'src/shared/identifier'
+import { generateAlphanumericId } from 'src/shared/identifier'
 import prisma from 'src/server/prisma'
+import { round2dp } from 'src/shared/number'
 
 function dbFindAllSummaries() {
   return prisma.invoice.findMany({
@@ -78,12 +80,14 @@ function dbSummaryToInvoiceSummary(
 
   const paymentDue = add(issuedAt, { days: paymentTerms })
 
-  const total = invoiceItems.reduce(
-    (acc, cur) => acc + cur.quantity * cur.item.price,
-    0
+  const amountDue = round2dp(
+    invoiceItems.reduce(
+      (acc, cur) => round2dp(acc + round2dp(cur.quantity * cur.item.price)),
+      0
+    )
   )
 
-  return { id, paymentDue, clientName, total, status }
+  return { id, paymentDue, clientName, amountDue, status }
 }
 
 export function findAll(): Promise<Array<InvoiceSummary>> {
@@ -98,20 +102,37 @@ export function create(newInvoice: NewInvoiceInputDTO): Promise<InvoiceDetail> {
   const invoiceToSave = prepareInvoiceForCreate(newInvoice)
 
   return dbCreate(invoiceToSave)
-    .then(createInvoiceReturnSchema.parse)
+    .then(invoiceDetailSchema.parse)
     .then(flattenInvoiceDetail)
 }
 
 function flattenInvoiceDetail(
-  invoice: z.infer<typeof createInvoiceReturnSchema>
+  invoice: z.infer<typeof invoiceDetailSchema>
 ): InvoiceDetail {
-  const { sender, client, invoiceItems, ...restInvoice } = invoice
+  const {
+    sender,
+    client,
+    invoiceItems,
+    issuedAt,
+    paymentTerms,
+    ...restInvoice
+  } = invoice
 
-  const itemList = invoiceItems.map(({ item: { name, price }, quantity }) => ({
-    name,
-    quantity,
-    price,
-  }))
+  const itemList = invoiceItems.map(
+    ({ item: { name, price }, quantity, id }) => ({
+      id,
+      name,
+      quantity,
+      price,
+      total: round2dp(price * quantity),
+    })
+  )
+
+  const paymentDue = add(issuedAt, { days: paymentTerms })
+
+  const amountDue = round2dp(
+    itemList.reduce((acc, { total: itemTotal }) => round2dp(acc + itemTotal), 0)
+  )
 
   return {
     senderAddress: sender.address,
@@ -119,6 +140,10 @@ function flattenInvoiceDetail(
     clientEmail: client.email,
     clientAddress: client.address,
     itemList,
+    issuedAt,
+    paymentTerms,
+    paymentDue,
+    amountDue,
     ...restInvoice,
   }
 }
@@ -160,6 +185,7 @@ function dbCreate(invoice: Prisma.InvoiceCreateInput) {
       },
       invoiceItems: {
         select: {
+          id: true,
           quantity: true,
           item: {
             select: {
@@ -201,7 +227,7 @@ const draftAddressSchema = z.object({
     .transform((val) => val ?? ''),
 })
 
-const createDraftInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
+const draftInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
   z.object({
     id: z.string().min(1),
     status: z.literal('draft'),
@@ -227,6 +253,7 @@ const createDraftInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
     }),
     invoiceItems: z.array(
       z.object({
+        id: z.number(),
         quantity: z.number().min(1),
         item: z.object({
           name: z
@@ -239,7 +266,7 @@ const createDraftInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
     ),
   })
 )
-const createPendingInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
+const pendingInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
   z.object({
     id: z.string().min(1),
     status: z.literal('pending'),
@@ -256,6 +283,7 @@ const createPendingInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
     }),
     invoiceItems: z.array(
       z.object({
+        id: z.number(),
         quantity: z.number().min(1),
         item: z.object({
           name: z.string().min(1),
@@ -266,9 +294,9 @@ const createPendingInvoiceReturnSchema = schemaForType<DBCreateInvoiceReturn>()(
   })
 )
 
-const createInvoiceReturnSchema = z.union([
-  createDraftInvoiceReturnSchema,
-  createPendingInvoiceReturnSchema,
+const invoiceDetailSchema = z.union([
+  draftInvoiceDetailSchema,
+  pendingInvoiceDetailSchema,
 ])
 
 function prepareInvoiceForCreate(
@@ -283,7 +311,7 @@ function prepareInvoiceForCreate(
     ...restInvoice
   } = newInvoice
 
-  const id = generateId()
+  const id = generateAlphanumericId()
 
   const sender: Prisma.SenderCreateNestedOneWithoutInvoiceInput = {
     create: {
@@ -324,4 +352,70 @@ function prepareInvoiceForCreate(
   }
 
   return invoiceToSave
+}
+
+function dbFindInvoiceDetail(id: InvoiceDetail['id']) {
+  return prisma.invoice.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      status: true,
+      issuedAt: true,
+      paymentTerms: true,
+      projectDescription: true,
+      sender: {
+        select: {
+          address: {
+            select: {
+              street: true,
+              city: true,
+              country: true,
+              postcode: true,
+            },
+          },
+        },
+      },
+      client: {
+        select: {
+          name: true,
+          email: true,
+          address: {
+            select: {
+              street: true,
+              city: true,
+              country: true,
+              postcode: true,
+            },
+          },
+        },
+      },
+      invoiceItems: {
+        select: {
+          id: true,
+          quantity: true,
+          item: {
+            select: {
+              name: true,
+              price: true,
+            },
+          },
+        },
+      },
+    },
+  })
+}
+
+export function findInvoiceDetail(
+  id: InvoiceDetail['id']
+): Promise<InvoiceDetail> {
+  return dbFindInvoiceDetail(id)
+    .then((dbInvoice) => {
+      if (!dbInvoice)
+        return Promise.reject(
+          new NotFoundError(`Cannot find invoice with id '${id}'`)
+        )
+      return dbInvoice
+    })
+    .then(invoiceDetailSchema.parse)
+    .then(flattenInvoiceDetail)
 }

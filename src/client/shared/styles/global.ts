@@ -38,6 +38,9 @@ export const Global = createGlobalStyle`
     --h3-letter-spacing: ${TYPOGRAPHY.h3.letterSpacing.value};
     --body1-font-size: ${TYPOGRAPHY.body1.fontSize.value};
     --body1-letter-spacing: ${TYPOGRAPHY.body1.letterSpacing.value};
+    --body2-font-size: ${TYPOGRAPHY.body2.fontSize.value};
+    --body2-letter-spacing: ${TYPOGRAPHY.body2.letterSpacing.value};
+    --body2-line-height: ${TYPOGRAPHY.body2.lineHeight.value};
     --font-weight-normal: ${TYPOGRAPHY.fontWeight.normal.value};
     --font-weight-bold: ${TYPOGRAPHY.fontWeight.bold.value};
   }

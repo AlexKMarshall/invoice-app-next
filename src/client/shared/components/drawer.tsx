@@ -129,6 +129,7 @@ const Underlay = styled.div`
   display: flex;
 `
 
+// This uses the width of the sidebar to avoid getting hidden by it, could maybe measure that instead of hard coding
 const Overlay = styled.div`
   max-width: 80vw;
   padding: 56px;

@@ -1,11 +1,39 @@
 import { COLORS } from '../styles/theme'
 import Image from 'next/image'
 import { Logo } from '../icons/logo'
+import { ReactNode } from 'react'
 import styled from 'styled-components'
 
-export function Sidebar(): JSX.Element {
+type Props = {
+  children: ReactNode
+}
+
+export function Layout({ children }: Props): JSX.Element {
   return (
     <Wrapper>
+      <Main>{children}</Main>
+      <Sidebar />
+    </Wrapper>
+  )
+}
+
+const Wrapper = styled.div`
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: 'sidebar main';
+`
+
+const Main = styled.main`
+  width: 100%;
+  max-width: 730px;
+  margin-left: auto;
+  margin-right: auto;
+  grid-area: main;
+`
+
+function Sidebar(): JSX.Element {
+  return (
+    <SidebarWrapper>
       <LogoBox>
         <Logo />
       </LogoBox>
@@ -19,17 +47,18 @@ export function Sidebar(): JSX.Element {
           />
         </AvatarImageWrapper>
       </AvatarBox>
-    </Wrapper>
+    </SidebarWrapper>
   )
 }
 
-const Wrapper = styled.div`
+const SidebarWrapper = styled.div`
   --border-radius: 20px;
   height: 100vh;
   width: fit-content;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  grid-area: sidebar;
 
   background: ${COLORS.sidebarColor.prop};
   position: sticky;

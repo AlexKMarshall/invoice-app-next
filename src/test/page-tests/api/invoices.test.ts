@@ -3,15 +3,18 @@ import {
   buildMockPendingInvoiceInput,
 } from 'src/server/test/mocks/invoice.fixtures'
 import { database, prepareDbForTests } from 'src/server/test/test-utils'
+import {
+  invoiceDetailFromInput,
+  invoiceDetailToSummary,
+} from 'src/server/features/invoice/invoice.mappers'
 
 import handler from 'src/pages/api/invoices'
 import { idRegex } from 'src/shared/identifier'
-import { invoiceDetailToSummary } from 'src/server/features/invoice/invoice.mappers'
 import { testApiHandler } from 'next-test-api-route-handler'
 
 prepareDbForTests()
 
-it('should get invoices', async () => {
+it('should get invoice summaries', async () => {
   expect.hasAssertions()
 
   const mockInvoices = [buildMockInvoiceDetail(), buildMockInvoiceDetail()]
@@ -22,6 +25,9 @@ it('should get invoices', async () => {
     handler,
     test: async ({ fetch }) => {
       const response = await fetch({ method: 'GET' })
+
+      expect(response.status).toBe(200)
+
       const data = await response.json()
 
       expect(data).toEqual({
@@ -69,17 +75,23 @@ it('should post a pending invoice', async () => {
         },
       })
 
+      expect(response.status).toBe(201)
+
       const result = await response.json()
 
       // a post request should give us back the full saved invoice object
-      expect(result).toEqual({
+      const mockInvoiceDetail = invoiceDetailFromInput(newInvoiceInput)
+      expect(result).toMatchObject({
         data: {
           savedInvoice: {
-            ...JSON.parse(JSON.stringify(newInvoiceInput)),
-            itemList: expect.arrayContaining(
-              JSON.parse(JSON.stringify(newInvoiceInput.itemList))
-            ),
+            ...JSON.parse(JSON.stringify(mockInvoiceDetail)),
             id: expect.stringMatching(idRegex),
+            itemList: expect.toIncludeSameMembers(
+              mockInvoiceDetail.itemList.map((mockItem) => ({
+                ...mockItem,
+                id: expect.any(Number),
+              }))
+            ),
           },
         },
       })

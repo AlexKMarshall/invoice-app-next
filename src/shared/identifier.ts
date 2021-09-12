@@ -9,7 +9,7 @@ function randomLetter(): string {
   return String.fromCharCode(charCode)
 }
 
-export function generateId(): string {
+export function generateAlphanumericId(): string {
   const characters = [
     randomLetter(),
     randomLetter(),
@@ -20,6 +20,10 @@ export function generateId(): string {
   ]
 
   return characters.join('')
+}
+
+export function generateNumericId(): number {
+  return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
 }
 
 export const idRegex = /[A-Z]{2}\d{4}/
