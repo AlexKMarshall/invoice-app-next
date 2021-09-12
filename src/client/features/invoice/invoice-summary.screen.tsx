@@ -191,7 +191,7 @@ function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
       <Cell>{invoice.clientName}</Cell>
       <Cell style={{ textAlign: 'right' }}>
         <Heading level={3} forwardedAs="span">
-          {currencyFormatterGBP.format(invoice.amountDue / 100)}
+          {currencyFormatterGBP.format(invoice.amountDue)}
         </Heading>
       </Cell>
       <Cell>

@@ -9,6 +9,7 @@ import { Prisma } from '@prisma/client'
 import { add } from 'date-fns'
 import { generateAlphanumericId } from 'src/shared/identifier'
 import prisma from 'src/server/prisma'
+import { round2dp } from 'src/shared/number'
 
 function dbFindAllSummaries() {
   return prisma.invoice.findMany({
@@ -79,9 +80,11 @@ function dbSummaryToInvoiceSummary(
 
   const paymentDue = add(issuedAt, { days: paymentTerms })
 
-  const amountDue = invoiceItems.reduce(
-    (acc, cur) => acc + cur.quantity * cur.item.price,
-    0
+  const amountDue = round2dp(
+    invoiceItems.reduce(
+      (acc, cur) => round2dp(acc + round2dp(cur.quantity * cur.item.price)),
+      0
+    )
   )
 
   return { id, paymentDue, clientName, amountDue, status }
@@ -121,15 +124,14 @@ function flattenInvoiceDetail(
       name,
       quantity,
       price,
-      total: price * quantity,
+      total: round2dp(price * quantity),
     })
   )
 
   const paymentDue = add(issuedAt, { days: paymentTerms })
 
-  const amountDue = itemList.reduce(
-    (acc, { total: itemTotal }) => acc + itemTotal,
-    0
+  const amountDue = round2dp(
+    itemList.reduce((acc, { total: itemTotal }) => round2dp(acc + itemTotal), 0)
   )
 
   return {

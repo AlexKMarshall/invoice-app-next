@@ -9,6 +9,7 @@ import {
 
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { add } from 'date-fns'
+import { round2dp } from 'src/shared/number'
 
 export function invoiceDetailToSummary({
   id,
@@ -39,9 +40,12 @@ export function invoiceDetailFromInput(
       id: generateNumericId(),
       total: itemInput.quantity * itemInput.price,
     })),
-    amountDue: input.itemList.reduce(
-      (acc, { quantity, price }) => acc + quantity * price,
-      0
+    amountDue: round2dp(
+      input.itemList.reduce(
+        (acc, { quantity, price }) =>
+          round2dp(acc + round2dp(quantity * price)),
+        0
+      )
     ),
   }
 }

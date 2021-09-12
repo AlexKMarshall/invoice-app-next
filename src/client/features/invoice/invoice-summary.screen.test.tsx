@@ -55,9 +55,7 @@ it('should show list of invoice summaries', async () => {
       expect(inInvoice.getByText(mockInvoice.clientName)).toBeInTheDocument()
     }
     expect(
-      inInvoice.getByText(
-        currencyFormatterGBP.format(mockInvoice.amountDue / 100)
-      )
+      inInvoice.getByText(currencyFormatterGBP.format(mockInvoice.amountDue))
     ).toBeInTheDocument()
     expect(inInvoice.getByText(mockInvoice.status)).toBeInTheDocument()
   })
@@ -288,7 +286,7 @@ it('should allow new draft invoices to be creacted', async () => {
   }
   expect(
     inNewInvoiceItem.getByText(
-      currencyFormatterGBP.format(mockInvoiceSummary.amountDue / 100)
+      currencyFormatterGBP.format(mockInvoiceSummary.amountDue)
     )
   ).toBeInTheDocument()
   expect(
@@ -447,7 +445,7 @@ it('should allow new pending invoices to be creacted', async () => {
   ).toBeInTheDocument()
   expect(
     inNewInvoiceItem.getByText(
-      currencyFormatterGBP.format(mockInvoiceSummary.amountDue / 100)
+      currencyFormatterGBP.format(mockInvoiceSummary.amountDue)
     )
   ).toBeInTheDocument()
   expect(

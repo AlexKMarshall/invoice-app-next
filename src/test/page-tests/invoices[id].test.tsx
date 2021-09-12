@@ -9,6 +9,7 @@ import {
 } from '@testing-library/react'
 
 import { buildMockInvoiceDetail } from 'src/client/test/mocks/invoice.fixtures'
+import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { getPage } from 'next-page-tester'
 
@@ -86,17 +87,19 @@ it('should show invoice details', async () => {
       within(rowCells[itemQtyIndex])
     )
     validateTextIfNonEmpty(
-      mockItem.price.toString(),
+      currencyFormatterGBP.format(mockItem.price),
       within(rowCells[itemPriceIndex])
     )
     validateTextIfNonEmpty(
-      mockItem.total.toString(),
+      currencyFormatterGBP.format(mockItem.total),
       within(rowCells[itemTotalIndex])
     )
   })
 
   expect(
-    within(footerRow).getByText(mockInvoice.amountDue.toString())
+    within(footerRow).getByText(
+      currencyFormatterGBP.format(mockInvoice.amountDue)
+    )
   ).toBeInTheDocument()
 })
 

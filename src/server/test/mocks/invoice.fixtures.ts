@@ -129,7 +129,7 @@ function buildMockItem(
   return {
     name: faker.commerce.product(),
     quantity: faker.datatype.number({ min: 1, max: 9 }),
-    price: faker.datatype.number({ min: 100, max: 100000 }),
+    price: faker.datatype.number({ min: 0, max: 10000, precision: 2 }),
     ...overrides,
   }
 }

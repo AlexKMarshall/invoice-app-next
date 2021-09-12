@@ -7,6 +7,7 @@ import styled, { CSSProperties } from 'styled-components'
 
 import { Button } from 'src/client/shared/components/button'
 import { StatusBadge } from 'src/client/shared/components/status-badge'
+import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { useInvoiceDetail } from './invoice.queries'
 
@@ -86,17 +87,19 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
                 <tr key={item.id}>
                   <td>{item.name}</td>
                   <td>{item.quantity}</td>
-                  <td>{item.price}</td>
-                  <td>{item.total}</td>
+                  <td>{currencyFormatterGBP.format(item.price)}</td>
+                  <td>{currencyFormatterGBP.format(item.total)}</td>
                 </tr>
               ))}
             </TBody>
             <TFoot>
               <tr>
-                <th scope="row" colSpan={3}>
+                <th scope="row" colSpan={2}>
                   Amount Due
                 </th>
-                <td>{invoice.amountDue}</td>
+                <td colSpan={2}>
+                  {currencyFormatterGBP.format(invoice.amountDue)}
+                </td>
               </tr>
             </TFoot>
           </ItemTable>
