@@ -13,3 +13,7 @@ export function maybeFactory<U extends unknown>(
 }
 
 export const maybeEmpty = maybeFactory(0.5, '')
+
+export function randomBetween(min: number, max: number): number {
+  return min + Math.floor(Math.random() * (max - min + 1))
+}
