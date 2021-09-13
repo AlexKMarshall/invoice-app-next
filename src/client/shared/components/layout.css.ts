@@ -1,6 +1,6 @@
 import { createVar, globalStyle, style } from '@vanilla-extract/css'
 
-import { themeVars } from '../styles/theme.css'
+import { themeVars } from 'src/client/shared/styles/theme.css'
 
 export const layoutWrapper = style({
   display: 'grid',
