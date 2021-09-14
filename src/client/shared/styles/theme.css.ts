@@ -22,6 +22,11 @@ export const themeVars = createGlobalTheme(':root', {
     },
     sidebar: 'hsla(231, 20%, 27%, 1)',
     divider: 'hsla(231, 20%, 36%, 1)',
+    warning: 'hsla(0, 80%, 63%, 1)',
+    text: {
+      normal: 'hsla(231, 37%, 63%, 1)',
+    },
+    fieldBoder: 'hsla(231, 75%, 93%, 1)',
   },
   typography: {
     fontWeight: {
