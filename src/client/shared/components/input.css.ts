@@ -1,6 +1,5 @@
 import { assignVars, createThemeContract, style } from '@vanilla-extract/css'
 
-import { inherits } from 'util'
 import { recipe } from '@vanilla-extract/recipes'
 import { themeVars } from 'src/client/shared/styles/theme.css'
 

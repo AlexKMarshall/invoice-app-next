@@ -1,10 +1,10 @@
 import { ReactNode, useContext, useMemo, useRef, useState } from 'react'
+import { overlay, underlay } from './drawer.css'
 
 import { FocusScope } from '@react-aria/focus'
 import ReactDOM from 'react-dom'
 import { RefObject } from 'hoist-non-react-statics/node_modules/@types/react'
 import { createContext } from 'react'
-import styled from 'styled-components'
 import { useDialog } from '@react-aria/dialog'
 import { useId } from '@react-aria/utils'
 import { useOverlay } from '@react-aria/overlays'
@@ -27,13 +27,13 @@ export function Drawer(props: Props): JSX.Element {
 
   return isOpen ? (
     <DrawerPortal>
-      <Underlay {...underlayProps}>
+      <div className={underlay} {...underlayProps}>
         <FocusScope contain autoFocus restoreFocus>
-          <Overlay {...dialogProps} {...overlayProps}>
+          <div className={overlay} {...dialogProps} {...overlayProps}>
             {children}
-          </Overlay>
+          </div>
         </FocusScope>
-      </Underlay>
+      </div>
     </DrawerPortal>
   ) : (
     <></>
@@ -118,22 +118,3 @@ export function DrawerContainer(): JSX.Element {
 
   return <div ref={drawerPortalRef} />
 }
-
-const Underlay = styled.div`
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-`
-
-// This uses the width of the sidebar to avoid getting hidden by it, could maybe measure that instead of hard coding
-const Overlay = styled.div`
-  max-width: 80vw;
-  padding: 56px;
-  padding-left: calc(104px + 56px);
-  background-color: white;
-  overflow-y: auto;
-`
