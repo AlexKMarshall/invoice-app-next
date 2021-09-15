@@ -17,24 +17,21 @@ export function Button({
   color = 'primary',
   className,
   children,
+  icon,
+  prefix,
   ...props
 }: Props): JSX.Element {
   let kind: 'icon' | 'prefix' | undefined
 
   // TODO - discriminating union?
-  if ('icon' in props) kind = 'icon'
-  if ('prefix' in props) kind = 'prefix'
+  if (icon) kind = 'icon'
+  if (prefix) kind = 'prefix'
 
-  function renderIcon() {
-    props.icon ? <Icon icon={props.icon} /> : null
-  }
-
-  const additionalStyle =
-    'prefix' in props
-      ? assignInlineVars({
-          [prefixContent]: `'${props.prefix}`,
-        })
-      : undefined
+  const additionalStyle = prefix
+    ? assignInlineVars({
+        [prefixContent]: `'${prefix}`,
+      })
+    : undefined
 
   return (
     <button
@@ -42,7 +39,7 @@ export function Button({
       className={`${button({ color, kind })} ${className}`}
       style={additionalStyle}
     >
-      {renderIcon()}
+      {icon ? <Icon icon={icon} /> : null}
       {children}
     </button>
   )
