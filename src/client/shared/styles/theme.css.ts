@@ -6,6 +6,15 @@ export const themeVars = createGlobalTheme(':root', {
       main: 'hsla(252, 94%, 67%, 1)',
       light: 'hsla(252, 100%, 73%, 1)',
     },
+    muted: {
+      main: 'hsla(231, 67%, 99%, 1)',
+      hover: 'hsla(231, 73%, 93%, 1)',
+    },
+    mono: {
+      main: 'hsla(231, 20%, 27%, 1)',
+      hover: 'hsla(231, 28%, 7%, 1)',
+      contrastText: 'hsla(231, 20%, 61%, 1)',
+    },
     status: {
       draft: {
         main: 'hsla(231, 20%, 27%, 1)',

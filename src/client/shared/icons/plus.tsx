@@ -1,6 +1,14 @@
-export function Plus(): JSX.Element {
+type Props = {
+  className?: string
+}
+
+export function Plus({ className }: Props): JSX.Element {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11 11">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 11 11"
+      className={className}
+    >
       <defs />
       <path
         fill="currentColor"
