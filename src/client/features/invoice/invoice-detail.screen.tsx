@@ -2,8 +2,27 @@ import {
   Address as AddressType,
   InvoiceDetail,
 } from 'src/client/features/invoice/invoice.types'
-import { COLORS, TYPOGRAPHY } from 'src/client/shared/styles/theme'
-import styled, { CSSProperties } from 'styled-components'
+import {
+  addressWrapper,
+  backButton,
+  backButtonIcon,
+  bodyCell,
+  details,
+  grid,
+  headingCell,
+  invoiceId,
+  itemTable,
+  primaryValue,
+  sectionHeader,
+  span2,
+  status,
+  statusBar,
+  tbody,
+  tfoot,
+  thead,
+  totalHeader,
+  totalValue,
+} from './invoice-detail.screen.css'
 
 import { ArrowLeft } from 'src/client/shared/icons/arrow-left'
 import { Button } from 'src/client/shared/components/button'
@@ -26,19 +45,17 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
     return (
       <>
         <BackButton />
-        <StatusBar>
-          <Status>
+        <div className={statusBar}>
+          <div className={status}>
             Status
             <StatusBadge status={invoice.status} />
-          </Status>
+          </div>
           <Button color="primary">Mark as Paid</Button>
-        </StatusBar>
-        <Details>
-          <Grid>
-            <section>
-              <h1>
-                <InvoiceId>{invoice.id}</InvoiceId>
-              </h1>
+        </div>
+        <div className={details}>
+          <div className={grid}>
+            <section className={span2}>
+              <h1 className={invoiceId}>{invoice.id}</h1>
               <p>{invoice.projectDescription}</p>
             </section>
             <section>
@@ -52,119 +69,70 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
               }}
             >
               <section>
-                <SectionHeader>Invoice Date</SectionHeader>
-                <PrimaryValue>
+                <h2 className={sectionHeader}>Invoice Date</h2>
+                <p className={primaryValue}>
                   {format(invoice.issuedAt, 'dd MMM yyyy')}
-                </PrimaryValue>
+                </p>
               </section>
               <section>
-                <SectionHeader>Payment Due</SectionHeader>
-                <PrimaryValue>
+                <h2 className={sectionHeader}>Payment Due</h2>
+                <p className={primaryValue}>
                   {format(invoice.paymentDue, 'dd MMM yyyy')}
-                </PrimaryValue>
+                </p>
               </section>
             </div>
             <section>
-              <SectionHeader>Bill To</SectionHeader>
-              <PrimaryValue style={{ marginBottom: '8px' }}>
+              <h2 className={sectionHeader}>Bill To</h2>
+              <p className={primaryValue} style={{ marginBottom: '8px' }}>
                 {invoice.clientName}
-              </PrimaryValue>
+              </p>
               <Address address={invoice.clientAddress} />
             </section>
             <section>
-              <SectionHeader>Sent To</SectionHeader>
-              <PrimaryValue>{invoice.clientEmail}</PrimaryValue>
+              <h2 className={sectionHeader}>Sent To</h2>
+              <p className={primaryValue}>{invoice.clientEmail}</p>
             </section>
-          </Grid>
-          <ItemTable>
-            <THead>
+          </div>
+          <table className={itemTable}>
+            <thead className={thead}>
               <tr>
-                <th>Item Name</th>
-                <th>QTY.</th>
-                <th>Price</th>
-                <th>Total</th>
+                <th className={headingCell}>Item Name</th>
+                <th className={headingCell}>QTY.</th>
+                <th className={headingCell}>Price</th>
+                <th className={headingCell}>Total</th>
               </tr>
-            </THead>
-            <TBody>
+            </thead>
+            <tbody className={tbody}>
               {invoice.itemList.map((item) => (
                 <tr key={item.id}>
-                  <td>{item.name}</td>
-                  <td>{item.quantity}</td>
-                  <td>
+                  <td className={bodyCell}>{item.name}</td>
+                  <td className={bodyCell}>{item.quantity}</td>
+                  <td className={bodyCell}>
                     <GBPValue value={item.price} />
                   </td>
-                  <td>
+                  <td className={bodyCell}>
                     <GBPValue value={item.total} />
                   </td>
                 </tr>
               ))}
-            </TBody>
-            <TFoot>
+            </tbody>
+            <tfoot className={tfoot}>
               <tr>
-                <th scope="row" colSpan={2}>
+                <th scope="row" colSpan={2} className={totalHeader}>
                   Amount Due
                 </th>
-                <td colSpan={2}>
+                <td colSpan={2} className={totalValue}>
                   <GBPValue value={invoice.amountDue} />
                 </td>
               </tr>
-            </TFoot>
-          </ItemTable>
-        </Details>
+            </tfoot>
+          </table>
+        </div>
       </>
     )
   }
   return <></>
 }
-
-const StatusBar = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 20px 32px;
-  margin-bottom: 24px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 10px 10px -10px ${COLORS.shadowColor.prop};
-`
-
-const Status = styled.div`
-  display: flex;
-  align-items: baseline;
-  gap: 16px;
-`
-
-const Details = styled.div`
-  padding: 48px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 10px 10px -10px ${COLORS.shadowColor.prop};
-`
-
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 21px;
-  margin-bottom: 45px;
-
-  & > :first-child {
-    grid-column: span 2;
-  }
-`
-
-const InvoiceId = styled.span`
-  color: ${COLORS.textColor.strong.prop};
-  font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
-  font-size: ${TYPOGRAPHY.h3.fontSize.prop};
-  text-decoration: none;
-  margin-bottom: 8px;
-
-  &:before {
-    content: '#';
-    color: ${COLORS.textColor.prop};
-  }
-`
 
 type AddressProps = {
   address: AddressType
@@ -172,7 +140,7 @@ type AddressProps = {
 }
 function Address({ address, align = 'left' }: AddressProps): JSX.Element {
   return (
-    <AddressWrapper style={{ '--text-align': align } as CSSProperties}>
+    <p className={addressWrapper({ align })}>
       <span>{address.street}</span>
       <br />
       <span>{address.city}</span>
@@ -180,134 +148,9 @@ function Address({ address, align = 'left' }: AddressProps): JSX.Element {
       <span>{address.postcode}</span>
       <br />
       <span>{address.country}</span>
-    </AddressWrapper>
+    </p>
   )
 }
-
-const AddressWrapper = styled.p`
-  text-align: var(--text-align);
-  font-size: ${TYPOGRAPHY.body2.fontSize.prop};
-  line-height: ${TYPOGRAPHY.body2.lineHeight.prop};
-  letter-spacing: ${TYPOGRAPHY.body2.letterSpacing.prop};
-`
-
-const SectionHeader = styled.h2`
-  font-size: ${TYPOGRAPHY.body1.fontSize.prop};
-  letter-spacing: ${TYPOGRAPHY.body1.letterSpacing.prop};
-  font-weight: ${TYPOGRAPHY.fontWeight.normal.prop};
-  margin-bottom: 12px;
-`
-
-const PrimaryValue = styled.p`
-  font-size: 15px;
-  line-height: 20px;
-  letter-spacing: -0.31px;
-  color: ${COLORS.textColor.strong.prop};
-  font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
-`
-
-const ItemTable = styled.table`
-  table-layout: fixed;
-  width: 100%;
-  padding: 32px;
-  border-collapse: collapse;
-  border-radius: 8px;
-  overflow: hidden;
-`
-
-const THead = styled.thead`
-  background-color: hsla(231, 67%, 99%, 1);
-  font-size: ${TYPOGRAPHY.body2.fontSize.prop};
-  line-height: ${TYPOGRAPHY.body2.lineHeight.prop};
-  letter-spacing: ${TYPOGRAPHY.body2.letterSpacing.prop};
-  font-weight: ${TYPOGRAPHY.fontWeight.normal.prop};
-
-  & th {
-    padding-top: 32px;
-    padding-bottom: 32px;
-    font-weight: inherit;
-    box-sizing: content-box;
-  }
-
-  & th:nth-child(1) {
-    padding-left: 32px;
-    width: 50%;
-    text-align: left;
-  }
-
-  & th:nth-child(2) {
-    width: 10%;
-    text-align: center;
-  }
-  & th:nth-child(3) {
-    width: 20%;
-    text-align: right;
-  }
-
-  & th:nth-child(4) {
-    padding-right: 32px;
-    width: 20%;
-    text-align: right;
-  }
-`
-const TBody = styled.tbody`
-  background-color: hsla(231, 67%, 99%, 1);
-  font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
-
-  & td:nth-child(1) {
-    padding-left: 32px;
-    text-align: left;
-    color: ${COLORS.textColor.strong.prop};
-  }
-
-  & td:nth-child(2) {
-    text-align: center;
-  }
-
-  & td:nth-child(3) {
-    text-align: right;
-  }
-
-  & td:last-child {
-    padding-right: 32px;
-    text-align: right;
-    color: ${COLORS.textColor.strong.prop};
-  }
-
-  & tr > td {
-    padding-bottom: 32px;
-  }
-
-  & tr:last-child > td {
-    padding-bottom: 40px;
-  }
-`
-
-const TFoot = styled.tfoot`
-  background-color: hsla(231, 20%, 27%, 1);
-
-  & th {
-    padding-left: 32px;
-    text-align: left;
-    font-size: ${TYPOGRAPHY.body2.fontSize.prop};
-    line-height: ${TYPOGRAPHY.body2.lineHeight.prop};
-    letter-spacing: ${TYPOGRAPHY.body2.letterSpacing.prop};
-    font-weight: ${TYPOGRAPHY.fontWeight.normal.prop};
-    color: white;
-  }
-
-  & td {
-    padding-right: 32px;
-    padding-top: 24px;
-    padding-bottom: 24px;
-    text-align: right;
-    font-size: ${24 / 16}rem;
-    letter-spacing: -0.5px;
-    line-height: ${32 / 16}rem;
-    font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
-    color: white;
-  }
-`
 
 type GBPValueProps = {
   value: number
@@ -327,28 +170,9 @@ function BackButton() {
   const router = useRouter()
 
   return (
-    <BackButtonWrapper onClick={router.back}>
-      <ArrowLeft />
+    <button className={backButton} onClick={router.back}>
+      <ArrowLeft className={backButtonIcon} />
       Go back
-    </BackButtonWrapper>
+    </button>
   )
 }
-
-const BackButtonWrapper = styled.button`
-  margin-top: 64px;
-  margin-bottom: 32px;
-  border: none;
-  background-color: transparent;
-  display: flex;
-  justify-content: flex-start;
-  align-items: baseline;
-  gap: 24px;
-  font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
-  color: ${COLORS.textColor.strong.prop};
-  cursor: pointer;
-
-  & > svg {
-    height: ${TYPOGRAPHY.body1.fontSize.prop};
-    color: ${COLORS.textColor.prop};
-  }
-`
