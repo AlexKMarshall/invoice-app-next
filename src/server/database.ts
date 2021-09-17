@@ -1,8 +1,6 @@
-import * as invoiceModel from './features/invoice/invoice.model'
-
 import { InvoiceDetail } from './features/invoice/invoice.types'
-import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { Client as PGClient } from 'pg'
+import { Prisma } from '@prisma/client'
 import { execSync } from 'child_process'
 import prisma from 'src/server/prisma'
 
@@ -22,19 +20,13 @@ export class Database {
     await client.end()
   }
 
-  seedInvoices(
-    ...invoices: Array<NewInvoiceInputDTO | InvoiceDetail>
-  ): Promise<InvoiceDetail[]> {
-    const savePromises = invoices.map((invoice) => {
-      if ('paymentDue' in invoice) {
-        const cleanInvoice = removeProperty(
-          'amountDue',
-          removeProperty('paymentDue', invoice)
-        )
-        return invoiceModel.create(cleanInvoice)
-      }
-      return invoiceModel.create(invoice)
-    })
+  createInvoice(invoice: InvoiceDetail): Promise<unknown> {
+    const preparedInvoice = prepareInvoiceToCreate(invoice)
+    return prisma.invoice.create({ data: preparedInvoice })
+  }
+
+  seedInvoices(...invoices: Array<InvoiceDetail>): Promise<unknown> {
+    const savePromises = invoices.map((invoice) => this.createInvoice(invoice))
 
     return Promise.all(savePromises)
   }
@@ -49,10 +41,61 @@ export class Database {
   }
 }
 
-function removeProperty<T, K extends keyof T>(
-  property: K,
-  object: T
-): Omit<T, K> {
-  const { [property]: _, ...rest } = object
-  return rest
+function prepareInvoiceToCreate(
+  invoice: InvoiceDetail
+): Prisma.InvoiceCreateInput {
+  const {
+    id,
+    status,
+    issuedAt,
+    paymentTerms,
+    projectDescription,
+    clientName,
+    clientEmail,
+    clientAddress,
+    senderAddress,
+    itemList,
+  } = invoice
+  const sender: Prisma.SenderCreateNestedOneWithoutInvoiceInput = {
+    create: {
+      address: {
+        create: senderAddress,
+      },
+    },
+  }
+
+  const client: Prisma.ClientCreateNestedOneWithoutInvoiceInput = {
+    create: {
+      name: clientName,
+      email: clientEmail,
+      address: {
+        create: clientAddress,
+      },
+    },
+  }
+
+  const invoiceItems: Prisma.InvoiceItemCreateNestedManyWithoutInvoiceInput = {
+    create: itemList.map((itemInput) => ({
+      quantity: itemInput.quantity,
+      item: {
+        create: {
+          name: itemInput.name,
+          price: itemInput.price,
+        },
+      },
+    })),
+  }
+
+  const invoiceToSave = {
+    id,
+    status,
+    issuedAt,
+    paymentTerms,
+    projectDescription,
+    sender,
+    client,
+    invoiceItems,
+  }
+
+  return invoiceToSave
 }
