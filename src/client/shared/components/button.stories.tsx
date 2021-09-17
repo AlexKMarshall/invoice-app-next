@@ -1,9 +1,10 @@
+import 'src/client/shared/styles/global'
+import 'src/client/shared/styles/reset.css'
+
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 
 import { Button } from './button'
-import { Global } from '../styles/global'
 import React from 'react'
-import { Reset } from '../styles/reset'
 
 export default {
   title: 'Example/Button',
@@ -13,13 +14,7 @@ export default {
   },
 } as ComponentMeta<typeof Button>
 
-const Template: ComponentStory<typeof Button> = (args) => (
-  <>
-    <Reset />
-    <Global />
-    <Button {...args} />
-  </>
-)
+const Template: ComponentStory<typeof Button> = (args) => <Button {...args} />
 
 export const Primary = Template.bind({})
 Primary.args = {

@@ -1,3 +1,6 @@
+import 'src/client/shared/styles/global.css'
+import 'src/client/shared/styles/reset.css'
+
 import {
   DrawerContainer,
   DrawerOverlayContainer,
@@ -6,8 +9,6 @@ import {
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { AppProps } from 'next/app'
-import { Global as CSSGlobal } from 'src/client/shared/styles/global'
-import { Reset as CSSReset } from 'src/client/shared/styles/reset'
 import { Layout } from 'src/client/shared/components/layout'
 import { SSRProvider } from '@react-aria/ssr'
 
@@ -26,8 +27,6 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <SSRProvider>
       <QueryClientProvider client={queryClient}>
-        <CSSReset />
-        <CSSGlobal />
         <DrawerProvider>
           <Layout>
             <DrawerOverlayContainer>

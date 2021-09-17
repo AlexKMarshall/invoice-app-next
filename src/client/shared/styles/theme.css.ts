@@ -15,6 +15,7 @@ export const themeVars = createGlobalTheme(':root', {
       hover: 'hsla(231, 28%, 7%, 1)',
       contrastText: 'hsla(231, 20%, 61%, 1)',
     },
+    body: 'hsla(240, 27%, 98%, 1)',
     status: {
       draft: {
         main: 'hsla(231, 20%, 27%, 1)',
