@@ -146,10 +146,15 @@ export function buildMockInvoiceDetail(
     input = buildMockDraftInvoiceInput(rest)
   } else if (status === 'pending') {
     input = buildMockPendingInvoiceInput(rest)
+  } else if (status === 'paid') {
+    input = buildMockPendingInvoiceInput(rest)
   } else {
     const _exhaustiveCheck: never = status
     return _exhaustiveCheck
   }
 
-  return invoiceDetailFromInput(input, generateAlphanumericId())
+  return {
+    ...invoiceDetailFromInput(input, generateAlphanumericId()),
+    status: input.status,
+  }
 }
