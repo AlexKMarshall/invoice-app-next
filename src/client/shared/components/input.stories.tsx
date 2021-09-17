@@ -1,9 +1,10 @@
+import 'src/client/shared/styles/global.css'
+import 'src/client/shared/styles/reset.css'
+
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 
-import { Global } from '../styles/global'
 import { Input } from './input'
 import React from 'react'
-import { Reset } from '../styles/reset'
 
 export default {
   title: 'Example/Input',
@@ -13,13 +14,7 @@ export default {
   },
 } as ComponentMeta<typeof Input>
 
-const Template: ComponentStory<typeof Input> = (args) => (
-  <>
-    <Reset />
-    <Global />
-    <Input {...args} />
-  </>
-)
+const Template: ComponentStory<typeof Input> = (args) => <Input {...args} />
 
 export const Primary = Template.bind({})
 Primary.args = {

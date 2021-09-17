@@ -1,62 +1,30 @@
-import { COLORS, TYPOGRAPHY } from '../styles/theme'
-
 import { BaseHTMLAttributes } from 'react'
-import styled from 'styled-components'
+import { heading } from 'src/client/shared/components/typography.css'
 
-const LEVELS = {
-  1: {
-    component: 'h1' as const,
-    style: {
-      '--font-size': TYPOGRAPHY.h1.fontSize.prop,
-      '--line-height': TYPOGRAPHY.h1.lineHeight.prop,
-      '--letter-spacing': TYPOGRAPHY.h1.letterSpacing.prop,
-    },
-  },
-  2: {
-    component: 'h2' as const,
-    style: {
-      '--font-size': TYPOGRAPHY.h2.fontSize.prop,
-      '--line-height': TYPOGRAPHY.h2.lineHeight.prop,
-      '--letter-spacing': TYPOGRAPHY.h2.letterSpacing.prop,
-    },
-  },
-  3: {
-    component: 'h3' as const,
-    style: {
-      '--font-size': TYPOGRAPHY.h3.fontSize.prop,
-      '--line-height': TYPOGRAPHY.h3.lineHeight.prop,
-      '--letter-spacing': TYPOGRAPHY.h3.letterSpacing.prop,
-    },
-  },
+type HeadingLevel = 1 | 2 | 3
+
+const HEADING_LEVELS: Record<HeadingLevel, React.ElementType> = {
+  1: 'h1',
+  2: 'h2',
+  3: 'h3',
 }
 
 type Props = {
-  level?: keyof typeof LEVELS
+  level?: keyof typeof HEADING_LEVELS
   as?: 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'span' | 'div'
 } & BaseHTMLAttributes<HTMLHeadingElement>
 
 export function Heading({
   level = 1,
+  as,
+  className,
   children,
-  style,
   ...props
 }: Props): JSX.Element {
-  const levelOptions = LEVELS[level]
+  const Component = as ?? HEADING_LEVELS[level]
   return (
-    <Wrapper
-      as={levelOptions.component}
-      style={{ ...style, ...levelOptions.style }}
-      {...props}
-    >
+    <Component className={`${heading({ level })} ${className}`} {...props}>
       {children}
-    </Wrapper>
+    </Component>
   )
 }
-
-const Wrapper = styled.h1`
-  font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
-  font-size: var(--font-size);
-  line-height: var(--line-height);
-  letter-spacing: var(--letter-spacing);
-  color: ${COLORS.textColor.strong.prop};
-`

@@ -1,14 +1,25 @@
-import { COLORS, TYPOGRAPHY } from 'src/client/shared/styles/theme'
+import {
+  buttonGroup,
+  fieldset,
+  fieldsetHeader,
+  form,
+  gridWrapper,
+  itemListHeader,
+  spanFull,
+  spanHalf,
+  spanThird,
+  table,
+  tableInput,
+  th,
+} from './new-invoice-form.css'
 import { useFieldArray, useForm } from 'react-hook-form'
 
 import { Button } from 'src/client/shared/components/button'
-import { ComponentPropsWithRef } from 'react'
-import { Input as InputBase } from 'src/client/shared/components/input'
+import { Input } from 'src/client/shared/components/input'
 import { InvoiceDetail } from './invoice.types'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { format } from 'date-fns'
 import { newInvoiceInputDtoSchema } from 'src/shared/invoice.schema'
-import styled from 'styled-components'
 import { useCreateInvoice } from './invoice.queries'
 import { useId } from '@react-aria/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -73,88 +84,93 @@ export function NewInvoiceForm({
   })
 
   return (
-    <Form
+    <form
       onSubmit={handleSubmit((data) => {
         createInvoiceMutation.mutate(data)
         onSubmit?.(data)
       })}
       {...delegatedProps}
+      className={form}
     >
-      <Fieldset aria-labelledby={billFromLegendId}>
-        <GridWrapper>
-          <FieldsetHeader id={billFromLegendId}>Bill From</FieldsetHeader>
+      <fieldset className={fieldset} aria-labelledby={billFromLegendId}>
+        <div className={gridWrapper}>
+          <h3 className={fieldsetHeader} id={billFromLegendId}>
+            Bill From
+          </h3>
           <Input
-            $span="full"
+            className={spanFull}
             label="Street Address"
             errorMessage={errors.senderAddress?.street?.message}
             {...register('senderAddress.street')}
           />
           <Input
-            $span="third"
+            className={spanThird}
             label="City"
             errorMessage={errors.senderAddress?.city?.message}
             {...register('senderAddress.city')}
           />
           <Input
-            $span="third"
+            className={spanThird}
             label="Post Code"
             errorMessage={errors.senderAddress?.postcode?.message}
             {...register('senderAddress.postcode')}
           />
           <Input
-            $span="third"
+            className={spanThird}
             label="Country"
             errorMessage={errors.senderAddress?.country?.message}
             {...register('senderAddress.country')}
           />
-        </GridWrapper>
-      </Fieldset>
-      <Fieldset aria-labelledby={billToLegendId}>
-        <GridWrapper>
-          <FieldsetHeader id={billToLegendId}>Bill To</FieldsetHeader>
+        </div>
+      </fieldset>
+      <fieldset className={fieldset} aria-labelledby={billToLegendId}>
+        <div className={gridWrapper}>
+          <h3 className={fieldsetHeader} id={billToLegendId}>
+            Bill To
+          </h3>
           <Input
-            $span="full"
+            className={spanFull}
             label="Client's Name"
             errorMessage={errors.clientName?.message}
             {...register('clientName')}
           />
           <Input
-            $span="full"
+            className={spanFull}
             label="Client's Email"
             type="email"
             errorMessage={errors.clientEmail?.message}
             {...register('clientEmail')}
           ></Input>
           <Input
-            $span="full"
+            className={spanFull}
             label="Street Address"
             errorMessage={errors.clientAddress?.street?.message}
             {...register('clientAddress.street')}
           />
           <Input
-            $span="third"
+            className={spanThird}
             label="City"
             errorMessage={errors.clientAddress?.city?.message}
             {...register('clientAddress.city')}
           />
           <Input
-            $span="third"
+            className={spanThird}
             label="Post Code"
             errorMessage={errors.clientAddress?.postcode?.message}
             {...register('clientAddress.postcode')}
           />
           <Input
-            $span="third"
+            className={spanThird}
             label="Country"
             errorMessage={errors.clientAddress?.country?.message}
             {...register('clientAddress.country')}
           />
-        </GridWrapper>
-      </Fieldset>
-      <Fieldset>
-        <GridWrapper>
+        </div>
+      </fieldset>
+      <fieldset className={fieldset}>
+        <div className={gridWrapper}>
           <Input
-            $span="half"
+            className={spanHalf}
             label="Issue Date"
             type="date"
             {...register('issuedAt', {
@@ -162,40 +178,45 @@ export function NewInvoiceForm({
             })}
           />
           <Input
-            $span="half"
+            className={spanHalf}
             label="Payment Terms"
             type="number"
             {...register('paymentTerms', { valueAsNumber: true })}
           />
           <Input
-            $span="full"
+            className={spanFull}
             label="Project Description"
             errorMessage={errors.projectDescription?.message}
             {...register('projectDescription')}
           />
-        </GridWrapper>
-      </Fieldset>
-      <Fieldset>
-        <GridWrapper>
-          <ItemListHeader id={itemListHeadingId}>Item List</ItemListHeader>
-          <Table aria-labelledby={itemListHeadingId}>
+        </div>
+      </fieldset>
+      <fieldset className={fieldset}>
+        <div className={gridWrapper}>
+          <h3 className={itemListHeader} id={itemListHeadingId}>
+            Item List
+          </h3>
+          <table className={table} aria-labelledby={itemListHeadingId}>
             <thead>
               <tr>
-                <Th scope="col">Item Name</Th>
+                <th className={th} scope="col">
+                  Item Name
+                </th>
                 {/* Don't like this hardcoding of widths */}
-                <Th scope="col" style={{ width: '20%' }}>
+                <th className={th} scope="col" style={{ width: '20%' }}>
                   Qty.
-                </Th>
-                <Th scope="col" style={{ width: '30%' }}>
+                </th>
+                <th className={th} scope="col" style={{ width: '30%' }}>
                   Price
-                </Th>
+                </th>
               </tr>
             </thead>
             <tbody>
               {itemsFieldArray.fields.map((item, index) => (
                 <tr key={item.id}>
                   <td>
-                    <TableInput
+                    <input
+                      className={tableInput}
                       type="text"
                       defaultValue={`${item.name}`}
                       aria-label="Item Name"
@@ -203,7 +224,8 @@ export function NewInvoiceForm({
                     />
                   </td>
                   <td>
-                    <TableInput
+                    <input
+                      className={tableInput}
                       type="number"
                       aria-label="Quantity"
                       defaultValue={`${item.quantity}`}
@@ -213,7 +235,8 @@ export function NewInvoiceForm({
                     />
                   </td>
                   <td>
-                    <TableInput
+                    <input
+                      className={tableInput}
                       size={0}
                       type="number"
                       aria-label="Price"
@@ -226,19 +249,20 @@ export function NewInvoiceForm({
                 </tr>
               ))}
             </tbody>
-          </Table>
+          </table>
           <Button
             type="button"
             prefix="+"
             color="muted"
             onClick={() => itemsFieldArray.append(DEFAULT_ITEM_VALUES)}
+            className={spanFull}
           >
             Add New Item
           </Button>
-        </GridWrapper>
-      </Fieldset>
+        </div>
+      </fieldset>
       <input type="hidden" {...register('status')} />
-      <ButtonGroup>
+      <div className={buttonGroup}>
         <Button type="button" color="muted" onClick={() => onCancel?.()}>
           Discard
         </Button>
@@ -260,84 +284,7 @@ export function NewInvoiceForm({
         >
           Save & Send
         </Button>
-      </ButtonGroup>
-    </Form>
+      </div>
+    </form>
   )
 }
-
-const Form = styled.form`
-  max-width: 730px;
-  display: flex;
-  flex-direction: column;
-  gap: 48px;
-`
-
-const Fieldset = styled.fieldset`
-  border: none;
-  margin: 0;
-  padding: 0;
-`
-const FieldsetHeader = styled.h3`
-  margin: 0;
-  padding: 0;
-  color: ${COLORS.primaryColor.prop};
-  font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
-`
-
-const ItemListHeader = styled.h3`
-  font-size: ${17 / 16}rem;
-  font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
-  letter-spacing: -0.375px;
-  color: hsla(225deg, 14%, 53%, 100%);
-`
-
-const GridWrapper = styled.div`
-  display: grid;
-  gap: 24px;
-  grid-template-columns: repeat(6, 1fr);
-  grid-auto-rows: auto;
-  & > * {
-    grid-column: 1 / -1;
-  }
-`
-
-type InputProps = ComponentPropsWithRef<typeof InputBase> & {
-  $span: 'full' | 'half' | 'third'
-}
-
-const spanMap: Record<InputProps['$span'], string> = {
-  full: 'span 6',
-  half: 'span 3',
-  third: 'span 2',
-}
-const Input = styled(InputBase)<InputProps>`
-  grid-column: ${(props) => spanMap[props.$span]};
-`
-
-const Table = styled.table`
-  --spacing: 1rem;
-  table-layout: fixed;
-  border-spacing: var(--spacing);
-  margin: calc(-1 * var(--spacing));
-`
-
-const Th = styled.th`
-  text-align: left;
-`
-
-const TableInput = styled.input`
-  padding: 16px 20px;
-  border: 1px solid ${COLORS.fieldBorderColor.prop};
-  border-radius: 4px;
-  font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
-  width: 100%;
-`
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 8px;
-
-  & > :first-child {
-    margin-right: auto;
-  }
-`

@@ -1,10 +1,22 @@
-import { COLORS, TYPOGRAPHY } from 'src/client/shared/styles/theme'
 import { Drawer, useDrawer } from 'src/client/shared/components/drawer'
 import { MouseEventHandler, TableHTMLAttributes, useRef, useState } from 'react'
+import {
+  cell,
+  drawerTitle,
+  emptyStateWrapper,
+  header,
+  heading,
+  iconSvg,
+  iconWrapper,
+  invoiceId,
+  rowLink,
+  rowWrapper,
+  table,
+} from './invoice-summary.screen.css'
 
 import { ArrowRight } from 'src/client/shared/icons/arrow-right'
-import { Heading as BaseHeading } from 'src/client/shared/components/typography'
 import { Button } from 'src/client/shared/components/button'
+import { Heading } from 'src/client/shared/components/typography'
 import Image from 'next/image'
 import { InvoiceSummary } from './invoice.types'
 import Link from 'next/link'
@@ -13,7 +25,6 @@ import { StatusBadge } from 'src/client/shared/components/status-badge'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { inflect } from 'src/client/shared/grammar'
-import styled from 'styled-components'
 import { useId } from '@react-aria/utils'
 import { useInvoiceSummaries } from './invoice.queries'
 
@@ -25,9 +36,9 @@ export function InvoiceSummaryScreen(): JSX.Element {
 
   return (
     <>
-      <Header>
+      <header className={header}>
         <div>
-          <Heading level={1} id={headingId}>
+          <Heading level={1} id={headingId} className={heading}>
             Invoices
           </Heading>
           <TotalInvoiceCount />
@@ -35,7 +46,7 @@ export function InvoiceSummaryScreen(): JSX.Element {
         <Button type="button" icon="plus" onClick={() => open()}>
           New Invoice
         </Button>
-      </Header>
+      </header>
       {listQuery.isLoading ? <div>Loading...</div> : null}
       {listQuery.isSuccess ? (
         <Table
@@ -45,7 +56,7 @@ export function InvoiceSummaryScreen(): JSX.Element {
             <InvoiceSummaryItem key={invoice.id} invoice={invoice} />
           )}
           emptyState={
-            <EmptyStateWrapper>
+            <div className={emptyStateWrapper}>
               <Image
                 src="/illustration-empty.svg"
                 alt="Illustration of woman with a megaphone emerging from an open envelope, with a paper aeroplane flying around her"
@@ -57,12 +68,14 @@ export function InvoiceSummaryScreen(): JSX.Element {
                 Create an invoice by clicking the <strong>New Invoice</strong>{' '}
                 button and get started
               </p>
-            </EmptyStateWrapper>
+            </div>
           }
         />
       ) : null}
       <Drawer>
-        <DrawerTitle id={drawerTitleId}>New Invoice</DrawerTitle>
+        <h2 className={drawerTitle} id={drawerTitleId}>
+          New Invoice
+        </h2>
         <NewInvoiceForm
           aria-labelledby={drawerTitleId}
           onCancel={close}
@@ -81,46 +94,6 @@ export function InvoiceSummaryScreen(): JSX.Element {
   )
 }
 
-const Header = styled.header`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  padding-top: 72px;
-  padding-bottom: 65px;
-
-  & > :first-child {
-    margin-right: auto;
-  }
-`
-
-const Heading = styled(BaseHeading)`
-  margin-bottom: 8px;
-`
-
-const EmptyStateWrapper = styled.div`
-  margin-left: auto;
-  margin-right: auto;
-  max-width: min-content;
-  text-align: center;
-  padding-top: 48px;
-
-  & > :nth-child(2) {
-    margin-top: 64px;
-    margin-bottom: 24px;
-    white-space: nowrap;
-  }
-`
-
-const DrawerTitle = styled.h2`
-  margin-bottom: 48px;
-  font-size: ${24 / 16}rem;
-  font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
-  line-height: ${32 / 16}rem;
-  letter-spacing: -0.5px;
-  color: ${COLORS.textColor.strong.prop};
-`
-
 type TableProps<T> = {
   collection: Array<T>
   renderItem: (item: T, index: number, collection: Array<T>) => JSX.Element
@@ -134,20 +107,13 @@ function Table<T>({
   ...delegatedProps
 }: TableProps<T>) {
   return collection.length > 0 ? (
-    <TableWrapper {...delegatedProps}>
+    <table {...delegatedProps} className={table}>
       <tbody>{collection.map(renderItem)}</tbody>
-    </TableWrapper>
+    </table>
   ) : (
     emptyState
   )
 }
-
-const TableWrapper = styled.table`
-  width: 100%;
-
-  border-spacing: 0 1rem;
-  margin-top: -1rem;
-`
 
 type InvoiceSummaryItemProps = {
   invoice: InvoiceSummary
@@ -169,118 +135,43 @@ function InvoiceSummaryItem({ invoice }: InvoiceSummaryItemProps) {
   }
 
   return (
-    <RowWrapper
+    <tr
+      className={rowWrapper({ saving: isSaving || undefined })}
       aria-labelledby={id}
-      data-saving={isSaving ? 'true' : undefined}
       onClick={(event) => handleInvoiceClick(event)}
     >
       {isSaving ? (
-        <Cell scope="row" id={id}>
-          <InvoiceId>{savingInvoiceIdDisplay}</InvoiceId>
-        </Cell>
+        <td className={cell} scope="row" id={id}>
+          <span className={invoiceId}>{savingInvoiceIdDisplay}</span>
+        </td>
       ) : (
-        <Cell scope="row" id={id}>
+        <td className={cell} scope="row" id={id}>
           <Link href={`/invoices/${invoice.id}`} passHref>
-            <InvoiceId as="a" ref={linkRef}>
+            <a ref={linkRef} className={`${rowLink} ${invoiceId}`}>
               {invoice.id}
-            </InvoiceId>
+            </a>
           </Link>
-        </Cell>
+        </td>
       )}
-      <Cell>{`Due ${format(invoice.paymentDue, 'dd MMM yyyy')}`}</Cell>
-      <Cell>{invoice.clientName}</Cell>
-      <Cell style={{ textAlign: 'right' }}>
-        <Heading level={3} forwardedAs="span">
+      <td className={cell}>{`Due ${format(
+        invoice.paymentDue,
+        'dd MMM yyyy'
+      )}`}</td>
+      <td className={cell}>{invoice.clientName}</td>
+      <td className={cell} style={{ textAlign: 'right' }}>
+        <Heading level={3} as="span">
           <GBPValue value={invoice.amountDue} />
         </Heading>
-      </Cell>
-      <Cell>
+      </td>
+      <td className={cell}>
         <StatusBadge status={invoice.status} />
-        <DecorativeIcon>
-          <ArrowRight />
-        </DecorativeIcon>
-      </Cell>
-    </RowWrapper>
+        <div className={iconWrapper}>
+          <ArrowRight className={iconSvg} />
+        </div>
+      </td>
+    </tr>
   )
 }
-
-const RowWrapper = styled.tr`
-  --cursor: pointer;
-  position: relative;
-  --border-radius: 8px;
-  box-shadow: 0 10px 10px -10px ${COLORS.shadowColor.prop};
-  --border-color: transparent;
-  --border-width: 2px;
-  --border-style: solid;
-  --border: var(--border-width) var(--border-style) var(--border-color);
-
-  cursor: var(--cursor);
-
-  & a:focus {
-    outline: none;
-  }
-
-  &:hover:not([data-saving]),
-  &:focus-within:not([data-saving]) {
-    --border-color: ${COLORS.primaryColor.prop};
-  }
-
-  &[data-saving] {
-    --cursor: default;
-  }
-
-  & > * {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    border-top: var(--border);
-    border-bottom: var(--border);
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
-
-    &:first-child {
-      padding-left: 2rem;
-      border-left: var(--border);
-      border-top-left-radius: var(--border-radius);
-      border-bottom-left-radius: var(--border-radius);
-    }
-
-    &:last-child {
-      padding-right: 3rem;
-      border-right: var(--border);
-      border-top-right-radius: var(--border-radius);
-      border-bottom-right-radius: var(--border-radius);
-    }
-  }
-`
-
-const Cell = styled.td`
-  background-color: white;
-`
-
-const DecorativeIcon = styled.div`
-  position: absolute;
-  right: 24px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: ${COLORS.primaryColor.prop};
-
-  & > * {
-    display: block;
-    width: 7px;
-    height: 10px;
-  }
-`
-
-const InvoiceId = styled.span`
-  color: ${COLORS.textColor.strong.prop};
-  font-weight: ${TYPOGRAPHY.fontWeight.bold.prop};
-  text-decoration: none;
-
-  &:before {
-    content: '#';
-    color: ${COLORS.textColor.prop};
-  }
-`
 
 function TotalInvoiceCount() {
   const countQuery = useInvoiceSummaries({
