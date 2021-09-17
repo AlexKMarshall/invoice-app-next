@@ -29,7 +29,9 @@ export const button = recipe({
     fontWeight: themeVars.typography.fontWeight.bold,
 
     ':hover': {
-      [colorVars.background]: colorVars.hoverBackground,
+      vars: {
+        [colorVars.background]: colorVars.hoverBackground,
+      },
     },
 
     ':focus-visible': {
