@@ -89,7 +89,7 @@ export function postInvoice(
 
 export function updateStatus(
   id: string,
-  status: JsonObject | JsonArray
+  status: unknown
 ): ControllerResponse<UpdateInvoiceReturnDTO> {
   const parsingResult = updateStatusInputDtoSchema.safeParse(status)
   if (!parsingResult.success) {
