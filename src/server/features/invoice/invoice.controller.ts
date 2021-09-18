@@ -1,6 +1,7 @@
 import * as invoiceModel from './invoice.model'
 import * as z from 'zod'
 
+import { ActionNotPermittedError, NotFoundError } from 'src/server/errors'
 import {
   GetInvoiceDetailDTO,
   GetInvoiceSummaryDTO,
@@ -14,7 +15,6 @@ import {
   updateStatusInputDtoSchema,
 } from 'src/shared/invoice.schema'
 
-import { NotFoundError } from 'src/server/errors'
 import { parseJSON } from 'date-fns'
 
 export type ControllerResponse<TData = unknown> = Promise<
@@ -109,6 +109,9 @@ export function updateStatus(
     .catch((error: unknown) => {
       if (error instanceof NotFoundError) {
         return { code: 404, response: { error: error.message } }
+      }
+      if (error instanceof ActionNotPermittedError) {
+        return { code: 403, response: { error: error.message } }
       }
       return {
         code: 500,

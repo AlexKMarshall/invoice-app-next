@@ -1,10 +1,10 @@
 import * as z from 'zod'
 
+import { ActionNotPermittedError, NotFoundError } from 'src/server/errors'
 import { AsyncReturnType, IterableElement } from 'type-fest'
 import { InvoiceDetail, InvoiceSummary } from './invoice.types'
 
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
-import { NotFoundError } from 'src/server/errors'
 import { Prisma } from '@prisma/client'
 import { add } from 'date-fns'
 import { generateAlphanumericId } from 'src/shared/identifier'
@@ -452,6 +452,14 @@ export async function updateStatus(
   id: InvoiceDetail['id'],
   status: 'paid'
 ): Promise<InvoiceDetail> {
+  // this should throw if invoice not found
+  const invoice = await findInvoiceDetail(id)
+  if (invoice.status === 'draft') {
+    throw new ActionNotPermittedError(
+      `cannot mark draft invoice '${id}' as paid`
+    )
+  }
+
   await prisma.invoice.updateMany({
     data: {
       status,
