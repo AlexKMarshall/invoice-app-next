@@ -6,11 +6,15 @@ import {
   GetInvoiceSummaryDTO,
   NewInvoiceInputDTO,
   NewInvoiceReturnDTO,
+  UpdateInvoiceReturnDTO,
 } from 'src/shared/dtos'
 import { JsonArray, JsonObject } from 'type-fest'
+import {
+  newInvoiceInputDtoSchema,
+  updateStatusInputDtoSchema,
+} from 'src/shared/invoice.schema'
 
 import { NotFoundError } from 'src/server/errors'
-import { newInvoiceInputDtoSchema } from 'src/shared/invoice.schema'
 import { parseJSON } from 'date-fns'
 
 export type ControllerResponse<TData = unknown> = Promise<
@@ -81,6 +85,36 @@ export function postInvoice(
       code: 500,
       response: { error: JSON.stringify(error) },
     }))
+}
+
+export function updateStatus(
+  id: string,
+  status: JsonObject | JsonArray
+): ControllerResponse<UpdateInvoiceReturnDTO> {
+  const parsingResult = updateStatusInputDtoSchema.safeParse(status)
+  if (!parsingResult.success) {
+    return Promise.resolve({
+      code: 400,
+      response: { error: flattenError(parsingResult.error) },
+    })
+  }
+  const { status: parsedStatus } = parsingResult.data
+
+  return invoiceModel
+    .updateStatus(id, parsedStatus)
+    .then((updatedInvoice) => ({
+      code: 200,
+      response: { data: { updatedInvoice } },
+    }))
+    .catch((error: unknown) => {
+      if (error instanceof NotFoundError) {
+        return { code: 404, response: { error: error.message } }
+      }
+      return {
+        code: 500,
+        response: { error: JSON.stringify(error) },
+      }
+    })
 }
 
 type SafeParse<T> =

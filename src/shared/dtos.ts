@@ -78,3 +78,9 @@ export type NewInvoiceReturnDTO = {
     savedInvoice: InvoiceDetail
   }
 }
+
+export type UpdateInvoiceReturnDTO = {
+  data: {
+    updatedInvoice: InvoiceDetail
+  }
+}

@@ -293,10 +293,38 @@ const pendingInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
     ),
   })
 )
+const paidInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
+  z.object({
+    id: z.string().min(1),
+    status: z.literal('paid'),
+    issuedAt: z.date(),
+    paymentTerms: z.number(),
+    projectDescription: z.string(),
+    sender: z.object({
+      address: addressSchema,
+    }),
+    client: z.object({
+      name: z.string().min(1),
+      email: z.string().min(1),
+      address: addressSchema,
+    }),
+    invoiceItems: z.array(
+      z.object({
+        id: z.number(),
+        quantity: z.number().min(1),
+        item: z.object({
+          name: z.string().min(1),
+          price: z.number().min(0),
+        }),
+      })
+    ),
+  })
+)
 
 const invoiceDetailSchema = z.union([
   draftInvoiceDetailSchema,
   pendingInvoiceDetailSchema,
+  paidInvoiceDetailSchema,
 ])
 
 function prepareInvoiceForCreate(
@@ -418,4 +446,23 @@ export function findInvoiceDetail(
     })
     .then(invoiceDetailSchema.parse)
     .then(flattenInvoiceDetail)
+}
+
+export async function updateStatus(
+  id: InvoiceDetail['id'],
+  status: 'paid'
+): Promise<InvoiceDetail> {
+  await prisma.invoice.updateMany({
+    data: {
+      status,
+    },
+    where: {
+      id,
+      status: {
+        in: ['pending', 'paid'],
+      },
+    },
+  })
+
+  return findInvoiceDetail(id)
 }
