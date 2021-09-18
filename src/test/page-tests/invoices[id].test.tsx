@@ -27,9 +27,6 @@ it('should show invoice details', async () => {
   await waitForElementToBeRemoved(() => screen.queryByText(/loading/i))
 
   expect(screen.getByText(mockInvoice.status)).toBeInTheDocument()
-  expect(
-    screen.getByRole('button', { name: /mark as paid/i })
-  ).toBeInTheDocument()
 
   expect(screen.getByText(mockInvoice.id)).toBeInTheDocument()
   validateTextIfNonEmpty(mockInvoice.projectDescription)
@@ -117,6 +114,27 @@ it('should allow pending invoices to be marked as paid', async () => {
       )
     )
   )
+
+  // we don't see the button once it's already paid
+  expect(
+    screen.queryByRole('button', { name: /mark as paid/i })
+  ).not.toBeInTheDocument()
+})
+it('should not show mark as paid button if invoice is draft', async () => {
+  const mockInvoice = buildMockInvoiceDetail({ status: 'draft' })
+  invoiceModel.initialise([mockInvoice])
+
+  const { render } = await getPage({
+    route: `/invoices/${mockInvoice.id}`,
+  })
+
+  render()
+
+  await screen.findByText(/draft/i)
+
+  expect(
+    screen.queryByRole('button', { name: /mark as paid/i })
+  ).not.toBeInTheDocument()
 })
 
 it.todo('should handle fetch errors')

@@ -51,6 +51,7 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
   if (invoiceDetailQuery.isLoading) return <div>Loading...</div>
   if (invoiceDetailQuery.isSuccess) {
     const invoice = invoiceDetailQuery.data
+    const canMarkAsPaid = invoice.status === 'pending'
     return (
       <>
         <BackButton />
@@ -59,9 +60,14 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
             Status
             <StatusBadge status={invoice.status} />
           </div>
-          <Button color="primary" onClick={() => markAsPaidMutation.mutate(id)}>
-            Mark as Paid
-          </Button>
+          {canMarkAsPaid ? (
+            <Button
+              color="primary"
+              onClick={() => markAsPaidMutation.mutate(id)}
+            >
+              Mark as Paid
+            </Button>
+          ) : null}
         </div>
         <div className={details}>
           <div className={grid}>
