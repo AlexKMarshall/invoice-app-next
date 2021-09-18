@@ -4,6 +4,8 @@ import {
   NewInvoiceInputDTO,
   NewInvoiceReturnDTO,
   Stringify,
+  UpdateInvoiceReturnDTO,
+  UpdateInvoiceStatusInputDTO,
 } from 'src/shared/dtos'
 import { InvoiceDetail, InvoiceSummary } from './invoice.types'
 
@@ -67,9 +69,32 @@ export async function postInvoice(
   } = await client<NewInvoiceReturnDTO, NewInvoiceInputDTO>('/api/invoices', {
     data: newInvoice,
   })
+  return destringifyInvoiceDetail(savedInvoice)
+}
+
+export async function updateStatus(
+  invoiceId: InvoiceDetail['id'],
+  status: 'paid'
+): Promise<InvoiceDetail> {
+  const {
+    data: { updatedInvoice },
+  } = await client<UpdateInvoiceReturnDTO, UpdateInvoiceStatusInputDTO>(
+    `/api/invoices/${invoiceId}/status`,
+    {
+      data: { status },
+      method: 'PUT',
+    }
+  )
+
+  return destringifyInvoiceDetail(updatedInvoice)
+}
+
+function destringifyInvoiceDetail(
+  invoice: Stringify<InvoiceDetail>
+): InvoiceDetail {
   return {
-    ...savedInvoice,
-    issuedAt: parseJSON(savedInvoice.issuedAt),
-    paymentDue: parseJSON(savedInvoice.paymentDue),
+    ...invoice,
+    issuedAt: parseJSON(invoice.issuedAt),
+    paymentDue: parseJSON(invoice.paymentDue),
   }
 }

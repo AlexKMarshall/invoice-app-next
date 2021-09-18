@@ -79,6 +79,10 @@ export type NewInvoiceReturnDTO = {
   }
 }
 
+export type UpdateInvoiceStatusInputDTO = {
+  status: 'paid'
+}
+
 export type UpdateInvoiceReturnDTO = {
   data: {
     updatedInvoice: InvoiceDetail

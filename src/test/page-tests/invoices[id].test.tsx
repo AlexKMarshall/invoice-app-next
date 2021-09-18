@@ -2,6 +2,7 @@ import * as invoiceModel from 'src/client/test/mocks/invoice.model'
 
 import {
   screen,
+  waitFor,
   waitForElementToBeRemoved,
   within,
 } from '@testing-library/react'
@@ -10,6 +11,8 @@ import { validateGBPValue, validateTextIfNonEmpty } from '../validators'
 import { buildMockInvoiceDetail } from 'src/client/test/mocks/invoice.fixtures'
 import { format } from 'date-fns'
 import { getPage } from 'next-page-tester'
+import { idRegex } from 'src/shared/identifier'
+import userEvent from '@testing-library/user-event'
 
 it('should show invoice details', async () => {
   const mockInvoice = buildMockInvoiceDetail()
@@ -89,6 +92,31 @@ it('should show invoice details', async () => {
   })
 
   validateGBPValue(mockInvoice.amountDue, within(footerRow))
+})
+it('should allow pending invoices to be marked as paid', async () => {
+  const mockInvoice = buildMockInvoiceDetail({ status: 'pending' })
+  invoiceModel.initialise([mockInvoice])
+
+  const { render } = await getPage({
+    route: `/invoices/${mockInvoice.id}`,
+  })
+
+  render()
+
+  await screen.findByText(/pending/i)
+
+  userEvent.click(screen.getByRole('button', { name: /mark as paid/i }))
+
+  const elNotificationArea = screen.getByRole('status')
+
+  await waitFor(() =>
+    expect(elNotificationArea).toHaveTextContent(
+      new RegExp(
+        `invoice id ${idRegex.source} successfully marked as paid`,
+        'i'
+      )
+    )
+  )
 })
 
 it.todo('should handle fetch errors')

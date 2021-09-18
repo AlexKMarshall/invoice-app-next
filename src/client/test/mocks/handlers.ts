@@ -6,6 +6,8 @@ import {
   NewInvoiceInputDTO,
   NewInvoiceReturnDTO,
   Stringify,
+  UpdateInvoiceReturnDTO,
+  UpdateInvoiceStatusInputDTO,
 } from 'src/shared/dtos'
 
 import { parseJSON } from 'date-fns'
@@ -14,9 +16,6 @@ import { rest } from 'msw'
 type EmptyObject = Record<string, never>
 
 export const handlers = [
-  rest.get('/api/hello', (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json({ message: 'hello' }))
-  }),
   rest.get<EmptyObject, GetInvoiceSummaryDTO, EmptyObject>(
     '/api/invoices',
     async (req, res, ctx) => {
@@ -35,7 +34,7 @@ export const handlers = [
     '/api/invoices',
     async (req, res, ctx) => {
       const newInvoice = req.body
-      const savedInvoice = await invoiceModel.save({
+      const savedInvoice = await invoiceModel.create({
         ...newInvoice,
         issuedAt: parseJSON(newInvoice.issuedAt),
       })
@@ -44,6 +43,26 @@ export const handlers = [
         ctx.json({
           data: {
             savedInvoice,
+          },
+        })
+      )
+    }
+  ),
+  rest.put<UpdateInvoiceStatusInputDTO, UpdateInvoiceReturnDTO, { id: string }>(
+    '/api/invoices/:id/status',
+    async (req, res, ctx) => {
+      const { id } = req.params
+      const { status } = req.body
+
+      const oldInvoice = await invoiceModel.findById(id)
+      const updatedInvoice = { ...oldInvoice, status }
+      await invoiceModel.update(updatedInvoice)
+
+      return res(
+        ctx.status(200),
+        ctx.json({
+          data: {
+            updatedInvoice,
           },
         })
       )

@@ -11,6 +11,7 @@ import {
   getInvoiceDetail,
   getInvoices,
   postInvoice,
+  updateStatus,
 } from './invoice.api-client'
 
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
@@ -108,6 +109,59 @@ export function useCreateInvoice({
         }
 
         onSuccess?.(savedInvoiceDetail, _newInvoiceInput, context)
+      },
+    }
+  )
+}
+
+type UseMarkAsPaidProps = {
+  onSuccess?: UseMutationOptions<
+    InvoiceDetail,
+    unknown,
+    InvoiceDetail['id']
+  >['onSuccess']
+}
+
+export function useMarkAsPaid({
+  onSuccess,
+}: UseMarkAsPaidProps = {}): UseMutationResult<
+  InvoiceDetail,
+  unknown,
+  InvoiceDetail['id'],
+  unknown
+> {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (invoiceId: InvoiceDetail['id']) => updateStatus(invoiceId, 'paid'),
+    {
+      onMutate: async (invoiceId: InvoiceDetail['id']) => {
+        await queryClient.cancelQueries(invoiceKeys.all)
+
+        const previousInvoiceDetail = queryClient.getQueryData<InvoiceDetail>(
+          invoiceKeys.detail(invoiceId)
+        )
+
+        if (previousInvoiceDetail) {
+          queryClient.setQueryData<InvoiceDetail>(
+            invoiceKeys.detail(invoiceId),
+            {
+              ...previousInvoiceDetail,
+              status: 'paid',
+            }
+          )
+        }
+
+        return { previousInvoiceDetail }
+      },
+      onSuccess: async (updatedInvoiceDetail, invoiceId, context) => {
+        await queryClient.cancelQueries(invoiceKeys.all)
+
+        queryClient.setQueryData<InvoiceDetail>(
+          invoiceKeys.detail(invoiceId),
+          updatedInvoiceDetail
+        )
+
+        onSuccess?.(updatedInvoiceDetail, invoiceId, context)
       },
     }
   )

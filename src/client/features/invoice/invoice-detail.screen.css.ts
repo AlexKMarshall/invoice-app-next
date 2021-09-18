@@ -34,7 +34,7 @@ export const grid = style({
   marginBottom: '45px',
 })
 
-export const span2 = style({
+export const twoColumns = style({
   gridColumn: 'span 2',
 })
 
