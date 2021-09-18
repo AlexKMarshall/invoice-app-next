@@ -25,6 +25,7 @@ import { StatusBadge } from 'src/client/shared/components/status-badge'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { inflect } from 'src/client/shared/grammar'
+import { screenReaderOnly } from 'src/client/shared/styles/accessibility.css'
 import { useId } from '@react-aria/utils'
 import { useInvoiceSummaries } from './invoice.queries'
 
@@ -87,7 +88,7 @@ export function InvoiceSummaryScreen(): JSX.Element {
           }}
         />
       </Drawer>
-      <div role="status" aria-live="polite">
+      <div role="status" aria-live="polite" className={screenReaderOnly}>
         {notificationMessage}
       </div>
     </>
