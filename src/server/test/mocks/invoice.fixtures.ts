@@ -8,7 +8,7 @@ import { generateAlphanumericId } from 'src/shared/identifier'
 import { invoiceDetailFromInput } from 'src/server/features/invoice/invoice.mappers'
 
 function randomStatus() {
-  return randomPick(['draft', 'pending'] as const)
+  return randomPick(['draft', 'pending', 'paid'] as const)
 }
 
 export function buildMockPendingInvoiceInput(
@@ -100,7 +100,7 @@ export function buildMockInvoiceInput(
 ): NewInvoiceInputDTO {
   const { status: overrideStatus, ...rest } = overrides
 
-  const status = overrideStatus ?? randomStatus()
+  const status = overrideStatus ?? randomPick(['draft', 'pending'])
 
   if (status === 'draft') return buildMockDraftInvoiceInput(rest)
   if (status === 'pending') return buildMockPendingInvoiceInput(rest)

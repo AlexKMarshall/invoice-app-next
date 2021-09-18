@@ -70,7 +70,7 @@ it('should reject if invoice does not exist', async () => {
     },
   })
 })
-it.only('should reject if invoice is draft', async () => {
+it('should reject if invoice is draft', async () => {
   expect.hasAssertions()
 
   const draftInvoice = buildMockInvoiceDetail({ status: 'draft' })

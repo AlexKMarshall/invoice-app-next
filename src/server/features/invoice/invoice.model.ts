@@ -62,7 +62,7 @@ const invoiceSummaryDbSchema = schemaForType<DbInvoiceSummary>()(
         }),
       })
     ),
-    status: z.enum(['draft', 'pending']),
+    status: z.enum(['draft', 'pending', 'paid']),
   })
 )
 
