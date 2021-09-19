@@ -17,7 +17,11 @@ prepareDbForTests()
 it('should get invoice summaries', async () => {
   expect.hasAssertions()
 
-  const mockInvoices = [buildMockInvoiceDetail(), buildMockInvoiceDetail()]
+  const mockInvoices = [
+    buildMockInvoiceDetail({ status: 'draft' }),
+    buildMockInvoiceDetail({ status: 'pending' }),
+    buildMockInvoiceDetail({ status: 'paid' }),
+  ]
 
   await database.seedInvoices(...mockInvoices)
 

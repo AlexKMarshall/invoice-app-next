@@ -28,13 +28,14 @@ export type GetInvoiceDetailDTO = {
   }
 }
 
-type InvoiceStatus = 'draft' | 'pending'
+type InvoiceStatus = 'draft' | 'pending' | 'paid'
 
 export type NewInvoiceInputDTO = Except<
   InvoiceDetail,
-  'id' | 'paymentDue' | 'itemList' | 'amountDue'
+  'id' | 'paymentDue' | 'itemList' | 'amountDue' | 'status'
 > & {
   itemList: Array<NewInvoiceItemInput>
+  status: Exclude<InvoiceStatus, 'paid'>
 }
 
 type NewInvoiceItemInput = Except<InvoiceItem, 'id' | 'total'>
@@ -75,5 +76,15 @@ type InvoiceItem = {
 export type NewInvoiceReturnDTO = {
   data: {
     savedInvoice: InvoiceDetail
+  }
+}
+
+export type UpdateInvoiceStatusInputDTO = {
+  status: 'paid'
+}
+
+export type UpdateInvoiceReturnDTO = {
+  data: {
+    updatedInvoice: InvoiceDetail
   }
 }

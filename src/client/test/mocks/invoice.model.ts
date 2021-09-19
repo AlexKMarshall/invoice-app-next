@@ -25,7 +25,7 @@ export function findById(id: InvoiceDetail['id']): Promise<InvoiceDetail> {
   return Promise.resolve(foundInvoice)
 }
 
-export function save(invoice: NewInvoiceInputDTO): Promise<InvoiceDetail> {
+export function create(invoice: NewInvoiceInputDTO): Promise<InvoiceDetail> {
   const invoiceWithId = invoiceDetailFromInput(
     invoice,
     generateAlphanumericId()
@@ -33,6 +33,14 @@ export function save(invoice: NewInvoiceInputDTO): Promise<InvoiceDetail> {
   store.invoices.push(invoiceWithId)
 
   return Promise.resolve(invoiceWithId)
+}
+
+export function update(updatedInvoice: InvoiceDetail): Promise<InvoiceDetail> {
+  store.invoices = store.invoices.map((invoice) =>
+    invoice.id === updatedInvoice.id ? updatedInvoice : invoice
+  )
+
+  return Promise.resolve(updatedInvoice)
 }
 
 export function initialise(invoices: Array<InvoiceDetail>): void {

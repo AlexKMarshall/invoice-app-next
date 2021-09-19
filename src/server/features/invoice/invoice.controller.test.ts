@@ -8,6 +8,7 @@ import {
   buildMockPendingInvoiceInput,
 } from '../../test/mocks/invoice.fixtures'
 
+import { generateAlphanumericId } from 'src/shared/identifier'
 import { mocked } from 'ts-jest/utils'
 
 jest.mock('./invoice.model')
@@ -150,6 +151,37 @@ describe('postInvoice', () => {
             },
           },
         },
+      },
+    })
+  })
+})
+describe('updateStatus', () => {
+  it('should reject umexpected status', async () => {
+    const id = generateAlphanumericId()
+    const badStatus = {
+      status: 'invalid',
+    }
+
+    const result = await invoiceController.updateStatus(id, badStatus)
+
+    expect(result.code).toBe(400)
+    expect(result.response).toEqual({
+      error: {
+        fieldErrors: {
+          status: ['Expected paid, received invalid'],
+        },
+      },
+    })
+  })
+  it('should reject missing status', async () => {
+    const id = generateAlphanumericId()
+    const missingStatus = null
+
+    const result = await invoiceController.updateStatus(id, missingStatus)
+    expect(result.code).toBe(400)
+    expect(result.response).toEqual({
+      error: {
+        fieldErrors: {},
       },
     })
   })

@@ -65,3 +65,7 @@ export const newInvoiceInputDtoSchema = z.union([
   newDraftInvoiceInputDtoSchema,
   newPendingInvoiceInputDtoSchema,
 ])
+
+export const updateStatusInputDtoSchema = z.object({
+  status: z.literal('paid'),
+})

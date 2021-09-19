@@ -2,6 +2,7 @@ import * as invoiceModel from 'src/client/test/mocks/invoice.model'
 
 import {
   screen,
+  waitFor,
   waitForElementToBeRemoved,
   within,
 } from '@testing-library/react'
@@ -10,6 +11,8 @@ import { validateGBPValue, validateTextIfNonEmpty } from '../validators'
 import { buildMockInvoiceDetail } from 'src/client/test/mocks/invoice.fixtures'
 import { format } from 'date-fns'
 import { getPage } from 'next-page-tester'
+import { idRegex } from 'src/shared/identifier'
+import userEvent from '@testing-library/user-event'
 
 it('should show invoice details', async () => {
   const mockInvoice = buildMockInvoiceDetail()
@@ -24,9 +27,6 @@ it('should show invoice details', async () => {
   await waitForElementToBeRemoved(() => screen.queryByText(/loading/i))
 
   expect(screen.getByText(mockInvoice.status)).toBeInTheDocument()
-  expect(
-    screen.getByRole('button', { name: /mark as paid/i })
-  ).toBeInTheDocument()
 
   expect(screen.getByText(mockInvoice.id)).toBeInTheDocument()
   validateTextIfNonEmpty(mockInvoice.projectDescription)
@@ -89,6 +89,52 @@ it('should show invoice details', async () => {
   })
 
   validateGBPValue(mockInvoice.amountDue, within(footerRow))
+})
+it('should allow pending invoices to be marked as paid', async () => {
+  const mockInvoice = buildMockInvoiceDetail({ status: 'pending' })
+  invoiceModel.initialise([mockInvoice])
+
+  const { render } = await getPage({
+    route: `/invoices/${mockInvoice.id}`,
+  })
+
+  render()
+
+  await screen.findByText(/pending/i)
+
+  userEvent.click(screen.getByRole('button', { name: /mark as paid/i }))
+
+  const elNotificationArea = screen.getByRole('status')
+
+  await waitFor(() =>
+    expect(elNotificationArea).toHaveTextContent(
+      new RegExp(
+        `invoice id ${idRegex.source} successfully marked as paid`,
+        'i'
+      )
+    )
+  )
+
+  // we don't see the button once it's already paid
+  expect(
+    screen.queryByRole('button', { name: /mark as paid/i })
+  ).not.toBeInTheDocument()
+})
+it('should not show mark as paid button if invoice is draft', async () => {
+  const mockInvoice = buildMockInvoiceDetail({ status: 'draft' })
+  invoiceModel.initialise([mockInvoice])
+
+  const { render } = await getPage({
+    route: `/invoices/${mockInvoice.id}`,
+  })
+
+  render()
+
+  await screen.findByText(/draft/i)
+
+  expect(
+    screen.queryByRole('button', { name: /mark as paid/i })
+  ).not.toBeInTheDocument()
 })
 
 it.todo('should handle fetch errors')

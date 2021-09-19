@@ -7,7 +7,8 @@ import { getPage } from 'next-page-tester'
 import { userEvent } from 'src/client/test/test-utils'
 
 it('should go to invoice detail page when clicking on invoice link', async () => {
-  invoiceModel.initialise([buildMockInvoiceDetail()])
+  const invoice = buildMockInvoiceDetail()
+  invoiceModel.initialise([invoice])
 
   const { render } = await getPage({
     route: '/',
@@ -15,8 +16,14 @@ it('should go to invoice detail page when clicking on invoice link', async () =>
 
   render()
 
-  await waitForElementToBeRemoved(() => screen.queryByText(/loading/i))
+  await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
   userEvent.click(screen.getByRole('row'))
 
-  expect(await screen.findByText(/mark as paid/i)).toBeInTheDocument()
+  await waitForElementToBeRemoved(() =>
+    screen.getByRole('heading', { name: /invoices/i })
+  )
+
+  await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
+
+  expect(screen.getByRole('heading', { name: invoice.id }))
 }, 10000)

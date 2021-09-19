@@ -14,7 +14,6 @@ import {
   itemTable,
   primaryValue,
   sectionHeader,
-  span2,
   status,
   statusBar,
   tbody,
@@ -22,15 +21,18 @@ import {
   thead,
   totalHeader,
   totalValue,
+  twoColumns,
 } from './invoice-detail.screen.css'
+import { useInvoiceDetail, useMarkAsPaid } from './invoice.queries'
 
 import { ArrowLeft } from 'src/client/shared/icons/arrow-left'
 import { Button } from 'src/client/shared/components/button'
 import { StatusBadge } from 'src/client/shared/components/status-badge'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
-import { useInvoiceDetail } from './invoice.queries'
+import { screenReaderOnly } from 'src/client/shared/styles/accessibility.css'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 
 type Props = {
   id: InvoiceDetail['id']
@@ -38,10 +40,19 @@ type Props = {
 
 export function InvoiceDetailScreen({ id }: Props): JSX.Element {
   const invoiceDetailQuery = useInvoiceDetail(id)
+  const [notificationMessage, setNotificationMessage] = useState('')
+  const markAsPaidMutation = useMarkAsPaid({
+    onSuccess: (updatedInvoice) => {
+      setNotificationMessage(
+        `Invoice id ${updatedInvoice.id} successfully marked as paid`
+      )
+    },
+  })
 
   if (invoiceDetailQuery.isLoading) return <div>Loading...</div>
   if (invoiceDetailQuery.isSuccess) {
     const invoice = invoiceDetailQuery.data
+    const canMarkAsPaid = invoice.status === 'pending'
     return (
       <>
         <BackButton />
@@ -50,11 +61,18 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
             Status
             <StatusBadge status={invoice.status} />
           </div>
-          <Button color="primary">Mark as Paid</Button>
+          {canMarkAsPaid ? (
+            <Button
+              color="primary"
+              onClick={() => markAsPaidMutation.mutate(id)}
+            >
+              Mark as Paid
+            </Button>
+          ) : null}
         </div>
         <div className={details}>
           <div className={grid}>
-            <section className={span2}>
+            <section className={twoColumns}>
               <h1 className={invoiceId}>{invoice.id}</h1>
               <p>{invoice.projectDescription}</p>
             </section>
@@ -127,6 +145,9 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
               </tr>
             </tfoot>
           </table>
+        </div>
+        <div role="status" aria-live="polite" className={screenReaderOnly}>
+          {notificationMessage}
         </div>
       </>
     )
