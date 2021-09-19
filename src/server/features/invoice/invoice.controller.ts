@@ -35,23 +35,23 @@ type ControllerErrorResponse<TError = unknown> = {
   }
 }
 
-export function getInvoiceSummaries(): ControllerResponse<GetInvoiceSummaryDTO> {
-  return invoiceModel
-    .findAll()
-    .then((invoices) => ({ code: 200, response: { data: { invoices } } }))
-    .catch(errorHandler)
-}
+export const getInvoiceSummaries = withErrorHandler(
+  function getInvoiceSummaries(): ControllerResponse<GetInvoiceSummaryDTO> {
+    return invoiceModel
+      .findAll()
+      .then((invoices) => ({ code: 200, response: { data: { invoices } } }))
+  }
+)
 
-export function getInvoiceDetail(
+export const getInvoiceDetail = withErrorHandler(function getInvoiceDetail(
   id: string
 ): ControllerResponse<GetInvoiceDetailDTO> {
   return invoiceModel
     .findInvoiceDetail(id)
     .then((invoice) => ({ code: 200, response: { data: { invoice } } }))
-    .catch(errorHandler)
-}
+})
 
-export function postInvoice(
+export const postInvoice = withErrorHandler(function postInvoice(
   newInvoice: JsonObject | JsonArray
 ): ControllerResponse<NewInvoiceReturnDTO> {
   const parsingResult = parseNewInvoiceInputDto(newInvoice)
@@ -65,16 +65,13 @@ export function postInvoice(
 
   const parsedInvoice = parsingResult.data
 
-  return invoiceModel
-    .create(parsedInvoice)
-    .then((savedInvoice) => ({
-      code: 201,
-      response: { data: { savedInvoice } },
-    }))
-    .catch(errorHandler)
-}
+  return invoiceModel.create(parsedInvoice).then((savedInvoice) => ({
+    code: 201,
+    response: { data: { savedInvoice } },
+  }))
+})
 
-export function updateStatus(
+export const updateStatus = withErrorHandler(function updateStatus(
   id: string,
   status: unknown
 ): ControllerResponse<UpdateInvoiceReturnDTO> {
@@ -87,14 +84,11 @@ export function updateStatus(
   }
   const { status: parsedStatus } = parsingResult.data
 
-  return invoiceModel
-    .updateStatus(id, parsedStatus)
-    .then((updatedInvoice) => ({
-      code: 200,
-      response: { data: { updatedInvoice } },
-    }))
-    .catch(errorHandler)
-}
+  return invoiceModel.updateStatus(id, parsedStatus).then((updatedInvoice) => ({
+    code: 200,
+    response: { data: { updatedInvoice } },
+  }))
+})
 
 export const deleteInvoice = withErrorHandler(function deleteInvoice(
   id: InvoiceDetail['id']
@@ -178,8 +172,8 @@ function errorHandler(error: unknown) {
   }
 }
 
-function withErrorHandler<TArgs, TResult>(
-  func: (args: TArgs) => Promise<TResult>
-): (args: TArgs) => Promise<TResult | ControllerErrorResponse> {
-  return (args: TArgs) => func(args).catch(errorHandler)
+function withErrorHandler<TArgs extends Array<unknown>, TResult>(
+  func: (...args: TArgs) => Promise<TResult>
+): (...args: TArgs) => Promise<TResult | ControllerErrorResponse> {
+  return (...args: TArgs) => func(...args).catch(errorHandler)
 }
