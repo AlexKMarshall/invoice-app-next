@@ -1,5 +1,5 @@
 import { Drawer, useDrawer } from 'src/client/shared/components/drawer'
-import { MouseEventHandler, TableHTMLAttributes, useRef, useState } from 'react'
+import { MouseEventHandler, TableHTMLAttributes, useRef } from 'react'
 import {
   cell,
   drawerTitle,

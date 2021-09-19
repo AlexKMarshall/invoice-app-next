@@ -151,7 +151,7 @@ export function buildMockInvoiceDetail(
 
   return {
     ...invoiceDetailFromInput(input, generateAlphanumericId()),
-    status: input.status,
+    status: status,
   }
 }
 

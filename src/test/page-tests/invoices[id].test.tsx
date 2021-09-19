@@ -177,5 +177,49 @@ it('should allow pending or draft invoices to be deleted', async () => {
     )
   )
 })
+it('should not show delete button for paid invoices', async () => {
+  const paidInvoice = buildMockInvoiceDetail({
+    status: 'paid',
+  })
+
+  invoiceModel.initialise([paidInvoice])
+
+  const { render } = await getPage({
+    route: `/invoices/${paidInvoice.id}`,
+  })
+
+  render()
+
+  await waitForElementToBeRemoved(screen.getByText(/loading/i))
+
+  expect(
+    screen.queryByRole('button', { name: /delete/i })
+  ).not.toBeInTheDocument()
+})
+it('should allow delete dialog to be cancelled', async () => {
+  const mockInvoice = buildMockInvoiceDetail({
+    status: randomPick(['draft', 'pending']),
+  })
+
+  invoiceModel.initialise([mockInvoice])
+
+  const { render } = await getPage({
+    route: `/invoices/${mockInvoice.id}`,
+  })
+
+  render()
+
+  userEvent.click(await screen.findByRole('button', { name: /delete/i }))
+
+  const deleteDialog = screen.getByRole('dialog', { name: /confirm delete/i })
+
+  userEvent.click(within(deleteDialog).getByRole('button', { name: /cancel/i }))
+
+  expect(
+    screen.queryByRole('heading', { name: /confirm delete/i })
+  ).not.toBeInTheDocument()
+
+  expect(screen.getByText(mockInvoice.id)).toBeInTheDocument()
+})
 
 it.todo('should handle fetch errors')

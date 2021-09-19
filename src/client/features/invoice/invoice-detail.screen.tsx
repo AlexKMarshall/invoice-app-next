@@ -69,6 +69,7 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
   if (invoiceDetailQuery.isSuccess) {
     const invoice = invoiceDetailQuery.data
     const canMarkAsPaid = invoice.status === 'pending'
+    const canDelete = ['draft', 'pending'].includes(invoice.status)
     return (
       <>
         <BackButton />
@@ -77,9 +78,11 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
             Status
             <StatusBadge status={invoice.status} />
           </div>
-          <Button color="warning" onClick={() => setIsDialogOpen(true)}>
-            Delete
-          </Button>
+          {canDelete ? (
+            <Button color="warning" onClick={() => setIsDialogOpen(true)}>
+              Delete
+            </Button>
+          ) : null}
           {canMarkAsPaid ? (
             <Button
               color="primary"
@@ -174,6 +177,9 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
               isDismissable
             >
               <p>{`Are you sure you want to delete invoice #${invoice.id}? This action cannot be undone.`}</p>
+              <Button color="muted" onClick={() => setIsDialogOpen(false)}>
+                Cancel
+              </Button>
               <Button
                 color="warning"
                 onClick={() => deleteInvoiceMutation.mutate(invoice.id)}
