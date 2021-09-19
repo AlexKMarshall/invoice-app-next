@@ -31,21 +31,19 @@ import {
 
 import { ArrowLeft } from 'src/client/shared/icons/arrow-left'
 import { Button } from 'src/client/shared/components/button'
-import { Dialog } from 'src/client/shared/components/dialog'
-import { OverlayContainer } from '@react-aria/overlays'
 import { StatusBadge } from 'src/client/shared/components/status-badge'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
+import { useConfirmationDialog } from 'src/client/shared/components/confirmation-dialog'
 import { useRouter } from 'next/router'
 import { useScreenReaderNotification } from 'src/client/shared/components/screen-reader-notification'
-import { useState } from 'react'
 
 type Props = {
   id: InvoiceDetail['id']
 }
 
 export function InvoiceDetailScreen({ id }: Props): JSX.Element {
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const { openDialog } = useConfirmationDialog()
   const { notify } = useScreenReaderNotification()
   const invoiceDetailQuery = useInvoiceDetail(id)
   const markAsPaidMutation = useMarkAsPaid({
@@ -53,6 +51,15 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
       notify(`Invoice id ${updatedInvoice.id} successfully marked as paid`)
     },
   })
+
+  function handleOpenDeleteConfirmation() {
+    openDialog({
+      title: 'Confirm Delete',
+      message: `Are you sure you want to delete invoice #${id}? This action cannot be undone.`,
+      actionLabel: 'Delete',
+      onConfirm: () => deleteInvoiceMutation.mutate(id),
+    })
+  }
 
   const router = useRouter()
 
@@ -79,7 +86,7 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
             <StatusBadge status={invoice.status} />
           </div>
           {canDelete ? (
-            <Button color="warning" onClick={() => setIsDialogOpen(true)}>
+            <Button color="warning" onClick={handleOpenDeleteConfirmation}>
               Delete
             </Button>
           ) : null}
@@ -168,27 +175,6 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
             </tfoot>
           </table>
         </div>
-        {isDialogOpen ? (
-          <OverlayContainer>
-            <Dialog
-              title="Confirm Delete"
-              isOpen={isDialogOpen}
-              onClose={() => setIsDialogOpen(false)}
-              isDismissable
-            >
-              <p>{`Are you sure you want to delete invoice #${invoice.id}? This action cannot be undone.`}</p>
-              <Button color="muted" onClick={() => setIsDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                color="warning"
-                onClick={() => deleteInvoiceMutation.mutate(invoice.id)}
-              >
-                Delete
-              </Button>
-            </Dialog>
-          </OverlayContainer>
-        ) : null}
       </>
     )
   }

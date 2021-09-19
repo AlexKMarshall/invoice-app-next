@@ -9,6 +9,7 @@ import {
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { AppProps } from 'next/app'
+import { ConfirmationDialogProvider } from 'src/client/shared/components/confirmation-dialog'
 import { Layout } from 'src/client/shared/components/layout'
 import { OverlayProvider } from '@react-aria/overlays'
 import { SSRProvider } from '@react-aria/ssr'
@@ -29,18 +30,20 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <SSRProvider>
       <QueryClientProvider client={queryClient}>
-        <OverlayProvider>
-          <DrawerProvider>
-            <Layout>
-              <ScreenReaderNotificationProvider>
-                <DrawerOverlayContainer>
-                  <Component {...pageProps} />
-                </DrawerOverlayContainer>
-                <DrawerContainer />
-              </ScreenReaderNotificationProvider>
-            </Layout>
-          </DrawerProvider>
-        </OverlayProvider>
+        <ConfirmationDialogProvider>
+          <OverlayProvider>
+            <DrawerProvider>
+              <Layout>
+                <ScreenReaderNotificationProvider>
+                  <DrawerOverlayContainer>
+                    <Component {...pageProps} />
+                  </DrawerOverlayContainer>
+                  <DrawerContainer />
+                </ScreenReaderNotificationProvider>
+              </Layout>
+            </DrawerProvider>
+          </OverlayProvider>
+        </ConfirmationDialogProvider>
       </QueryClientProvider>
     </SSRProvider>
   )
