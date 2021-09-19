@@ -4,6 +4,7 @@ import { buildMockInvoiceDetail } from 'src/server/test/mocks/invoice.fixtures'
 import { generateAlphanumericId } from 'src/shared/identifier'
 import handler from 'src/pages/api/invoices/[id]'
 import invoicesHandler from 'src/pages/api/invoices'
+import { randomPick } from 'src/shared/random'
 import { testApiHandler } from 'next-test-api-route-handler'
 
 prepareDbForTests()
@@ -71,7 +72,7 @@ it('should allow deleting an invoice', async () => {
   expect.hasAssertions()
 
   const invoiceToDelete = buildMockInvoiceDetail({
-    status: Math.random() < 0.5 ? 'draft' : 'pending',
+    status: randomPick(['draft', 'pending']),
   })
   await database.seedInvoices(invoiceToDelete)
 

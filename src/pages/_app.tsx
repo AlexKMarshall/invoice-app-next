@@ -10,7 +10,9 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { AppProps } from 'next/app'
 import { Layout } from 'src/client/shared/components/layout'
+import { OverlayProvider } from '@react-aria/overlays'
 import { SSRProvider } from '@react-aria/ssr'
+import { ScreenReaderNotificationProvider } from 'src/client/shared/components/screen-reader-notification'
 
 const queryClient = new QueryClient()
 
@@ -27,14 +29,18 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <SSRProvider>
       <QueryClientProvider client={queryClient}>
-        <DrawerProvider>
-          <Layout>
-            <DrawerOverlayContainer>
-              <Component {...pageProps} />
-            </DrawerOverlayContainer>
-            <DrawerContainer />
-          </Layout>
-        </DrawerProvider>
+        <OverlayProvider>
+          <DrawerProvider>
+            <Layout>
+              <ScreenReaderNotificationProvider>
+                <DrawerOverlayContainer>
+                  <Component {...pageProps} />
+                </DrawerOverlayContainer>
+                <DrawerContainer />
+              </ScreenReaderNotificationProvider>
+            </Layout>
+          </DrawerProvider>
+        </OverlayProvider>
       </QueryClientProvider>
     </SSRProvider>
   )

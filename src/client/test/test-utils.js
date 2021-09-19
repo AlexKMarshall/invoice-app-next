@@ -5,6 +5,7 @@ import {
 } from '../shared/components/drawer'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
+import { ScreenReaderNotificationProvider } from '../shared/components/screen-reader-notification'
 import { render as rtlRender } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -19,10 +20,12 @@ function Providers({ children }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <DrawerProvider>
-        <DrawerOverlayContainer>{children}</DrawerOverlayContainer>
-        <DrawerContainer />
-      </DrawerProvider>
+      <ScreenReaderNotificationProvider>
+        <DrawerProvider>
+          <DrawerOverlayContainer>{children}</DrawerOverlayContainer>
+          <DrawerContainer />
+        </DrawerProvider>
+      </ScreenReaderNotificationProvider>
     </QueryClientProvider>
   )
 }

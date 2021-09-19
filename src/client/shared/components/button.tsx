@@ -8,7 +8,7 @@ import { assignInlineVars } from '@vanilla-extract/dynamic'
 type Icon = 'plus'
 
 type Props = {
-  color?: 'primary' | 'muted' | 'mono'
+  color?: 'primary' | 'muted' | 'mono' | 'warning'
   icon?: Icon
   prefix?: string
 } & Except<ButtonHTMLAttributes<HTMLButtonElement>, 'style'>

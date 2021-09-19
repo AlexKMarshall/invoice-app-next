@@ -25,13 +25,13 @@ import { StatusBadge } from 'src/client/shared/components/status-badge'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { inflect } from 'src/client/shared/grammar'
-import { screenReaderOnly } from 'src/client/shared/styles/accessibility.css'
 import { useId } from '@react-aria/utils'
 import { useInvoiceSummaries } from './invoice.queries'
+import { useScreenReaderNotification } from 'src/client/shared/components/screen-reader-notification'
 
 export function InvoiceSummaryScreen(): JSX.Element {
   const listQuery = useInvoiceSummaries()
-  const [notificationMessage, setNotificationMessage] = useState('')
+  const { notify } = useScreenReaderNotification()
   const headingId = useId()
   const { open, close, titleId: drawerTitleId } = useDrawer()
 
@@ -82,15 +82,10 @@ export function InvoiceSummaryScreen(): JSX.Element {
           onCancel={close}
           onSubmit={close}
           onSubmitSuccess={(savedInvoice) => {
-            setNotificationMessage(
-              `New invoice id ${savedInvoice.id} successfully created`
-            )
+            notify(`New invoice id ${savedInvoice.id} successfully created`)
           }}
         />
       </Drawer>
-      <div role="status" aria-live="polite" className={screenReaderOnly}>
-        {notificationMessage}
-      </div>
     </>
   )
 }

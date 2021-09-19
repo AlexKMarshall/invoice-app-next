@@ -23,15 +23,21 @@ import {
   totalValue,
   twoColumns,
 } from './invoice-detail.screen.css'
-import { useInvoiceDetail, useMarkAsPaid } from './invoice.queries'
+import {
+  useDeleteInvoice,
+  useInvoiceDetail,
+  useMarkAsPaid,
+} from './invoice.queries'
 
 import { ArrowLeft } from 'src/client/shared/icons/arrow-left'
 import { Button } from 'src/client/shared/components/button'
+import { Dialog } from 'src/client/shared/components/dialog'
+import { OverlayContainer } from '@react-aria/overlays'
 import { StatusBadge } from 'src/client/shared/components/status-badge'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
-import { screenReaderOnly } from 'src/client/shared/styles/accessibility.css'
 import { useRouter } from 'next/router'
+import { useScreenReaderNotification } from 'src/client/shared/components/screen-reader-notification'
 import { useState } from 'react'
 
 type Props = {
@@ -39,13 +45,23 @@ type Props = {
 }
 
 export function InvoiceDetailScreen({ id }: Props): JSX.Element {
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const { notify } = useScreenReaderNotification()
   const invoiceDetailQuery = useInvoiceDetail(id)
-  const [notificationMessage, setNotificationMessage] = useState('')
   const markAsPaidMutation = useMarkAsPaid({
     onSuccess: (updatedInvoice) => {
-      setNotificationMessage(
-        `Invoice id ${updatedInvoice.id} successfully marked as paid`
-      )
+      notify(`Invoice id ${updatedInvoice.id} successfully marked as paid`)
+    },
+  })
+
+  const router = useRouter()
+
+  const deleteInvoiceMutation = useDeleteInvoice({
+    onMutate: () => {
+      router.push('/')
+    },
+    onSuccess: (deletedInvoice) => {
+      notify(`Invoice id ${deletedInvoice.id} successfully deleted`)
     },
   })
 
@@ -61,6 +77,9 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
             Status
             <StatusBadge status={invoice.status} />
           </div>
+          <Button color="warning" onClick={() => setIsDialogOpen(true)}>
+            Delete
+          </Button>
           {canMarkAsPaid ? (
             <Button
               color="primary"
@@ -146,9 +165,24 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
             </tfoot>
           </table>
         </div>
-        <div role="status" aria-live="polite" className={screenReaderOnly}>
-          {notificationMessage}
-        </div>
+        {isDialogOpen ? (
+          <OverlayContainer>
+            <Dialog
+              title="Confirm Delete"
+              isOpen={isDialogOpen}
+              onClose={() => setIsDialogOpen(false)}
+              isDismissable
+            >
+              <p>{`Are you sure you want to delete invoice #${invoice.id}? This action cannot be undone.`}</p>
+              <Button
+                color="warning"
+                onClick={() => deleteInvoiceMutation.mutate(invoice.id)}
+              >
+                Delete
+              </Button>
+            </Dialog>
+          </OverlayContainer>
+        ) : null}
       </>
     )
   }

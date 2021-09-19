@@ -87,6 +87,13 @@ export const button = recipe({
           [colorVars.text]: themeVars.color.mono.contrastText,
         },
       },
+      warning: {
+        vars: {
+          [colorVars.idleBackground]: themeVars.color.warning.main,
+          [colorVars.hoverBackground]: themeVars.color.warning.hover,
+          [colorVars.text]: themeVars.color.warning.contrastText,
+        },
+      },
     },
   },
 

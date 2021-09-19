@@ -8,6 +8,7 @@ import {
   useQueryClient,
 } from 'react-query'
 import {
+  deleteInvoice,
   getInvoiceDetail,
   getInvoices,
   postInvoice,
@@ -162,6 +163,56 @@ export function useMarkAsPaid({
         )
 
         onSuccess?.(updatedInvoiceDetail, invoiceId, context)
+      },
+    }
+  )
+}
+
+type UseDeleteInvoiceProps = Pick<
+  UseMutationOptions<InvoiceDetail, unknown, InvoiceDetail['id']>,
+  'onSuccess' | 'onMutate'
+>
+
+export function useDeleteInvoice({
+  onSuccess,
+  onMutate,
+}: UseDeleteInvoiceProps = {}): UseMutationResult<
+  InvoiceDetail,
+  unknown,
+  InvoiceDetail['id'],
+  unknown
+> {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (invoiceId: InvoiceDetail['id']) => deleteInvoice(invoiceId),
+    {
+      onMutate: async (invoiceId: InvoiceDetail['id']) => {
+        await queryClient.cancelQueries(invoiceKeys.all)
+
+        const previousInvoices = queryClient.getQueryData<
+          Array<InvoiceSummary>
+        >(invoiceKeys.list())
+
+        if (previousInvoices) {
+          queryClient.setQueryData<Array<InvoiceSummary>>(
+            invoiceKeys.list(),
+            previousInvoices.filter((invoice) => invoice.id !== invoiceId)
+          )
+        }
+
+        const previousInvoiceDetail = queryClient.getQueryData<InvoiceDetail>(
+          invoiceKeys.detail(invoiceId)
+        )
+        if (previousInvoiceDetail) {
+          queryClient.removeQueries(invoiceKeys.detail(invoiceId))
+        }
+
+        onMutate?.(invoiceId)
+
+        return { previousInvoices, previousInvoiceDetail }
+      },
+      onSuccess: async (deletedInvoiceDetail, invoiceId, context) => {
+        onSuccess?.(deletedInvoiceDetail, invoiceId, context)
       },
     }
   )

@@ -32,7 +32,11 @@ export const themeVars = createGlobalTheme(':root', {
     },
     sidebar: 'hsla(231, 20%, 27%, 1)',
     divider: 'hsla(231, 20%, 36%, 1)',
-    warning: 'hsla(0, 80%, 63%, 1)',
+    warning: {
+      main: 'hsla(0, 80%, 63%, 1)',
+      hover: 'hsla(0, 100%, 80%, 1)',
+      contrastText: 'hsla(0, 100%, 100%, 1)',
+    },
     text: {
       normal: 'hsla(231, 37%, 63%, 1)',
       strong: 'hsla(231, 28%, 7%, 1)',

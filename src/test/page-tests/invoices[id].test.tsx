@@ -12,6 +12,7 @@ import { buildMockInvoiceDetail } from 'src/client/test/mocks/invoice.fixtures'
 import { format } from 'date-fns'
 import { getPage } from 'next-page-tester'
 import { idRegex } from 'src/shared/identifier'
+import { randomPick } from 'src/shared/random'
 import userEvent from '@testing-library/user-event'
 
 it('should show invoice details', async () => {
@@ -135,6 +136,46 @@ it('should not show mark as paid button if invoice is draft', async () => {
   expect(
     screen.queryByRole('button', { name: /mark as paid/i })
   ).not.toBeInTheDocument()
+})
+it('should allow pending or draft invoices to be deleted', async () => {
+  const mockInvoice = buildMockInvoiceDetail({
+    status: randomPick(['draft', 'pending']),
+  })
+
+  invoiceModel.initialise([mockInvoice])
+
+  const { render } = await getPage({
+    route: `/invoices/${mockInvoice.id}`,
+  })
+
+  render()
+
+  userEvent.click(await screen.findByRole('button', { name: /delete/i }))
+
+  const deleteDialog = screen.getByRole('dialog', { name: /confirm delete/i })
+
+  const deleteMessage = within(deleteDialog).getByText(
+    /are you sure you want to delete/i
+  )
+
+  expect(deleteMessage).toHaveTextContent(
+    `Are you sure you want to delete invoice #${mockInvoice.id}? This action cannot be undone.`
+  )
+
+  // This is the delete confirmation button. RTL shouldn't be confused between this
+  // and the previous one as the other is hidden behind modal overlay
+  userEvent.click(screen.getByRole('button', { name: /delete/i }))
+
+  // after we delete an invoice we should go back to the main invoices page
+  await screen.findByRole('heading', { name: /invoices/i })
+
+  const elNotificationArea = screen.getByRole('status')
+
+  await waitFor(() =>
+    expect(elNotificationArea).toHaveTextContent(
+      new RegExp(`invoice id ${idRegex.source} successfully deleted`, 'i')
+    )
+  )
 })
 
 it.todo('should handle fetch errors')
