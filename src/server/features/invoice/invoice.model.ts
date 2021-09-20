@@ -559,10 +559,32 @@ export function findInvoiceDetail(
     .then(flattenInvoiceDetail)
 }
 
+type InvoiceStatus = InvoiceDetail['status']
+const allowedStatusTransitions: Record<InvoiceStatus, Array<InvoiceStatus>> = {
+  draft: ['draft', 'pending'],
+  pending: ['pending', 'paid'],
+  paid: [],
+}
+
+function isStatusTransitionValid(
+  from: InvoiceStatus,
+  to: InvoiceStatus
+): boolean {
+  return allowedStatusTransitions[from].includes(to)
+}
+
 export async function update(
   id: InvoiceDetail['id'],
   updatedInvoice: UpdateInvoiceInputDTO
 ): Promise<InvoiceDetail> {
+  const existingInvoice = await findInvoiceDetail(id)
+
+  if (!isStatusTransitionValid(existingInvoice.status, updatedInvoice.status)) {
+    throw new ActionNotPermittedError(
+      `Cannot update invoice ${id} from ${existingInvoice.status} to ${updatedInvoice.status}`
+    )
+  }
+
   const invoiceToSave = prepareInvoiceForUpdate(id, updatedInvoice)
 
   return dbUpdate(id, invoiceToSave)

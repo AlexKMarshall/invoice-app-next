@@ -116,6 +116,83 @@ it('should allow updating a pending invoice', async () => {
     },
   })
 })
+it('should allow draft invoices to be updated to pending', async () => {
+  expect.hasAssertions()
+
+  const existingDraftInvoice = buildMockInvoiceDetail({ status: 'draft' })
+  await database.seedInvoices(existingDraftInvoice)
+
+  const updatedInvoiceInput = buildMockInvoiceInput({ status: 'pending' })
+
+  const updatedInvoiceDetail = invoiceDetailFromInput(
+    updatedInvoiceInput,
+    existingDraftInvoice.id
+  )
+
+  await testApiHandler({
+    handler,
+    params: { id: existingDraftInvoice.id },
+    test: async ({ fetch }) => {
+      const response = await fetch({
+        method: 'PUT',
+        body: JSON.stringify(updatedInvoiceInput),
+        headers: { 'content-type': 'application/json' },
+      })
+
+      expect(response.status).toBe(200)
+
+      const data = await response.json()
+
+      expect(data).toEqual({
+        data: {
+          updatedInvoice: {
+            ...JSON.parse(JSON.stringify(updatedInvoiceDetail)),
+            // we don't care about the order of the itemList array or their ids
+            itemList: expect.toIncludeSameMembers(
+              updatedInvoiceDetail.itemList.map((mockItem) => ({
+                ...mockItem,
+                id: expect.any(Number),
+              }))
+            ),
+          },
+        },
+      })
+    },
+  })
+})
+it('should not allow pending invoices to be updated to draft', async () => {
+  expect.hasAssertions()
+
+  const existingPendingInvoice = buildMockInvoiceDetail({ status: 'pending' })
+  await database.seedInvoices(existingPendingInvoice)
+
+  const updatedInvoiceInput = buildMockInvoiceInput({ status: 'draft' })
+
+  const updatedInvoiceDetail = invoiceDetailFromInput(
+    updatedInvoiceInput,
+    existingPendingInvoice.id
+  )
+
+  await testApiHandler({
+    handler,
+    params: { id: existingPendingInvoice.id },
+    test: async ({ fetch }) => {
+      const response = await fetch({
+        method: 'PUT',
+        body: JSON.stringify(updatedInvoiceInput),
+        headers: { 'content-type': 'application/json' },
+      })
+
+      expect(response.status).toBe(403)
+
+      const data = await response.json()
+
+      expect(data).toEqual({
+        error: `Cannot update invoice ${existingPendingInvoice.id} from pending to draft`,
+      })
+    },
+  })
+})
 it('should allow deleting an invoice', async () => {
   expect.hasAssertions()
 
