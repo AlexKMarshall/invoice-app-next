@@ -168,11 +168,6 @@ it('should not allow pending invoices to be updated to draft', async () => {
 
   const updatedInvoiceInput = buildMockInvoiceInput({ status: 'draft' })
 
-  const updatedInvoiceDetail = invoiceDetailFromInput(
-    updatedInvoiceInput,
-    existingPendingInvoice.id
-  )
-
   await testApiHandler({
     handler,
     params: { id: existingPendingInvoice.id },

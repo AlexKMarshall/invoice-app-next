@@ -151,51 +151,7 @@ function flattenInvoiceDetail(
 function dbCreate(invoice: Prisma.InvoiceCreateInput) {
   return prisma.invoice.create({
     data: invoice,
-    select: {
-      id: true,
-      status: true,
-      issuedAt: true,
-      paymentTerms: true,
-      projectDescription: true,
-      sender: {
-        select: {
-          address: {
-            select: {
-              street: true,
-              city: true,
-              country: true,
-              postcode: true,
-            },
-          },
-        },
-      },
-      client: {
-        select: {
-          name: true,
-          email: true,
-          address: {
-            select: {
-              street: true,
-              city: true,
-              country: true,
-              postcode: true,
-            },
-          },
-        },
-      },
-      invoiceItems: {
-        select: {
-          id: true,
-          quantity: true,
-          item: {
-            select: {
-              name: true,
-              price: true,
-            },
-          },
-        },
-      },
-    },
+    select: invoiceDetailSelect,
   })
 }
 function dbUpdate(id: string, invoice: Prisma.InvoiceUpdateInput) {
@@ -204,51 +160,7 @@ function dbUpdate(id: string, invoice: Prisma.InvoiceUpdateInput) {
       id: id,
     },
     data: invoice,
-    select: {
-      id: true,
-      status: true,
-      issuedAt: true,
-      paymentTerms: true,
-      projectDescription: true,
-      sender: {
-        select: {
-          address: {
-            select: {
-              street: true,
-              city: true,
-              country: true,
-              postcode: true,
-            },
-          },
-        },
-      },
-      client: {
-        select: {
-          name: true,
-          email: true,
-          address: {
-            select: {
-              street: true,
-              city: true,
-              country: true,
-              postcode: true,
-            },
-          },
-        },
-      },
-      invoiceItems: {
-        select: {
-          id: true,
-          quantity: true,
-          item: {
-            select: {
-              name: true,
-              price: true,
-            },
-          },
-        },
-      },
-    },
+    select: invoiceDetailSelect,
   })
 }
 
@@ -346,33 +258,9 @@ const pendingInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
     ),
   })
 )
-const paidInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
-  z.object({
-    id: z.string().min(1),
-    status: z.literal('paid'),
-    issuedAt: z.date(),
-    paymentTerms: z.number(),
-    projectDescription: z.string(),
-    sender: z.object({
-      address: addressSchema,
-    }),
-    client: z.object({
-      name: z.string().min(1),
-      email: z.string().min(1),
-      address: addressSchema,
-    }),
-    invoiceItems: z.array(
-      z.object({
-        id: z.number(),
-        quantity: z.number().min(1),
-        item: z.object({
-          name: z.string().min(1),
-          price: z.number().min(0),
-        }),
-      })
-    ),
-  })
-)
+const paidInvoiceDetailSchema = pendingInvoiceDetailSchema
+  .omit({ status: true })
+  .extend({ status: z.literal('paid') })
 
 const invoiceDetailSchema = z.union([
   draftInvoiceDetailSchema,
@@ -493,54 +381,56 @@ function prepareInvoiceForUpdate(
   return invoiceToSave
 }
 
-function dbFindInvoiceDetail(id: InvoiceDetail['id']) {
-  return prisma.invoice.findUnique({
-    where: { id },
+const invoiceDetailSelect = {
+  id: true,
+  status: true,
+  issuedAt: true,
+  paymentTerms: true,
+  projectDescription: true,
+  sender: {
     select: {
-      id: true,
-      status: true,
-      issuedAt: true,
-      paymentTerms: true,
-      projectDescription: true,
-      sender: {
+      address: {
         select: {
-          address: {
-            select: {
-              street: true,
-              city: true,
-              country: true,
-              postcode: true,
-            },
-          },
-        },
-      },
-      client: {
-        select: {
-          name: true,
-          email: true,
-          address: {
-            select: {
-              street: true,
-              city: true,
-              country: true,
-              postcode: true,
-            },
-          },
-        },
-      },
-      invoiceItems: {
-        select: {
-          id: true,
-          quantity: true,
-          item: {
-            select: {
-              name: true,
-              price: true,
-            },
-          },
+          street: true,
+          city: true,
+          country: true,
+          postcode: true,
         },
       },
     },
+  },
+  client: {
+    select: {
+      name: true,
+      email: true,
+      address: {
+        select: {
+          street: true,
+          city: true,
+          country: true,
+          postcode: true,
+        },
+      },
+    },
+  },
+  invoiceItems: {
+    select: {
+      id: true,
+      quantity: true,
+      item: {
+        select: {
+          name: true,
+          price: true,
+        },
+      },
+    },
+  },
+}
+
+function dbFindInvoiceDetail(id: InvoiceDetail['id']) {
+  return prisma.invoice.findUnique({
+    where: { id },
+    select: invoiceDetailSelect,
   })
 }
 
