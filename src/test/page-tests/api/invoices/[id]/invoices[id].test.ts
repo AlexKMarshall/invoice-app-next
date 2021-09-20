@@ -1,8 +1,12 @@
+import {
+  buildMockInvoiceDetail,
+  buildMockInvoiceInput,
+} from 'src/server/test/mocks/invoice.fixtures'
 import { database, prepareDbForTests } from 'src/server/test/test-utils'
 
-import { buildMockInvoiceDetail } from 'src/server/test/mocks/invoice.fixtures'
 import { generateAlphanumericId } from 'src/shared/identifier'
 import handler from 'src/pages/api/invoices/[id]'
+import { invoiceDetailFromInput } from 'src/server/features/invoice/invoice.mappers'
 import invoicesHandler from 'src/pages/api/invoices'
 import { randomPick } from 'src/shared/random'
 import { testApiHandler } from 'next-test-api-route-handler'
@@ -64,6 +68,50 @@ it('should return 404 if no invoice for given id', async () => {
         error: expect.stringMatching(
           new RegExp(`cannot find invoice with id '${nonExistantId}'`, 'i')
         ),
+      })
+    },
+  })
+})
+it('should allow updating a pending invoice', async () => {
+  expect.hasAssertions()
+
+  const existingInvoice = buildMockInvoiceDetail({ status: 'pending' })
+  await database.seedInvoices(existingInvoice)
+
+  const updatedInvoiceInput = buildMockInvoiceInput({ status: 'pending' })
+
+  const updatedInvoiceDetail = invoiceDetailFromInput(
+    updatedInvoiceInput,
+    existingInvoice.id
+  )
+
+  await testApiHandler({
+    handler,
+    params: { id: existingInvoice.id },
+    test: async ({ fetch }) => {
+      const response = await fetch({
+        method: 'PUT',
+        body: JSON.stringify(updatedInvoiceInput),
+        headers: { 'content-type': 'application/json' },
+      })
+
+      expect(response.status).toBe(200)
+
+      const data = await response.json()
+
+      expect(data).toEqual({
+        data: {
+          updatedInvoice: {
+            ...JSON.parse(JSON.stringify(updatedInvoiceDetail)),
+            // we don't care about the order of the itemList array or their ids
+            itemList: expect.toIncludeSameMembers(
+              updatedInvoiceDetail.itemList.map((mockItem) => ({
+                ...mockItem,
+                id: expect.any(Number),
+              }))
+            ),
+          },
+        },
       })
     },
   })

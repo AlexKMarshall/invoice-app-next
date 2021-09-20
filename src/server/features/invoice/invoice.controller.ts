@@ -8,6 +8,7 @@ import {
   GetInvoiceSummaryDTO,
   NewInvoiceInputDTO,
   NewInvoiceReturnDTO,
+  UpdateInvoiceInputDTO,
   UpdateInvoiceReturnDTO,
 } from 'src/shared/dtos'
 import { JsonArray, JsonObject } from 'type-fest'
@@ -90,6 +91,27 @@ export const updateStatus = withErrorHandler(function updateStatus(
   }))
 })
 
+export const updateInvoice = withErrorHandler(function updateInvoice(
+  id: InvoiceDetail['id'],
+  updatedInvoice: JsonArray | JsonObject
+): ControllerResponse<UpdateInvoiceReturnDTO> {
+  const parsingResult = parseUpdateInvoiceInputDto(updatedInvoice)
+
+  if (!parsingResult.success) {
+    return Promise.resolve({
+      code: 400,
+      response: { error: parsingResult.error },
+    })
+  }
+
+  const parsedInvoice = parsingResult.data
+
+  return invoiceModel.update(id, parsedInvoice).then((updatedInvoice) => ({
+    code: 200,
+    response: { data: { updatedInvoice } },
+  }))
+})
+
 export const deleteInvoice = withErrorHandler(function deleteInvoice(
   id: InvoiceDetail['id']
 ): ControllerResponse<DeleteInvoiceReturnDTO> {
@@ -128,6 +150,14 @@ function parseNewInvoiceInputDto(
   }
 
   return result
+}
+
+function parseUpdateInvoiceInputDto(
+  updatedInvoiceInput: JsonObject | JsonArray
+): SafeParse<UpdateInvoiceInputDTO> {
+  // at the moment there's no difference between the new and update schemas so we can
+  // reuse this function. Created a separate declaration in case of future change
+  return parseNewInvoiceInputDto(updatedInvoiceInput)
 }
 
 function flattenError(

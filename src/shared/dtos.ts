@@ -94,3 +94,5 @@ export type DeleteInvoiceReturnDTO = {
     deletedInvoice: InvoiceDetail
   }
 }
+
+export type UpdateInvoiceInputDTO = NewInvoiceInputDTO

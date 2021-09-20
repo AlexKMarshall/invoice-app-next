@@ -3,8 +3,8 @@ import * as z from 'zod'
 import { ActionNotPermittedError, NotFoundError } from 'src/server/errors'
 import { AsyncReturnType, IterableElement } from 'type-fest'
 import { InvoiceDetail, InvoiceSummary } from './invoice.types'
+import { NewInvoiceInputDTO, UpdateInvoiceInputDTO } from 'src/shared/dtos'
 
-import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { Prisma } from '@prisma/client'
 import { add } from 'date-fns'
 import { generateAlphanumericId } from 'src/shared/identifier'
@@ -150,6 +150,59 @@ function flattenInvoiceDetail(
 
 function dbCreate(invoice: Prisma.InvoiceCreateInput) {
   return prisma.invoice.create({
+    data: invoice,
+    select: {
+      id: true,
+      status: true,
+      issuedAt: true,
+      paymentTerms: true,
+      projectDescription: true,
+      sender: {
+        select: {
+          address: {
+            select: {
+              street: true,
+              city: true,
+              country: true,
+              postcode: true,
+            },
+          },
+        },
+      },
+      client: {
+        select: {
+          name: true,
+          email: true,
+          address: {
+            select: {
+              street: true,
+              city: true,
+              country: true,
+              postcode: true,
+            },
+          },
+        },
+      },
+      invoiceItems: {
+        select: {
+          id: true,
+          quantity: true,
+          item: {
+            select: {
+              name: true,
+              price: true,
+            },
+          },
+        },
+      },
+    },
+  })
+}
+function dbUpdate(id: string, invoice: Prisma.InvoiceUpdateInput) {
+  return prisma.invoice.update({
+    where: {
+      id: id,
+    },
     data: invoice,
     select: {
       id: true,
@@ -381,6 +434,64 @@ function prepareInvoiceForCreate(
 
   return invoiceToSave
 }
+function prepareInvoiceForUpdate(
+  id: InvoiceDetail['id'],
+  updatedInvoice: UpdateInvoiceInputDTO
+): Prisma.InvoiceUpdateInput {
+  const {
+    clientName,
+    clientEmail,
+    clientAddress,
+    senderAddress,
+    itemList,
+    ...restInvoice
+  } = updatedInvoice
+
+  const sender: Prisma.SenderUpdateOneRequiredWithoutInvoiceInput = {
+    update: {
+      address: {
+        update: senderAddress,
+      },
+    },
+  }
+
+  const client: Prisma.ClientUpdateOneRequiredWithoutInvoiceInput = {
+    update: {
+      name: clientName,
+      email: clientEmail,
+      address: {
+        update: clientAddress,
+      },
+    },
+  }
+
+  const invoiceItems: Prisma.InvoiceItemCreateNestedManyWithoutInvoiceInput = {
+    create: itemList.map((itemInput) => ({
+      quantity: itemInput.quantity,
+      item: {
+        create: {
+          name: itemInput.name,
+          price: itemInput.price,
+        },
+      },
+    })),
+  }
+
+  const invoiceToSave: Prisma.InvoiceUpdateInput = {
+    id,
+    sender,
+    client,
+    invoiceItems: {
+      // delete the existing items
+      deleteMany: {},
+      // add the new ones
+      ...invoiceItems,
+    },
+    ...restInvoice,
+  }
+
+  return invoiceToSave
+}
 
 function dbFindInvoiceDetail(id: InvoiceDetail['id']) {
   return prisma.invoice.findUnique({
@@ -444,6 +555,17 @@ export function findInvoiceDetail(
         )
       return dbInvoice
     })
+    .then(invoiceDetailSchema.parse)
+    .then(flattenInvoiceDetail)
+}
+
+export async function update(
+  id: InvoiceDetail['id'],
+  updatedInvoice: UpdateInvoiceInputDTO
+): Promise<InvoiceDetail> {
+  const invoiceToSave = prepareInvoiceForUpdate(id, updatedInvoice)
+
+  return dbUpdate(id, invoiceToSave)
     .then(invoiceDetailSchema.parse)
     .then(flattenInvoiceDetail)
 }
