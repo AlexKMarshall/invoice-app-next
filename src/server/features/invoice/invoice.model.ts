@@ -173,23 +173,16 @@ const addressSchema = z.object({
   postcode: z.string().min(1),
 })
 
+const possiblyEmptyString = z
+  .string()
+  .nullable()
+  .transform((val) => val ?? '')
+
 const draftAddressSchema = z.object({
-  street: z
-    .string()
-    .nullable()
-    .transform((val) => val ?? ''),
-  city: z
-    .string()
-    .nullable()
-    .transform((val) => val ?? ''),
-  country: z
-    .string()
-    .nullable()
-    .transform((val) => val ?? ''),
-  postcode: z
-    .string()
-    .nullable()
-    .transform((val) => val ?? ''),
+  street: possiblyEmptyString,
+  city: possiblyEmptyString,
+  country: possiblyEmptyString,
+  postcode: possiblyEmptyString,
 })
 
 const draftInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
@@ -198,22 +191,13 @@ const draftInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
     status: z.literal('draft'),
     issuedAt: z.date(),
     paymentTerms: z.number(),
-    projectDescription: z
-      .string()
-      .nullable()
-      .transform((val) => val ?? ''),
+    projectDescription: possiblyEmptyString,
     sender: z.object({
       address: draftAddressSchema,
     }),
     client: z.object({
-      name: z
-        .string()
-        .nullable()
-        .transform((val) => val ?? ''),
-      email: z
-        .string()
-        .nullable()
-        .transform((val) => val ?? ''),
+      name: possiblyEmptyString,
+      email: possiblyEmptyString,
       address: draftAddressSchema,
     }),
     invoiceItems: z.array(
@@ -221,10 +205,7 @@ const draftInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
         id: z.number(),
         quantity: z.number().min(1),
         item: z.object({
-          name: z
-            .string()
-            .nullable()
-            .transform((val) => val ?? ''),
+          name: possiblyEmptyString,
           price: z.number().min(0),
         }),
       })
