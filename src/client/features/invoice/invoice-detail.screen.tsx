@@ -23,29 +23,52 @@ import {
   totalValue,
   twoColumns,
 } from './invoice-detail.screen.css'
-import { useInvoiceDetail, useMarkAsPaid } from './invoice.queries'
+import {
+  useDeleteInvoice,
+  useInvoiceDetail,
+  useMarkAsPaid,
+} from './invoice.queries'
 
 import { ArrowLeft } from 'src/client/shared/icons/arrow-left'
 import { Button } from 'src/client/shared/components/button'
 import { StatusBadge } from 'src/client/shared/components/status-badge'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
-import { screenReaderOnly } from 'src/client/shared/styles/accessibility.css'
+import { useConfirmationDialog } from 'src/client/shared/components/confirmation-dialog'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useScreenReaderNotification } from 'src/client/shared/components/screen-reader-notification'
 
 type Props = {
   id: InvoiceDetail['id']
 }
 
 export function InvoiceDetailScreen({ id }: Props): JSX.Element {
+  const { openDialog } = useConfirmationDialog()
+  const { notify } = useScreenReaderNotification()
   const invoiceDetailQuery = useInvoiceDetail(id)
-  const [notificationMessage, setNotificationMessage] = useState('')
   const markAsPaidMutation = useMarkAsPaid({
     onSuccess: (updatedInvoice) => {
-      setNotificationMessage(
-        `Invoice id ${updatedInvoice.id} successfully marked as paid`
-      )
+      notify(`Invoice id ${updatedInvoice.id} successfully marked as paid`)
+    },
+  })
+
+  function handleOpenDeleteConfirmation() {
+    openDialog({
+      title: 'Confirm Delete',
+      message: `Are you sure you want to delete invoice #${id}? This action cannot be undone.`,
+      actionLabel: 'Delete',
+      onConfirm: () => deleteInvoiceMutation.mutate(id),
+    })
+  }
+
+  const router = useRouter()
+
+  const deleteInvoiceMutation = useDeleteInvoice({
+    onMutate: () => {
+      router.push('/')
+    },
+    onSuccess: (deletedInvoice) => {
+      notify(`Invoice id ${deletedInvoice.id} successfully deleted`)
     },
   })
 
@@ -53,6 +76,7 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
   if (invoiceDetailQuery.isSuccess) {
     const invoice = invoiceDetailQuery.data
     const canMarkAsPaid = invoice.status === 'pending'
+    const canDelete = ['draft', 'pending'].includes(invoice.status)
     return (
       <>
         <BackButton />
@@ -61,6 +85,11 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
             Status
             <StatusBadge status={invoice.status} />
           </div>
+          {canDelete ? (
+            <Button color="warning" onClick={handleOpenDeleteConfirmation}>
+              Delete
+            </Button>
+          ) : null}
           {canMarkAsPaid ? (
             <Button
               color="primary"
@@ -145,9 +174,6 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
               </tr>
             </tfoot>
           </table>
-        </div>
-        <div role="status" aria-live="polite" className={screenReaderOnly}>
-          {notificationMessage}
         </div>
       </>
     )

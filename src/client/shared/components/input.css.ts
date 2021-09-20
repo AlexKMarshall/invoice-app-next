@@ -29,9 +29,9 @@ export const inputWrapper = recipe({
       },
       error: {
         vars: assignVars(colorVars, {
-          text: themeVars.color.warning,
-          outline: themeVars.color.warning,
-          border: themeVars.color.warning,
+          text: themeVars.color.warning.main,
+          outline: themeVars.color.warning.main,
+          border: themeVars.color.warning.main,
         }),
       },
     },

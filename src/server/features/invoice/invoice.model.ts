@@ -474,3 +474,11 @@ export async function updateStatus(
 
   return findInvoiceDetail(id)
 }
+
+export async function remove(id: InvoiceDetail['id']): Promise<InvoiceDetail> {
+  const invoice = await findInvoiceDetail(id)
+
+  await prisma.invoice.delete({ where: { id } })
+
+  return invoice
+}

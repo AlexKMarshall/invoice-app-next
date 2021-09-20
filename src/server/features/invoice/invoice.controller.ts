@@ -3,6 +3,7 @@ import * as z from 'zod'
 
 import { ActionNotPermittedError, NotFoundError } from 'src/server/errors'
 import {
+  DeleteInvoiceReturnDTO,
   GetInvoiceDetailDTO,
   GetInvoiceSummaryDTO,
   NewInvoiceInputDTO,
@@ -15,6 +16,7 @@ import {
   updateStatusInputDtoSchema,
 } from 'src/shared/invoice.schema'
 
+import { InvoiceDetail } from './invoice.types'
 import { parseJSON } from 'date-fns'
 
 export type ControllerResponse<TData = unknown> = Promise<
@@ -33,35 +35,23 @@ type ControllerErrorResponse<TError = unknown> = {
   }
 }
 
-export function getInvoiceSummaries(): ControllerResponse<GetInvoiceSummaryDTO> {
-  return invoiceModel
-    .findAll()
-    .then((invoices) => ({ code: 200, response: { data: { invoices } } }))
-    .catch((error) => ({
-      code: 500,
-      response: { error: JSON.stringify(error) },
-    }))
-}
+export const getInvoiceSummaries = withErrorHandler(
+  function getInvoiceSummaries(): ControllerResponse<GetInvoiceSummaryDTO> {
+    return invoiceModel
+      .findAll()
+      .then((invoices) => ({ code: 200, response: { data: { invoices } } }))
+  }
+)
 
-export function getInvoiceDetail(
+export const getInvoiceDetail = withErrorHandler(function getInvoiceDetail(
   id: string
 ): ControllerResponse<GetInvoiceDetailDTO> {
   return invoiceModel
     .findInvoiceDetail(id)
     .then((invoice) => ({ code: 200, response: { data: { invoice } } }))
-    .catch((error) => {
-      if (error instanceof NotFoundError) {
-        return { code: 404, response: { error: error.message } }
-      }
+})
 
-      return {
-        code: 500,
-        response: { error: JSON.stringify(error) },
-      }
-    })
-}
-
-export function postInvoice(
+export const postInvoice = withErrorHandler(function postInvoice(
   newInvoice: JsonObject | JsonArray
 ): ControllerResponse<NewInvoiceReturnDTO> {
   const parsingResult = parseNewInvoiceInputDto(newInvoice)
@@ -75,19 +65,13 @@ export function postInvoice(
 
   const parsedInvoice = parsingResult.data
 
-  return invoiceModel
-    .create(parsedInvoice)
-    .then((savedInvoice) => ({
-      code: 201,
-      response: { data: { savedInvoice } },
-    }))
-    .catch((error) => ({
-      code: 500,
-      response: { error: JSON.stringify(error) },
-    }))
-}
+  return invoiceModel.create(parsedInvoice).then((savedInvoice) => ({
+    code: 201,
+    response: { data: { savedInvoice } },
+  }))
+})
 
-export function updateStatus(
+export const updateStatus = withErrorHandler(function updateStatus(
   id: string,
   status: unknown
 ): ControllerResponse<UpdateInvoiceReturnDTO> {
@@ -100,25 +84,20 @@ export function updateStatus(
   }
   const { status: parsedStatus } = parsingResult.data
 
-  return invoiceModel
-    .updateStatus(id, parsedStatus)
-    .then((updatedInvoice) => ({
-      code: 200,
-      response: { data: { updatedInvoice } },
-    }))
-    .catch((error: unknown) => {
-      if (error instanceof NotFoundError) {
-        return { code: 404, response: { error: error.message } }
-      }
-      if (error instanceof ActionNotPermittedError) {
-        return { code: 403, response: { error: error.message } }
-      }
-      return {
-        code: 500,
-        response: { error: JSON.stringify(error) },
-      }
-    })
-}
+  return invoiceModel.updateStatus(id, parsedStatus).then((updatedInvoice) => ({
+    code: 200,
+    response: { data: { updatedInvoice } },
+  }))
+})
+
+export const deleteInvoice = withErrorHandler(function deleteInvoice(
+  id: InvoiceDetail['id']
+): ControllerResponse<DeleteInvoiceReturnDTO> {
+  return invoiceModel.remove(id).then((deletedInvoice) => ({
+    code: 200,
+    response: { data: { deletedInvoice } },
+  }))
+})
 
 type SafeParse<T> =
   | { success: true; data: T }
@@ -178,4 +157,23 @@ function flattenError(
     }
   }
   return { fieldErrors }
+}
+
+function errorHandler(error: unknown) {
+  if (error instanceof NotFoundError) {
+    return { code: 404, response: { error: error.message } }
+  }
+  if (error instanceof ActionNotPermittedError) {
+    return { code: 403, response: { error: error.message } }
+  }
+  return {
+    code: 500,
+    response: { error: JSON.stringify(error) },
+  }
+}
+
+function withErrorHandler<TArgs extends Array<unknown>, TResult>(
+  func: (...args: TArgs) => Promise<TResult>
+): (...args: TArgs) => Promise<TResult | ControllerErrorResponse> {
+  return (...args: TArgs) => func(...args).catch(errorHandler)
 }

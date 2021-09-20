@@ -88,3 +88,9 @@ export type UpdateInvoiceReturnDTO = {
     updatedInvoice: InvoiceDetail
   }
 }
+
+export type DeleteInvoiceReturnDTO = {
+  data: {
+    deletedInvoice: InvoiceDetail
+  }
+}

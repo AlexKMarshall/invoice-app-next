@@ -1,4 +1,5 @@
 import {
+  DeleteInvoiceReturnDTO,
   GetInvoiceDetailDTO,
   GetInvoiceSummaryDTO,
   NewInvoiceInputDTO,
@@ -87,6 +88,18 @@ export async function updateStatus(
   )
 
   return destringifyInvoiceDetail(updatedInvoice)
+}
+
+export async function deleteInvoice(
+  invoiceId: InvoiceDetail['id']
+): Promise<InvoiceDetail> {
+  const {
+    data: { deletedInvoice },
+  } = await client<DeleteInvoiceReturnDTO>(`/api/invoices/${invoiceId}`, {
+    method: 'DELETE',
+  })
+
+  return destringifyInvoiceDetail(deletedInvoice)
 }
 
 function destringifyInvoiceDetail(

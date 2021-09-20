@@ -1,6 +1,7 @@
 import * as invoiceModel from './invoice.model'
 
 import {
+  DeleteInvoiceReturnDTO,
   GetInvoiceDetailDTO,
   GetInvoiceSummaryDTO,
   NewInvoiceInputDTO,
@@ -43,6 +44,23 @@ export const handlers = [
         ctx.json({
           data: {
             savedInvoice,
+          },
+        })
+      )
+    }
+  ),
+  rest.delete<EmptyObject, DeleteInvoiceReturnDTO, { id: string }>(
+    '/api/invoices/:id',
+    async (req, res, ctx) => {
+      const { id } = req.params
+
+      const deletedInvoice = await invoiceModel.remove(id)
+
+      return res(
+        ctx.status(200),
+        ctx.json({
+          data: {
+            deletedInvoice,
           },
         })
       )

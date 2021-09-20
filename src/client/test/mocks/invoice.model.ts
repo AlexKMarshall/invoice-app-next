@@ -43,6 +43,14 @@ export function update(updatedInvoice: InvoiceDetail): Promise<InvoiceDetail> {
   return Promise.resolve(updatedInvoice)
 }
 
+export async function remove(invoiceId: string): Promise<InvoiceDetail> {
+  const deletedInvoice = await findById(invoiceId)
+
+  store.invoices = store.invoices.filter((invoice) => invoice.id !== invoiceId)
+
+  return Promise.resolve(deletedInvoice)
+}
+
 export function initialise(invoices: Array<InvoiceDetail>): void {
   store.invoices = invoices
 }
