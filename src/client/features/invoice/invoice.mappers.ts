@@ -1,11 +1,11 @@
+import { NewInvoiceInputDTO, Stringify } from 'src/shared/dtos'
+import { add, parseJSON } from 'date-fns'
 import {
   generateAlphanumericId,
   generateNumericId,
 } from 'src/shared/identifier'
 
 import { InvoiceDetail } from './invoice.types'
-import { NewInvoiceInputDTO } from 'src/shared/dtos'
-import { add } from 'date-fns'
 
 export function invoiceDetailFromInput(
   input: NewInvoiceInputDTO,
@@ -25,4 +25,20 @@ export function invoiceDetailFromInput(
     ),
     id,
   }
+}
+
+export function destringifyInvoiceDetail(
+  invoice: Stringify<InvoiceDetail>
+): InvoiceDetail {
+  return {
+    ...invoice,
+    issuedAt: parseJSON(invoice.issuedAt),
+    paymentDue: parseJSON(invoice.paymentDue),
+  }
+}
+
+export function destringifyInvoiceInput(
+  invoiceInput: Stringify<NewInvoiceInputDTO>
+): NewInvoiceInputDTO {
+  return { ...invoiceInput, issuedAt: parseJSON(invoiceInput.issuedAt) }
 }

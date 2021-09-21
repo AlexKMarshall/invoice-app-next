@@ -137,6 +137,49 @@ it('should not show mark as paid button if invoice is draft', async () => {
     screen.queryByRole('button', { name: /mark as paid/i })
   ).not.toBeInTheDocument()
 })
+it('should allow pending invoices to be edited', async () => {
+  const mockInvoice = buildMockInvoiceDetail({ status: 'pending' })
+
+  invoiceModel.initialise([mockInvoice])
+
+  const updatedProjectDescription = 'some new description'
+
+  const { render } = await getPage({
+    route: `/invoices/${mockInvoice.id}`,
+  })
+  render()
+
+  userEvent.click(await screen.findByRole('button', { name: /edit/i }))
+
+  expect(
+    screen.getByRole('heading', { name: `Edit ${mockInvoice.id}` })
+  ).toBeInTheDocument()
+
+  const projectDescriptionField = screen.getByRole('textbox', {
+    name: /project description/i,
+  })
+  // expect the field to have the old value
+  expect(projectDescriptionField).toHaveValue(mockInvoice.projectDescription)
+  // update project description with a new value
+  userEvent.clear(projectDescriptionField)
+  userEvent.type(projectDescriptionField, 'some new description')
+
+  userEvent.click(screen.getByRole('button', { name: /save changes/i }))
+
+  await waitForElementToBeRemoved(
+    screen.getByRole('heading', { name: `Edit ${mockInvoice.id}` })
+  )
+
+  expect(screen.getByText(updatedProjectDescription)).toBeInTheDocument()
+
+  const elNotificationArea = screen.getByRole('status')
+
+  await waitFor(() =>
+    expect(elNotificationArea).toHaveTextContent(
+      `Invoice id ${mockInvoice.id} successfully updated`
+    )
+  )
+})
 it('should allow pending or draft invoices to be deleted', async () => {
   const mockInvoice = buildMockInvoiceDetail({
     status: randomPick(['draft', 'pending']),

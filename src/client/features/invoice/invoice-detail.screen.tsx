@@ -2,6 +2,7 @@ import {
   Address as AddressType,
   InvoiceDetail,
 } from 'src/client/features/invoice/invoice.types'
+import { Drawer, useDrawer } from 'src/client/shared/components/drawer'
 import {
   addressWrapper,
   backButton,
@@ -27,19 +28,40 @@ import {
   useDeleteInvoice,
   useInvoiceDetail,
   useMarkAsPaid,
+  useUpdateInvoice,
 } from './invoice.queries'
 
 import { ArrowLeft } from 'src/client/shared/icons/arrow-left'
 import { Button } from 'src/client/shared/components/button'
+import { Except } from 'type-fest'
 import { StatusBadge } from 'src/client/shared/components/status-badge'
+import { UpdateInvoiceForm } from './update-invoice-form'
+import { UpdateInvoiceInputDTO } from 'src/shared/dtos'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
+import { useCallback } from 'react'
 import { useConfirmationDialog } from 'src/client/shared/components/confirmation-dialog'
 import { useRouter } from 'next/router'
 import { useScreenReaderNotification } from 'src/client/shared/components/screen-reader-notification'
 
 type Props = {
   id: InvoiceDetail['id']
+}
+
+type EditableInvoice = Except<InvoiceDetail, 'status'> & {
+  status: Exclude<InvoiceDetail['status'], 'paid'>
+}
+function editableInvoiceFromInvoiceDetail(
+  invoice: InvoiceDetail
+): EditableInvoice | null {
+  switch (invoice.status) {
+    case 'draft':
+      return { ...invoice, status: 'draft' as const }
+    case 'pending':
+      return { ...invoice, status: 'pending' as const }
+    case 'paid':
+      return null
+  }
 }
 
 export function InvoiceDetailScreen({ id }: Props): JSX.Element {
@@ -72,9 +94,25 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
     },
   })
 
+  const drawer = useDrawer()
+  const updateInvoiceMutation = useUpdateInvoice({
+    onSuccess: (savedInvoice) => {
+      notify(`Invoice id ${savedInvoice.id} successfully updated`)
+    },
+  })
+
+  const handleEditFormSubmit = useCallback(
+    (data: UpdateInvoiceInputDTO) => {
+      updateInvoiceMutation.mutate({ id, invoice: data })
+      drawer.close()
+    },
+    [drawer, id, updateInvoiceMutation]
+  )
+
   if (invoiceDetailQuery.isLoading) return <div>Loading...</div>
   if (invoiceDetailQuery.isSuccess) {
     const invoice = invoiceDetailQuery.data
+    const editableInvoice = editableInvoiceFromInvoiceDetail(invoice)
     const canMarkAsPaid = invoice.status === 'pending'
     const canDelete = ['draft', 'pending'].includes(invoice.status)
     return (
@@ -85,6 +123,9 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
             Status
             <StatusBadge status={invoice.status} />
           </div>
+          <Button color="muted" onClick={drawer.open}>
+            Edit
+          </Button>
           {canDelete ? (
             <Button color="warning" onClick={handleOpenDeleteConfirmation}>
               Delete
@@ -175,6 +216,21 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
             </tfoot>
           </table>
         </div>
+        {editableInvoice !== null ? (
+          <Drawer>
+            <h2 id={drawer.titleId}>
+              Edit <span className={invoiceId}>{invoice.id}</span>
+            </h2>
+            <UpdateInvoiceForm
+              kind="update"
+              invoiceId={editableInvoice.id}
+              existingInvoice={editableInvoice}
+              aria-labelledby={drawer.titleId}
+              onCancel={drawer.close}
+              onSubmit={handleEditFormSubmit}
+            />
+          </Drawer>
+        ) : null}
       </>
     )
   }
