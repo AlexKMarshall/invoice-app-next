@@ -34,8 +34,8 @@ import {
 import { ArrowLeft } from 'src/client/shared/icons/arrow-left'
 import { Button } from 'src/client/shared/components/button'
 import { Except } from 'type-fest'
+import { InvoiceForm } from './invoice-form'
 import { StatusBadge } from 'src/client/shared/components/status-badge'
-import { UpdateInvoiceForm } from './update-invoice-form'
 import { UpdateInvoiceInputDTO } from 'src/shared/dtos'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
@@ -221,10 +221,9 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
             <h2 id={drawer.titleId}>
               Edit <span className={invoiceId}>{invoice.id}</span>
             </h2>
-            <UpdateInvoiceForm
+            <InvoiceForm
               kind="update"
-              invoiceId={editableInvoice.id}
-              existingInvoice={editableInvoice}
+              defaultValues={editableInvoice}
               aria-labelledby={drawer.titleId}
               onCancel={drawer.close}
               onSubmit={handleEditFormSubmit}
