@@ -196,13 +196,14 @@ export function InvoiceForm({
                 <th className={th} scope="col">
                   Item Name
                 </th>
-                {/* Don't like this hardcoding of widths */}
+                {/* TODO Don't like this hardcoding of widths */}
                 <th className={th} scope="col" style={{ width: '20%' }}>
                   Qty.
                 </th>
                 <th className={th} scope="col" style={{ width: '30%' }}>
                   Price
                 </th>
+                <th className={th} scope="col" style={{ width: '10%' }} />
               </tr>
             </thead>
             <tbody>
@@ -239,6 +240,14 @@ export function InvoiceForm({
                         valueAsNumber: true,
                       })}
                     />
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      onClick={() => itemsFieldArray.remove(index)}
+                    >
+                      delete
+                    </button>
                   </td>
                 </tr>
               ))}

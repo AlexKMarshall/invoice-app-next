@@ -336,7 +336,7 @@ function validateTextfieldEntry(
   field: HTMLElement,
   entryValue: string | undefined,
   expectedValue: string | number | undefined = entryValue
-) {
+): void {
   if (!entryValue) return
   userEvent.clear(field)
   userEvent.type(field, entryValue)
