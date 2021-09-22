@@ -5,8 +5,9 @@ import { themeVars } from 'src/client/shared/styles/theme.css'
 export const statusBar = style({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'space-between',
+  justifyContent: 'flex-start',
   alignItems: 'baseline',
+  gap: '8px',
   padding: '20px 32px',
   marginBottom: '24px',
   backgroundColor: 'white',
@@ -18,6 +19,7 @@ export const status = style({
   display: 'flex',
   alignItems: 'baseline',
   gap: '16px',
+  marginRight: 'auto',
 })
 
 export const details = style({

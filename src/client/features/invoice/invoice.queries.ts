@@ -1,4 +1,5 @@
 import { InvoiceDetail, InvoiceSummary } from './invoice.types'
+import { NewInvoiceInputDTO, UpdateInvoiceInputDTO } from 'src/shared/dtos'
 import {
   UseMutationOptions,
   UseMutationResult,
@@ -12,10 +13,10 @@ import {
   getInvoiceDetail,
   getInvoices,
   postInvoice,
+  updateInvoice,
   updateStatus,
 } from './invoice.api-client'
 
-import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { invoiceDetailFromInput } from './invoice.mappers'
 import { nanoid } from 'nanoid'
 
@@ -163,6 +164,57 @@ export function useMarkAsPaid({
         )
 
         onSuccess?.(updatedInvoiceDetail, invoiceId, context)
+      },
+    }
+  )
+}
+
+type UseUpdateInvoiceMutationProps = {
+  id: InvoiceDetail['id']
+  invoice: UpdateInvoiceInputDTO
+}
+type UseUpdateInvoiceProps = Pick<
+  UseMutationOptions<InvoiceDetail, unknown, UseUpdateInvoiceMutationProps>,
+  'onSuccess'
+>
+export function useUpdateInvoice({
+  onSuccess,
+}: UseUpdateInvoiceProps): UseMutationResult<
+  InvoiceDetail,
+  unknown,
+  UseUpdateInvoiceMutationProps
+> {
+  const queryClient = useQueryClient()
+
+  return useMutation(
+    ({ id, invoice }: UseUpdateInvoiceMutationProps) =>
+      updateInvoice(id, invoice),
+    {
+      onMutate: async ({ id, invoice }: UseUpdateInvoiceMutationProps) => {
+        await queryClient.cancelQueries(invoiceKeys.all)
+
+        const previousInvoiceDetail = queryClient.getQueryData<InvoiceDetail>(
+          invoiceKeys.detail(id)
+        )
+
+        if (previousInvoiceDetail) {
+          queryClient.setQueryData<InvoiceDetail>(
+            invoiceKeys.detail(id),
+            invoiceDetailFromInput(invoice, id)
+          )
+        }
+
+        return { previousInvoiceDetail }
+      },
+      onSuccess: async (updatedInvoiceDetail, mutationProps, context) => {
+        await queryClient.cancelQueries(invoiceKeys.all)
+
+        queryClient.setQueryData<InvoiceDetail>(
+          invoiceKeys.detail(mutationProps.id),
+          updatedInvoiceDetail
+        )
+
+        onSuccess?.(updatedInvoiceDetail, mutationProps, context)
       },
     }
   )

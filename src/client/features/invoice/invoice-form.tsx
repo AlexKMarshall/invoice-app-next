@@ -1,5 +1,8 @@
+import { NewInvoiceInputDTO, UpdateInvoiceInputDTO } from 'src/shared/dtos'
 import {
   buttonGroup,
+  deleteButton,
+  deleteIcon,
   fieldset,
   fieldsetHeader,
   form,
@@ -11,28 +14,28 @@ import {
   table,
   tableInput,
   th,
-} from './new-invoice-form.css'
+} from './invoice-form.css'
 import { useFieldArray, useForm } from 'react-hook-form'
 
 import { Button } from 'src/client/shared/components/button'
+import { Delete } from 'src/client/shared/icons/delete'
+import { IconButton } from 'src/client/shared/components/icon-button'
 import { Input } from 'src/client/shared/components/input'
-import { InvoiceDetail } from './invoice.types'
-import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { format } from 'date-fns'
 import { newInvoiceInputDtoSchema } from 'src/shared/invoice.schema'
-import { useCreateInvoice } from './invoice.queries'
 import { useId } from '@react-aria/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 type Props = {
+  kind: 'create' | 'update'
   onCancel?: () => void
-  onSubmit?: (data: NewInvoiceInputDTO) => void
-  onSubmitSuccess?: (data: InvoiceDetail) => void
+  onSubmit: (data: NewInvoiceInputDTO) => void
+  defaultValues?: NewInvoiceInputDTO | UpdateInvoiceInputDTO
   'aria-labelledby': string
 }
 
-const DEFAULT_ITEM_VALUES = { name: '', quantity: 0, price: 0 }
-const DEFAULT_FORM_VALUES = {
+const defaultItemValues = { name: '', quantity: 0, price: 0 }
+const defaultFormValues = {
   senderAddress: {
     street: '',
     city: '',
@@ -47,27 +50,29 @@ const DEFAULT_FORM_VALUES = {
     postcode: '',
     country: '',
   },
-  issuedAt: format(new Date(), 'yyyy-MM-dd') ?? '',
+  issuedAt: new Date(), //format(new Date(), 'yyyy-MM-dd'),
   paymentTerms: 0,
   projectDescription: '',
   itemList: [],
   status: 'draft' as const,
 }
 
-export function NewInvoiceForm({
+export function InvoiceForm({
+  kind,
   onCancel,
   onSubmit,
-  onSubmitSuccess,
-  ...delegatedProps
+  defaultValues = defaultFormValues,
+  ...props
 }: Props): JSX.Element {
-  const createInvoiceMutation = useCreateInvoice({
-    onSuccess: (savedInvoice) => {
-      onSubmitSuccess?.(savedInvoice)
-    },
-  })
   const billFromLegendId = useId()
   const billToLegendId = useId()
   const itemListHeadingId = useId()
+
+  const formattedDefaultValues = {
+    ...defaultValues,
+    issuedAt: format(defaultValues.issuedAt, 'yyyy-MM-dd'),
+  }
+
   const {
     register,
     handleSubmit,
@@ -75,7 +80,7 @@ export function NewInvoiceForm({
     formState: { errors },
     setValue,
   } = useForm<NewInvoiceInputDTO>({
-    defaultValues: DEFAULT_FORM_VALUES,
+    defaultValues: formattedDefaultValues,
     resolver: zodResolver(newInvoiceInputDtoSchema),
   })
   const itemsFieldArray = useFieldArray({
@@ -84,14 +89,7 @@ export function NewInvoiceForm({
   })
 
   return (
-    <form
-      onSubmit={handleSubmit((data) => {
-        createInvoiceMutation.mutate(data)
-        onSubmit?.(data)
-      })}
-      {...delegatedProps}
-      className={form}
-    >
+    <form onSubmit={handleSubmit(onSubmit)} {...props} className={form}>
       <fieldset className={fieldset} aria-labelledby={billFromLegendId}>
         <div className={gridWrapper}>
           <h3 className={fieldsetHeader} id={billFromLegendId}>
@@ -202,13 +200,14 @@ export function NewInvoiceForm({
                 <th className={th} scope="col">
                   Item Name
                 </th>
-                {/* Don't like this hardcoding of widths */}
+                {/* TODO Don't like this hardcoding of widths */}
                 <th className={th} scope="col" style={{ width: '20%' }}>
                   Qty.
                 </th>
                 <th className={th} scope="col" style={{ width: '30%' }}>
                   Price
                 </th>
+                <th className={th} scope="col" style={{ width: '10%' }} />
               </tr>
             </thead>
             <tbody>
@@ -246,6 +245,15 @@ export function NewInvoiceForm({
                       })}
                     />
                   </td>
+                  <td>
+                    <IconButton
+                      label="delete"
+                      onClick={() => itemsFieldArray.remove(index)}
+                      className={deleteButton}
+                    >
+                      <Delete className={deleteIcon} />
+                    </IconButton>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -254,7 +262,7 @@ export function NewInvoiceForm({
             type="button"
             prefix="+"
             color="muted"
-            onClick={() => itemsFieldArray.append(DEFAULT_ITEM_VALUES)}
+            onClick={() => itemsFieldArray.append(defaultItemValues)}
             className={spanFull}
           >
             Add New Item
@@ -263,27 +271,56 @@ export function NewInvoiceForm({
       </fieldset>
       <input type="hidden" {...register('status')} />
       <div className={buttonGroup}>
-        <Button type="button" color="muted" onClick={() => onCancel?.()}>
-          Discard
-        </Button>
-        <Button
-          type="submit"
-          color="mono"
-          onClick={() => {
-            setValue('status', 'draft')
-          }}
-        >
-          Save as Draft
-        </Button>
-        <Button
-          type="submit"
-          color="primary"
-          onClick={() => {
-            setValue('status', 'pending')
-          }}
-        >
-          Save & Send
-        </Button>
+        {kind === 'update' ? (
+          <>
+            <Button type="button" color="muted" onClick={() => onCancel?.()}>
+              Discard
+            </Button>
+            <Button
+              type="submit"
+              color="mono"
+              onClick={() => {
+                setValue('status', 'draft')
+              }}
+            >
+              Save as Draft
+            </Button>
+            <Button
+              type="submit"
+              color="primary"
+              onClick={() => {
+                setValue('status', 'pending')
+              }}
+            >
+              Save Changes
+            </Button>
+          </>
+        ) : null}
+        {kind === 'create' ? (
+          <>
+            <Button type="button" color="muted" onClick={() => onCancel?.()}>
+              Discard
+            </Button>
+            <Button
+              type="submit"
+              color="mono"
+              onClick={() => {
+                setValue('status', 'draft')
+              }}
+            >
+              Save as Draft
+            </Button>
+            <Button
+              type="submit"
+              color="primary"
+              onClick={() => {
+                setValue('status', 'pending')
+              }}
+            >
+              Save & Send
+            </Button>
+          </>
+        ) : null}
       </div>
     </form>
   )

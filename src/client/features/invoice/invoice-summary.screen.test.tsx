@@ -6,6 +6,7 @@ import {
   buildMockPendingInvoiceInput,
 } from 'src/client/test/mocks/invoice.fixtures'
 import {
+  fillInInvoiceForm,
   render,
   screen,
   userEvent,
@@ -169,89 +170,7 @@ it('should allow new draft invoices to be creacted', async () => {
 
   expect(screen.getByRole('form', { name: /new invoice/i })).toBeInTheDocument()
 
-  const elBillFromGroup = screen.getByRole('group', { name: /bill from/i })
-  const inBillFrom = within(elBillFromGroup)
-
-  validateTextfieldEntry(
-    inBillFrom.getByLabelText(/street address/i),
-    mockDraftInvoiceInput.senderAddress.street
-  )
-  validateTextfieldEntry(
-    inBillFrom.getByLabelText(/city/i),
-    mockDraftInvoiceInput.senderAddress.city
-  )
-  validateTextfieldEntry(
-    inBillFrom.getByLabelText(/post code/i),
-    mockDraftInvoiceInput.senderAddress.postcode
-  )
-  validateTextfieldEntry(
-    inBillFrom.getByLabelText(/country/i),
-    mockDraftInvoiceInput.senderAddress.country
-  )
-
-  const elBillToGroup = screen.getByRole('group', { name: /bill to/i })
-  const inBillTo = within(elBillToGroup)
-
-  validateTextfieldEntry(
-    inBillTo.getByLabelText(/client's name/i),
-    mockDraftInvoiceInput.clientName
-  )
-  validateTextfieldEntry(
-    inBillTo.getByLabelText(/client's email/i),
-    mockDraftInvoiceInput.clientEmail
-  )
-  validateTextfieldEntry(
-    inBillTo.getByLabelText(/street address/i),
-    mockDraftInvoiceInput.senderAddress.street
-  )
-  validateTextfieldEntry(
-    inBillTo.getByLabelText(/city/i),
-    mockDraftInvoiceInput.senderAddress.city
-  )
-  validateTextfieldEntry(
-    inBillTo.getByLabelText(/post code/i),
-    mockDraftInvoiceInput.senderAddress.postcode
-  )
-  validateTextfieldEntry(
-    inBillTo.getByLabelText(/country/i),
-    mockDraftInvoiceInput.senderAddress.country
-  )
-
-  validateTextfieldEntry(
-    screen.getByLabelText(/issue date/i),
-    format(mockDraftInvoiceInput.issuedAt, 'yyyy-MM-dd')
-  )
-  validateTextfieldEntry(
-    screen.getByLabelText(/payment terms/i),
-    mockDraftInvoiceInput.paymentTerms.toString(),
-    mockDraftInvoiceInput.paymentTerms
-  )
-  validateTextfieldEntry(
-    screen.getByLabelText(/project description/i),
-    mockDraftInvoiceInput.projectDescription
-  )
-
-  const elItemList = screen.getByRole('table', { name: /item list/i })
-  const inItemList = within(elItemList)
-
-  mockDraftInvoiceInput.itemList.forEach((item) => {
-    userEvent.click(screen.getByRole('button', { name: /add new item/i }))
-
-    const [lastRow] = inItemList.getAllByRole('row').slice(-1)
-    const inLastRow = within(lastRow)
-
-    validateTextfieldEntry(inLastRow.getByLabelText(/item name/i), item.name)
-    validateTextfieldEntry(
-      inLastRow.getByLabelText(/quantity/i),
-      item.quantity.toString(),
-      item.quantity
-    )
-    validateTextfieldEntry(
-      inLastRow.getByLabelText(/price/i),
-      item.price.toString(),
-      item.price
-    )
-  })
+  fillInInvoiceForm(mockDraftInvoiceInput)
 
   // save the draft invoice
 
@@ -328,89 +247,7 @@ it('should allow new pending invoices to be creacted', async () => {
 
   expect(screen.getByRole('form', { name: /new invoice/i })).toBeInTheDocument()
 
-  const elBillFromGroup = screen.getByRole('group', { name: /bill from/i })
-  const inBillFrom = within(elBillFromGroup)
-
-  validateTextfieldEntry(
-    inBillFrom.getByLabelText(/street address/i),
-    mockPendingInvoiceInput.senderAddress.street
-  )
-  validateTextfieldEntry(
-    inBillFrom.getByLabelText(/city/i),
-    mockPendingInvoiceInput.senderAddress.city
-  )
-  validateTextfieldEntry(
-    inBillFrom.getByLabelText(/post code/i),
-    mockPendingInvoiceInput.senderAddress.postcode
-  )
-  validateTextfieldEntry(
-    inBillFrom.getByLabelText(/country/i),
-    mockPendingInvoiceInput.senderAddress.country
-  )
-
-  const elBillToGroup = screen.getByRole('group', { name: /bill to/i })
-  const inBillTo = within(elBillToGroup)
-
-  validateTextfieldEntry(
-    inBillTo.getByLabelText(/client's name/i),
-    mockPendingInvoiceInput.clientName
-  )
-  validateTextfieldEntry(
-    inBillTo.getByLabelText(/client's email/i),
-    mockPendingInvoiceInput.clientEmail
-  )
-  validateTextfieldEntry(
-    inBillTo.getByLabelText(/street address/i),
-    mockPendingInvoiceInput.senderAddress.street
-  )
-  validateTextfieldEntry(
-    inBillTo.getByLabelText(/city/i),
-    mockPendingInvoiceInput.senderAddress.city
-  )
-  validateTextfieldEntry(
-    inBillTo.getByLabelText(/post code/i),
-    mockPendingInvoiceInput.senderAddress.postcode
-  )
-  validateTextfieldEntry(
-    inBillTo.getByLabelText(/country/i),
-    mockPendingInvoiceInput.senderAddress.country
-  )
-
-  validateTextfieldEntry(
-    screen.getByLabelText(/issue date/i),
-    format(mockPendingInvoiceInput.issuedAt, 'yyyy-MM-dd')
-  )
-  validateTextfieldEntry(
-    screen.getByLabelText(/payment terms/i),
-    mockPendingInvoiceInput.paymentTerms.toString(),
-    mockPendingInvoiceInput.paymentTerms
-  )
-  validateTextfieldEntry(
-    screen.getByLabelText(/project description/i),
-    mockPendingInvoiceInput.projectDescription
-  )
-
-  const elItemList = screen.getByRole('table', { name: /item list/i })
-  const inItemList = within(elItemList)
-
-  mockPendingInvoiceInput.itemList.forEach((item) => {
-    userEvent.click(screen.getByRole('button', { name: /add new item/i }))
-
-    const [lastRow] = inItemList.getAllByRole('row').slice(-1)
-    const inLastRow = within(lastRow)
-
-    validateTextfieldEntry(inLastRow.getByLabelText(/item name/i), item.name)
-    validateTextfieldEntry(
-      inLastRow.getByLabelText(/quantity/i),
-      item.quantity.toString(),
-      item.quantity
-    )
-    validateTextfieldEntry(
-      inLastRow.getByLabelText(/price/i),
-      item.price.toString(),
-      item.price
-    )
-  })
+  fillInInvoiceForm(mockPendingInvoiceInput)
 
   // save the pending invoice
 
@@ -466,16 +303,6 @@ it('should allow new pending invoices to be creacted', async () => {
     inInvoiceTable.getByRole('link', { name: savedInvoiceId })
   ).toHaveAttribute('href', `/invoices/${savedInvoiceId}`)
 }, 10000)
-it('should default invoice issue date to today', () => {
-  const today = new Date()
-  render(<InvoiceSummaryScreen />)
-
-  userEvent.click(screen.getByRole('button', { name: /new invoice/i }))
-
-  expect(screen.getByLabelText(/issue date/i)).toHaveValue(
-    format(today, 'yyyy-MM-dd')
-  )
-})
 it('should be possible to cancel the new invoice form', () => {
   render(<InvoiceSummaryScreen />)
 
@@ -494,13 +321,3 @@ it('should be possible to cancel the new invoice form', () => {
   ).not.toBeInTheDocument()
   expect(screen.getByRole('heading', { name: /invoices/i })).toBeInTheDocument()
 })
-
-function validateTextfieldEntry(
-  field: HTMLElement,
-  entryValue: string | undefined,
-  expectedValue: string | number | undefined = entryValue
-) {
-  if (!entryValue) return
-  userEvent.type(field, entryValue)
-  expect(field).toHaveValue(expectedValue)
-}

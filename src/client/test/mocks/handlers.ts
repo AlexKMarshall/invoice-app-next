@@ -7,9 +7,14 @@ import {
   NewInvoiceInputDTO,
   NewInvoiceReturnDTO,
   Stringify,
+  UpdateInvoiceInputDTO,
   UpdateInvoiceReturnDTO,
   UpdateInvoiceStatusInputDTO,
 } from 'src/shared/dtos'
+import {
+  destringifyInvoiceInput,
+  invoiceDetailFromInput,
+} from 'src/client/features/invoice/invoice.mappers'
 
 import { parseJSON } from 'date-fns'
 import { rest } from 'msw'
@@ -86,4 +91,28 @@ export const handlers = [
       )
     }
   ),
+  rest.put<
+    Stringify<UpdateInvoiceInputDTO>,
+    UpdateInvoiceReturnDTO,
+    { id: string }
+  >('/api/invoices/:id', async (req, res, ctx) => {
+    const { id } = req.params
+    const invoiceInput = req.body
+
+    const updatedInvoice = invoiceDetailFromInput(
+      destringifyInvoiceInput(invoiceInput),
+      id
+    )
+
+    await invoiceModel.update(updatedInvoice)
+
+    return res(
+      ctx.status(200),
+      ctx.json({
+        data: {
+          updatedInvoice,
+        },
+      })
+    )
+  }),
 ]

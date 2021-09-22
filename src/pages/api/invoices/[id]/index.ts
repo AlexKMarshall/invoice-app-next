@@ -1,7 +1,11 @@
 import * as invoiceController from 'src/server/features/invoice/invoice.controller'
 import * as z from 'zod'
 
-import { DeleteInvoiceReturnDTO, GetInvoiceDetailDTO } from 'src/shared/dtos'
+import {
+  DeleteInvoiceReturnDTO,
+  GetInvoiceDetailDTO,
+  UpdateInvoiceReturnDTO,
+} from 'src/shared/dtos'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import { idRegex } from 'src/shared/identifier'
@@ -9,13 +13,25 @@ import { idRegex } from 'src/shared/identifier'
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<
-    GetInvoiceDetailDTO | DeleteInvoiceReturnDTO | { error: unknown }
+    | GetInvoiceDetailDTO
+    | UpdateInvoiceReturnDTO
+    | DeleteInvoiceReturnDTO
+    | { error: unknown }
   >
 ): Promise<void> {
   switch (req.method) {
     case 'GET': {
       const { id } = queryParamsSchema.parse(req.query)
       const { code, response } = await invoiceController.getInvoiceDetail(id)
+      res.status(code).json(response)
+      return
+    }
+    case 'PUT': {
+      const { id } = queryParamsSchema.parse(req.query)
+      const { code, response } = await invoiceController.updateInvoice(
+        id,
+        req.body
+      )
       res.status(code).json(response)
       return
     }

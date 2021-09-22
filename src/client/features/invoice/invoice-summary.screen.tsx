@@ -1,5 +1,10 @@
 import { Drawer, useDrawer } from 'src/client/shared/components/drawer'
-import { MouseEventHandler, TableHTMLAttributes, useRef } from 'react'
+import {
+  MouseEventHandler,
+  TableHTMLAttributes,
+  useCallback,
+  useRef,
+} from 'react'
 import {
   cell,
   drawerTitle,
@@ -13,20 +18,21 @@ import {
   rowWrapper,
   table,
 } from './invoice-summary.screen.css'
+import { useCreateInvoice, useInvoiceSummaries } from './invoice.queries'
 
 import { ArrowRight } from 'src/client/shared/icons/arrow-right'
 import { Button } from 'src/client/shared/components/button'
 import { Heading } from 'src/client/shared/components/typography'
 import Image from 'next/image'
+import { InvoiceForm } from './invoice-form'
 import { InvoiceSummary } from './invoice.types'
 import Link from 'next/link'
-import { NewInvoiceForm } from './new-invoice-form'
+import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { StatusBadge } from 'src/client/shared/components/status-badge'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { inflect } from 'src/client/shared/grammar'
 import { useId } from '@react-aria/utils'
-import { useInvoiceSummaries } from './invoice.queries'
 import { useScreenReaderNotification } from 'src/client/shared/components/screen-reader-notification'
 
 export function InvoiceSummaryScreen(): JSX.Element {
@@ -34,6 +40,19 @@ export function InvoiceSummaryScreen(): JSX.Element {
   const { notify } = useScreenReaderNotification()
   const headingId = useId()
   const { open, close, titleId: drawerTitleId } = useDrawer()
+  const createInvoiceMutation = useCreateInvoice({
+    onSuccess: (savedInvoice) => {
+      notify(`New invoice id ${savedInvoice.id} successfully created`)
+    },
+  })
+
+  const handleCreateFormSubmit = useCallback(
+    (data: NewInvoiceInputDTO) => {
+      createInvoiceMutation.mutate(data)
+      close()
+    },
+    [close, createInvoiceMutation]
+  )
 
   return (
     <>
@@ -77,13 +96,11 @@ export function InvoiceSummaryScreen(): JSX.Element {
         <h2 className={drawerTitle} id={drawerTitleId}>
           New Invoice
         </h2>
-        <NewInvoiceForm
+        <InvoiceForm
+          kind="create"
           aria-labelledby={drawerTitleId}
           onCancel={close}
-          onSubmit={close}
-          onSubmitSuccess={(savedInvoice) => {
-            notify(`New invoice id ${savedInvoice.id} successfully created`)
-          }}
+          onSubmit={handleCreateFormSubmit}
         />
       </Drawer>
     </>

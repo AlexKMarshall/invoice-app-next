@@ -5,11 +5,13 @@ import {
   NewInvoiceInputDTO,
   NewInvoiceReturnDTO,
   Stringify,
+  UpdateInvoiceInputDTO,
   UpdateInvoiceReturnDTO,
   UpdateInvoiceStatusInputDTO,
 } from 'src/shared/dtos'
 import { InvoiceDetail, InvoiceSummary } from './invoice.types'
 
+import { destringifyInvoiceDetail } from './invoice.mappers'
 import { parseJSON } from 'date-fns'
 
 type EmptyObject = Record<string, never>
@@ -90,6 +92,23 @@ export async function updateStatus(
   return destringifyInvoiceDetail(updatedInvoice)
 }
 
+export async function updateInvoice(
+  invoiceId: InvoiceDetail['id'],
+  invoice: UpdateInvoiceInputDTO
+): Promise<InvoiceDetail> {
+  const {
+    data: { updatedInvoice },
+  } = await client<UpdateInvoiceReturnDTO, UpdateInvoiceInputDTO>(
+    `/api/invoices/${invoiceId}`,
+    {
+      data: invoice,
+      method: 'PUT',
+    }
+  )
+
+  return destringifyInvoiceDetail(updatedInvoice)
+}
+
 export async function deleteInvoice(
   invoiceId: InvoiceDetail['id']
 ): Promise<InvoiceDetail> {
@@ -100,14 +119,4 @@ export async function deleteInvoice(
   })
 
   return destringifyInvoiceDetail(deletedInvoice)
-}
-
-function destringifyInvoiceDetail(
-  invoice: Stringify<InvoiceDetail>
-): InvoiceDetail {
-  return {
-    ...invoice,
-    issuedAt: parseJSON(invoice.issuedAt),
-    paymentDue: parseJSON(invoice.paymentDue),
-  }
 }

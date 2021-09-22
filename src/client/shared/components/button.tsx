@@ -35,6 +35,7 @@ export function Button({
 
   return (
     <button
+      type="button"
       {...props}
       className={`${button({ color, kind })} ${className}`}
       style={additionalStyle}

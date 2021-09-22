@@ -3,8 +3,8 @@ import * as z from 'zod'
 import { ActionNotPermittedError, NotFoundError } from 'src/server/errors'
 import { AsyncReturnType, IterableElement } from 'type-fest'
 import { InvoiceDetail, InvoiceSummary } from './invoice.types'
+import { NewInvoiceInputDTO, UpdateInvoiceInputDTO } from 'src/shared/dtos'
 
-import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { Prisma } from '@prisma/client'
 import { add } from 'date-fns'
 import { generateAlphanumericId } from 'src/shared/identifier'
@@ -151,51 +151,16 @@ function flattenInvoiceDetail(
 function dbCreate(invoice: Prisma.InvoiceCreateInput) {
   return prisma.invoice.create({
     data: invoice,
-    select: {
-      id: true,
-      status: true,
-      issuedAt: true,
-      paymentTerms: true,
-      projectDescription: true,
-      sender: {
-        select: {
-          address: {
-            select: {
-              street: true,
-              city: true,
-              country: true,
-              postcode: true,
-            },
-          },
-        },
-      },
-      client: {
-        select: {
-          name: true,
-          email: true,
-          address: {
-            select: {
-              street: true,
-              city: true,
-              country: true,
-              postcode: true,
-            },
-          },
-        },
-      },
-      invoiceItems: {
-        select: {
-          id: true,
-          quantity: true,
-          item: {
-            select: {
-              name: true,
-              price: true,
-            },
-          },
-        },
-      },
+    select: invoiceDetailSelect,
+  })
+}
+function dbUpdate(id: string, invoice: Prisma.InvoiceUpdateInput) {
+  return prisma.invoice.update({
+    where: {
+      id: id,
     },
+    data: invoice,
+    select: invoiceDetailSelect,
   })
 }
 
@@ -208,23 +173,16 @@ const addressSchema = z.object({
   postcode: z.string().min(1),
 })
 
+const possiblyEmptyString = z
+  .string()
+  .nullable()
+  .transform((val) => val ?? '')
+
 const draftAddressSchema = z.object({
-  street: z
-    .string()
-    .nullable()
-    .transform((val) => val ?? ''),
-  city: z
-    .string()
-    .nullable()
-    .transform((val) => val ?? ''),
-  country: z
-    .string()
-    .nullable()
-    .transform((val) => val ?? ''),
-  postcode: z
-    .string()
-    .nullable()
-    .transform((val) => val ?? ''),
+  street: possiblyEmptyString,
+  city: possiblyEmptyString,
+  country: possiblyEmptyString,
+  postcode: possiblyEmptyString,
 })
 
 const draftInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
@@ -233,22 +191,13 @@ const draftInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
     status: z.literal('draft'),
     issuedAt: z.date(),
     paymentTerms: z.number(),
-    projectDescription: z
-      .string()
-      .nullable()
-      .transform((val) => val ?? ''),
+    projectDescription: possiblyEmptyString,
     sender: z.object({
       address: draftAddressSchema,
     }),
     client: z.object({
-      name: z
-        .string()
-        .nullable()
-        .transform((val) => val ?? ''),
-      email: z
-        .string()
-        .nullable()
-        .transform((val) => val ?? ''),
+      name: possiblyEmptyString,
+      email: possiblyEmptyString,
       address: draftAddressSchema,
     }),
     invoiceItems: z.array(
@@ -256,10 +205,7 @@ const draftInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
         id: z.number(),
         quantity: z.number().min(1),
         item: z.object({
-          name: z
-            .string()
-            .nullable()
-            .transform((val) => val ?? ''),
+          name: possiblyEmptyString,
           price: z.number().min(0),
         }),
       })
@@ -293,33 +239,9 @@ const pendingInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
     ),
   })
 )
-const paidInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
-  z.object({
-    id: z.string().min(1),
-    status: z.literal('paid'),
-    issuedAt: z.date(),
-    paymentTerms: z.number(),
-    projectDescription: z.string(),
-    sender: z.object({
-      address: addressSchema,
-    }),
-    client: z.object({
-      name: z.string().min(1),
-      email: z.string().min(1),
-      address: addressSchema,
-    }),
-    invoiceItems: z.array(
-      z.object({
-        id: z.number(),
-        quantity: z.number().min(1),
-        item: z.object({
-          name: z.string().min(1),
-          price: z.number().min(0),
-        }),
-      })
-    ),
-  })
-)
+const paidInvoiceDetailSchema = pendingInvoiceDetailSchema
+  .omit({ status: true })
+  .extend({ status: z.literal('paid') })
 
 const invoiceDetailSchema = z.union([
   draftInvoiceDetailSchema,
@@ -381,55 +303,115 @@ function prepareInvoiceForCreate(
 
   return invoiceToSave
 }
+function prepareInvoiceForUpdate(
+  id: InvoiceDetail['id'],
+  updatedInvoice: UpdateInvoiceInputDTO
+): Prisma.InvoiceUpdateInput {
+  const {
+    clientName,
+    clientEmail,
+    clientAddress,
+    senderAddress,
+    itemList,
+    ...restInvoice
+  } = updatedInvoice
+
+  const sender: Prisma.SenderUpdateOneRequiredWithoutInvoiceInput = {
+    update: {
+      address: {
+        update: senderAddress,
+      },
+    },
+  }
+
+  const client: Prisma.ClientUpdateOneRequiredWithoutInvoiceInput = {
+    update: {
+      name: clientName,
+      email: clientEmail,
+      address: {
+        update: clientAddress,
+      },
+    },
+  }
+
+  const invoiceItems: Prisma.InvoiceItemCreateNestedManyWithoutInvoiceInput = {
+    create: itemList.map((itemInput) => ({
+      quantity: itemInput.quantity,
+      item: {
+        create: {
+          name: itemInput.name,
+          price: itemInput.price,
+        },
+      },
+    })),
+  }
+
+  const invoiceToSave: Prisma.InvoiceUpdateInput = {
+    id,
+    sender,
+    client,
+    invoiceItems: {
+      // delete the existing items
+      deleteMany: {},
+      // add the new ones
+      ...invoiceItems,
+    },
+    ...restInvoice,
+  }
+
+  return invoiceToSave
+}
+
+const invoiceDetailSelect = {
+  id: true,
+  status: true,
+  issuedAt: true,
+  paymentTerms: true,
+  projectDescription: true,
+  sender: {
+    select: {
+      address: {
+        select: {
+          street: true,
+          city: true,
+          country: true,
+          postcode: true,
+        },
+      },
+    },
+  },
+  client: {
+    select: {
+      name: true,
+      email: true,
+      address: {
+        select: {
+          street: true,
+          city: true,
+          country: true,
+          postcode: true,
+        },
+      },
+    },
+  },
+  invoiceItems: {
+    select: {
+      id: true,
+      quantity: true,
+      item: {
+        select: {
+          name: true,
+          price: true,
+        },
+      },
+    },
+  },
+}
 
 function dbFindInvoiceDetail(id: InvoiceDetail['id']) {
   return prisma.invoice.findUnique({
     where: { id },
-    select: {
-      id: true,
-      status: true,
-      issuedAt: true,
-      paymentTerms: true,
-      projectDescription: true,
-      sender: {
-        select: {
-          address: {
-            select: {
-              street: true,
-              city: true,
-              country: true,
-              postcode: true,
-            },
-          },
-        },
-      },
-      client: {
-        select: {
-          name: true,
-          email: true,
-          address: {
-            select: {
-              street: true,
-              city: true,
-              country: true,
-              postcode: true,
-            },
-          },
-        },
-      },
-      invoiceItems: {
-        select: {
-          id: true,
-          quantity: true,
-          item: {
-            select: {
-              name: true,
-              price: true,
-            },
-          },
-        },
-      },
-    },
+    select: invoiceDetailSelect,
   })
 }
 
@@ -444,6 +426,39 @@ export function findInvoiceDetail(
         )
       return dbInvoice
     })
+    .then(invoiceDetailSchema.parse)
+    .then(flattenInvoiceDetail)
+}
+
+type InvoiceStatus = InvoiceDetail['status']
+const allowedStatusTransitions: Record<InvoiceStatus, Array<InvoiceStatus>> = {
+  draft: ['draft', 'pending'],
+  pending: ['pending', 'paid'],
+  paid: [],
+}
+
+function isStatusTransitionValid(
+  from: InvoiceStatus,
+  to: InvoiceStatus
+): boolean {
+  return allowedStatusTransitions[from].includes(to)
+}
+
+export async function update(
+  id: InvoiceDetail['id'],
+  updatedInvoice: UpdateInvoiceInputDTO
+): Promise<InvoiceDetail> {
+  const existingInvoice = await findInvoiceDetail(id)
+
+  if (!isStatusTransitionValid(existingInvoice.status, updatedInvoice.status)) {
+    throw new ActionNotPermittedError(
+      `Cannot update invoice ${id} from ${existingInvoice.status} to ${updatedInvoice.status}`
+    )
+  }
+
+  const invoiceToSave = prepareInvoiceForUpdate(id, updatedInvoice)
+
+  return dbUpdate(id, invoiceToSave)
     .then(invoiceDetailSchema.parse)
     .then(flattenInvoiceDetail)
 }
