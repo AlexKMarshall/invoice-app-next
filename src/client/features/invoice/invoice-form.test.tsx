@@ -1,11 +1,20 @@
 import { render, screen, userEvent, within } from 'src/client/test/test-utils'
 
 import { InvoiceForm } from './invoice-form'
+import { format } from 'date-fns'
+
+const noop = () => void 0
+
+const defaultFormProps = {
+  kind: 'create' as const,
+  'aria-labelledby': 'some-id',
+  onSubmit: noop,
+}
 
 it('should be possible to add and delete invoice items', () => {
   render(
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    <InvoiceForm kind="create" aria-labelledby="some-id" onSubmit={() => {}} />
+    <InvoiceForm {...defaultFormProps} />
   )
 
   const itemsList = screen.getByRole('table', { name: /item list/i })
@@ -38,4 +47,12 @@ it('should be possible to add and delete invoice items', () => {
   expect(within(itemsList).getAllByRole('row')).toHaveLength(2)
   expect(screen.getByDisplayValue(/my second item/i)).toBeInTheDocument()
   expect(screen.queryByDisplayValue(/my first item/i)).not.toBeInTheDocument()
+})
+it('should default invoice issue date to today', () => {
+  const today = new Date()
+  render(<InvoiceForm {...defaultFormProps} />)
+
+  expect(screen.getByLabelText(/issue date/i)).toHaveValue(
+    format(today, 'yyyy-MM-dd')
+  )
 })

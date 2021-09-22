@@ -1,12 +1,12 @@
 import * as invoiceModel from 'src/client/test/mocks/invoice.model'
 
-import { NewInvoiceInputDTO, UpdateInvoiceInputDTO } from 'src/shared/dtos'
 import {
   buildMockInvoiceDetail,
   buildMockInvoiceInput,
   buildMockPendingInvoiceInput,
 } from 'src/client/test/mocks/invoice.fixtures'
 import {
+  fillInInvoiceForm,
   render,
   screen,
   userEvent,
@@ -303,16 +303,6 @@ it('should allow new pending invoices to be creacted', async () => {
     inInvoiceTable.getByRole('link', { name: savedInvoiceId })
   ).toHaveAttribute('href', `/invoices/${savedInvoiceId}`)
 }, 10000)
-it('should default invoice issue date to today', () => {
-  const today = new Date()
-  render(<InvoiceSummaryScreen />)
-
-  userEvent.click(screen.getByRole('button', { name: /new invoice/i }))
-
-  expect(screen.getByLabelText(/issue date/i)).toHaveValue(
-    format(today, 'yyyy-MM-dd')
-  )
-})
 it('should be possible to cancel the new invoice form', () => {
   render(<InvoiceSummaryScreen />)
 
@@ -332,101 +322,101 @@ it('should be possible to cancel the new invoice form', () => {
   expect(screen.getByRole('heading', { name: /invoices/i })).toBeInTheDocument()
 })
 
-function validateTextfieldEntry(
-  field: HTMLElement,
-  entryValue: string | undefined,
-  expectedValue: string | number | undefined = entryValue
-): void {
-  if (!entryValue) return
-  userEvent.clear(field)
-  userEvent.type(field, entryValue)
-  expect(field).toHaveValue(expectedValue)
-}
+// function validateTextfieldEntry(
+//   field: HTMLElement,
+//   entryValue: string | undefined,
+//   expectedValue: string | number | undefined = entryValue
+// ): void {
+//   if (!entryValue) return
+//   userEvent.clear(field)
+//   userEvent.type(field, entryValue)
+//   expect(field).toHaveValue(expectedValue)
+// }
 
-function fillInInvoiceForm(
-  invoice: NewInvoiceInputDTO | UpdateInvoiceInputDTO
-): void {
-  const elBillFromGroup = screen.getByRole('group', { name: /bill from/i })
-  const inBillFrom = within(elBillFromGroup)
+// function fillInInvoiceForm(
+//   invoice: NewInvoiceInputDTO | UpdateInvoiceInputDTO
+// ): void {
+//   const elBillFromGroup = screen.getByRole('group', { name: /bill from/i })
+//   const inBillFrom = within(elBillFromGroup)
 
-  validateTextfieldEntry(
-    inBillFrom.getByLabelText(/street address/i),
-    invoice.senderAddress.street
-  )
-  validateTextfieldEntry(
-    inBillFrom.getByLabelText(/city/i),
-    invoice.senderAddress.city
-  )
-  validateTextfieldEntry(
-    inBillFrom.getByLabelText(/post code/i),
-    invoice.senderAddress.postcode
-  )
-  validateTextfieldEntry(
-    inBillFrom.getByLabelText(/country/i),
-    invoice.senderAddress.country
-  )
+//   validateTextfieldEntry(
+//     inBillFrom.getByLabelText(/street address/i),
+//     invoice.senderAddress.street
+//   )
+//   validateTextfieldEntry(
+//     inBillFrom.getByLabelText(/city/i),
+//     invoice.senderAddress.city
+//   )
+//   validateTextfieldEntry(
+//     inBillFrom.getByLabelText(/post code/i),
+//     invoice.senderAddress.postcode
+//   )
+//   validateTextfieldEntry(
+//     inBillFrom.getByLabelText(/country/i),
+//     invoice.senderAddress.country
+//   )
 
-  const elBillToGroup = screen.getByRole('group', { name: /bill to/i })
-  const inBillTo = within(elBillToGroup)
+//   const elBillToGroup = screen.getByRole('group', { name: /bill to/i })
+//   const inBillTo = within(elBillToGroup)
 
-  validateTextfieldEntry(
-    inBillTo.getByLabelText(/client's name/i),
-    invoice.clientName
-  )
-  validateTextfieldEntry(
-    inBillTo.getByLabelText(/client's email/i),
-    invoice.clientEmail
-  )
-  validateTextfieldEntry(
-    inBillTo.getByLabelText(/street address/i),
-    invoice.senderAddress.street
-  )
-  validateTextfieldEntry(
-    inBillTo.getByLabelText(/city/i),
-    invoice.senderAddress.city
-  )
-  validateTextfieldEntry(
-    inBillTo.getByLabelText(/post code/i),
-    invoice.senderAddress.postcode
-  )
-  validateTextfieldEntry(
-    inBillTo.getByLabelText(/country/i),
-    invoice.senderAddress.country
-  )
+//   validateTextfieldEntry(
+//     inBillTo.getByLabelText(/client's name/i),
+//     invoice.clientName
+//   )
+//   validateTextfieldEntry(
+//     inBillTo.getByLabelText(/client's email/i),
+//     invoice.clientEmail
+//   )
+//   validateTextfieldEntry(
+//     inBillTo.getByLabelText(/street address/i),
+//     invoice.senderAddress.street
+//   )
+//   validateTextfieldEntry(
+//     inBillTo.getByLabelText(/city/i),
+//     invoice.senderAddress.city
+//   )
+//   validateTextfieldEntry(
+//     inBillTo.getByLabelText(/post code/i),
+//     invoice.senderAddress.postcode
+//   )
+//   validateTextfieldEntry(
+//     inBillTo.getByLabelText(/country/i),
+//     invoice.senderAddress.country
+//   )
 
-  validateTextfieldEntry(
-    screen.getByLabelText(/issue date/i),
-    format(invoice.issuedAt, 'yyyy-MM-dd')
-  )
-  validateTextfieldEntry(
-    screen.getByLabelText(/payment terms/i),
-    invoice.paymentTerms.toString(),
-    invoice.paymentTerms
-  )
-  validateTextfieldEntry(
-    screen.getByLabelText(/project description/i),
-    invoice.projectDescription
-  )
+//   validateTextfieldEntry(
+//     screen.getByLabelText(/issue date/i),
+//     format(invoice.issuedAt, 'yyyy-MM-dd')
+//   )
+//   validateTextfieldEntry(
+//     screen.getByLabelText(/payment terms/i),
+//     invoice.paymentTerms.toString(),
+//     invoice.paymentTerms
+//   )
+//   validateTextfieldEntry(
+//     screen.getByLabelText(/project description/i),
+//     invoice.projectDescription
+//   )
 
-  const elItemList = screen.getByRole('table', { name: /item list/i })
-  const inItemList = within(elItemList)
+//   const elItemList = screen.getByRole('table', { name: /item list/i })
+//   const inItemList = within(elItemList)
 
-  invoice.itemList.forEach((item) => {
-    userEvent.click(screen.getByRole('button', { name: /add new item/i }))
+//   invoice.itemList.forEach((item) => {
+//     userEvent.click(screen.getByRole('button', { name: /add new item/i }))
 
-    const [lastRow] = inItemList.getAllByRole('row').slice(-1)
-    const inLastRow = within(lastRow)
+//     const [lastRow] = inItemList.getAllByRole('row').slice(-1)
+//     const inLastRow = within(lastRow)
 
-    validateTextfieldEntry(inLastRow.getByLabelText(/item name/i), item.name)
-    validateTextfieldEntry(
-      inLastRow.getByLabelText(/quantity/i),
-      item.quantity.toString(),
-      item.quantity
-    )
-    validateTextfieldEntry(
-      inLastRow.getByLabelText(/price/i),
-      item.price.toString(),
-      item.price
-    )
-  })
-}
+//     validateTextfieldEntry(inLastRow.getByLabelText(/item name/i), item.name)
+//     validateTextfieldEntry(
+//       inLastRow.getByLabelText(/quantity/i),
+//       item.quantity.toString(),
+//       item.quantity
+//     )
+//     validateTextfieldEntry(
+//       inLastRow.getByLabelText(/price/i),
+//       item.price.toString(),
+//       item.price
+//     )
+//   })
+// }
