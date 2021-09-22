@@ -88,19 +88,19 @@ export function fillInInvoiceForm(
   )
   validateTextfieldEntry(
     inBillTo.getByLabelText(/street address/i),
-    invoice.senderAddress.street
+    invoice.clientAddress.street
   )
   validateTextfieldEntry(
     inBillTo.getByLabelText(/city/i),
-    invoice.senderAddress.city
+    invoice.clientAddress.city
   )
   validateTextfieldEntry(
     inBillTo.getByLabelText(/post code/i),
-    invoice.senderAddress.postcode
+    invoice.clientAddress.postcode
   )
   validateTextfieldEntry(
     inBillTo.getByLabelText(/country/i),
-    invoice.senderAddress.country
+    invoice.clientAddress.country
   )
 
   validateTextfieldEntry(
@@ -119,6 +119,14 @@ export function fillInInvoiceForm(
 
   const elItemList = screen.getByRole('table', { name: /item list/i })
   const inItemList = within(elItemList)
+
+  // delete existing items if there are any, ignore headers
+  inItemList
+    .getAllByRole('row')
+    .slice(1)
+    .forEach((row) => {
+      userEvent.click(within(row).getByRole('button', { name: /delete/i }))
+    })
 
   invoice.itemList.forEach((item) => {
     userEvent.click(screen.getByRole('button', { name: /add new item/i }))
