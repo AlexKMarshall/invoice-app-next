@@ -209,6 +209,23 @@ it('should not allow saving an update to draft invoice if not everything is fill
   const alertContents = alerts.map((alert) => alert.textContent)
   expect(alertContents).toIncludeAnyMembers(["can't be empty"])
 })
+it('should not show edit button for paid invoices', async () => {
+  const paidInvoice = buildMockInvoiceDetail({ status: 'paid' })
+
+  invoiceModel.initialise([paidInvoice])
+
+  const { render } = await getPage({
+    route: `/invoices/${paidInvoice.id}`,
+  })
+
+  render()
+
+  await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
+
+  expect(
+    screen.queryByRole('button', { name: /edit/i })
+  ).not.toBeInTheDocument()
+})
 it('should allow pending or draft invoices to be deleted', async () => {
   const mockInvoice = buildMockInvoiceDetail({
     status: randomPick(['draft', 'pending']),

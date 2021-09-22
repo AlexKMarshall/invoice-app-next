@@ -35,6 +35,7 @@ import { ArrowLeft } from 'src/client/shared/icons/arrow-left'
 import { Button } from 'src/client/shared/components/button'
 import { Except } from 'type-fest'
 import { InvoiceForm } from './invoice-form'
+import { ReactNode } from 'hoist-non-react-statics/node_modules/@types/react'
 import { StatusBadge } from 'src/client/shared/components/status-badge'
 import { UpdateInvoiceInputDTO } from 'src/shared/dtos'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
@@ -62,6 +63,13 @@ function editableInvoiceFromInvoiceDetail(
     case 'paid':
       return null
   }
+}
+
+type Action = 'edit' | 'delete' | 'markAsPaid'
+const allowedActions: Record<InvoiceDetail['status'], Action[]> = {
+  draft: ['edit', 'delete'],
+  pending: ['edit', 'delete', 'markAsPaid'],
+  paid: [],
 }
 
 export function InvoiceDetailScreen({ id }: Props): JSX.Element {
@@ -113,8 +121,6 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
   if (invoiceDetailQuery.isSuccess) {
     const invoice = invoiceDetailQuery.data
     const editableInvoice = editableInvoiceFromInvoiceDetail(invoice)
-    const canMarkAsPaid = invoice.status === 'pending'
-    const canDelete = ['draft', 'pending'].includes(invoice.status)
     return (
       <>
         <BackButton />
@@ -123,22 +129,24 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
             Status
             <StatusBadge status={invoice.status} />
           </div>
-          <Button color="muted" onClick={drawer.open}>
-            Edit
-          </Button>
-          {canDelete ? (
+          <AllowedAction action="edit" status={invoice.status}>
+            <Button color="muted" onClick={drawer.open}>
+              Edit
+            </Button>
+          </AllowedAction>
+          <AllowedAction action="delete" status={invoice.status}>
             <Button color="warning" onClick={handleOpenDeleteConfirmation}>
               Delete
             </Button>
-          ) : null}
-          {canMarkAsPaid ? (
+          </AllowedAction>
+          <AllowedAction action="markAsPaid" status={invoice.status}>
             <Button
               color="primary"
               onClick={() => markAsPaidMutation.mutate(id)}
             >
               Mark as Paid
             </Button>
-          ) : null}
+          </AllowedAction>
         </div>
         <div className={details}>
           <div className={grid}>
@@ -277,4 +285,19 @@ function BackButton() {
       Go back
     </button>
   )
+}
+
+type AllowedActionProps = {
+  action: Action
+  status: InvoiceDetail['status']
+  children: ReactNode
+}
+function AllowedAction({
+  action,
+  children,
+  status,
+}: AllowedActionProps): JSX.Element {
+  const canPerformAction = allowedActions[status].includes(action)
+
+  return canPerformAction ? <>{children}</> : <></>
 }
