@@ -1,6 +1,8 @@
 import { NewInvoiceInputDTO, UpdateInvoiceInputDTO } from 'src/shared/dtos'
 import {
   buttonGroup,
+  deleteButton,
+  deleteIcon,
   fieldset,
   fieldsetHeader,
   form,
@@ -16,6 +18,8 @@ import {
 import { useFieldArray, useForm } from 'react-hook-form'
 
 import { Button } from 'src/client/shared/components/button'
+import { Delete } from 'src/client/shared/icons/delete'
+import { IconButton } from 'src/client/shared/components/icon-button'
 import { Input } from 'src/client/shared/components/input'
 import { format } from 'date-fns'
 import { newInvoiceInputDtoSchema } from 'src/shared/invoice.schema'
@@ -242,12 +246,13 @@ export function InvoiceForm({
                     />
                   </td>
                   <td>
-                    <button
-                      type="button"
+                    <IconButton
+                      label="delete"
                       onClick={() => itemsFieldArray.remove(index)}
+                      className={deleteButton}
                     >
-                      delete
-                    </button>
+                      <Delete className={deleteIcon} />
+                    </IconButton>
                   </td>
                 </tr>
               ))}

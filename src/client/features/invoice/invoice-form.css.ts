@@ -85,3 +85,17 @@ export const buttonGroup = style([
 globalStyle(`${buttonGroup} > :first-child`, {
   marginRight: 'auto',
 })
+
+export const deleteButton = style({
+  color: themeVars.color.muted.hover,
+
+  selectors: {
+    '&:hover, &:focus': {
+      color: themeVars.color.warning.main,
+    },
+  },
+})
+
+export const deleteIcon = style({
+  height: '16px',
+})
