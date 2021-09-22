@@ -13,6 +13,7 @@ import {
 import { validateGBPValue, validateTextIfNonEmpty } from '../validators'
 
 import { InvoiceDetail } from 'src/client/features/invoice/invoice.types'
+import { buildMockDraftInvoiceInput } from 'src/server/test/mocks/invoice.fixtures'
 import { fillInInvoiceForm } from 'src/client/test/test-utils'
 import { format } from 'date-fns'
 import { getPage } from 'next-page-tester'
@@ -123,6 +124,90 @@ it('should allow pending invoices to be edited', async () => {
       `Invoice id ${initialPendingInvoice.id} successfully updated`
     )
   )
+})
+it('should convert draft invoices to pending on edit so long as every field valid', async () => {
+  const initialDraftInvoice = buildMockInvoiceDetail({ status: 'draft' })
+
+  invoiceModel.initialise([initialDraftInvoice])
+
+  // generate a new set of invoice data, we use the pending builder here just to ensure every field filled in
+  const updatedInvoiceInput = {
+    ...buildMockPendingInvoiceInput(),
+    status: 'draft' as const,
+  }
+  const updatedInvoiceDetail = invoiceDetailFromInput(
+    updatedInvoiceInput,
+    initialDraftInvoice.id
+  )
+
+  const { render } = await getPage({
+    route: `/invoices/${initialDraftInvoice.id}`,
+  })
+  render()
+
+  userEvent.click(await screen.findByRole('button', { name: /edit/i }))
+
+  expect(
+    screen.getByRole('heading', { name: `Edit ${initialDraftInvoice.id}` })
+  ).toBeInTheDocument()
+
+  fillInInvoiceForm(updatedInvoiceInput)
+
+  userEvent.click(screen.getByRole('button', { name: /save changes/i }))
+
+  await waitForElementToBeRemoved(
+    screen.getByRole('heading', { name: `Edit ${initialDraftInvoice.id}` })
+  )
+
+  // it should show the updated invoice as pending
+  validateInvoiceDetailInformation({
+    ...updatedInvoiceDetail,
+    status: 'pending',
+  })
+
+  const elNotificationArea = screen.getByRole('status')
+
+  await waitFor(() =>
+    expect(elNotificationArea).toHaveTextContent(
+      `Invoice id ${initialDraftInvoice.id} successfully updated`
+    )
+  )
+})
+it('should not allow saving an update to draft invoice if not everything is filled in', async () => {
+  const initialDraftInvoice = buildMockInvoiceDetail({ status: 'draft' })
+
+  invoiceModel.initialise([initialDraftInvoice])
+
+  // generate a new set of invoice data, making sure some is empty
+  const updatedInvoiceInput = buildMockDraftInvoiceInput({ clientName: '' })
+
+  const { render } = await getPage({
+    route: `/invoices/${initialDraftInvoice.id}`,
+  })
+  render()
+
+  userEvent.click(await screen.findByRole('button', { name: /edit/i }))
+
+  expect(
+    screen.getByRole('heading', { name: `Edit ${initialDraftInvoice.id}` })
+  ).toBeInTheDocument()
+
+  fillInInvoiceForm(updatedInvoiceInput)
+
+  const clientNameField = screen.getByRole('textbox', {
+    name: /client's name/i,
+  })
+
+  userEvent.click(screen.getByRole('button', { name: /save changes/i }))
+
+  // We have to wait for the field to be invalid as react hook form validation is async
+  await waitFor(() => expect(clientNameField).toBeInvalid())
+
+  // bit hacky - see if any of the alerts have a can't be empty message
+  // can't simply query by Role with a given message
+  const alerts = screen.getAllByRole('alert')
+  const alertContents = alerts.map((alert) => alert.textContent)
+  expect(alertContents).toIncludeAnyMembers(["can't be empty"])
 })
 it('should allow pending or draft invoices to be deleted', async () => {
   const mockInvoice = buildMockInvoiceDetail({

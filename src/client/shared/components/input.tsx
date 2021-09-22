@@ -26,7 +26,10 @@ export const Input = forwardRef(function Input(
     <div className={`${inputWrapperClassName} ${className}`}>
       <div className={labelWrapper}>
         <label htmlFor={inputId}>{label}</label>
-        {status === 'error' ? <div id={errorId}>{errorMessage}</div> : null}
+
+        <div id={errorId} role="alert">
+          {errorMessage}
+        </div>
       </div>
       <input
         className={input}

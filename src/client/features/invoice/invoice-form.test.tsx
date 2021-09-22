@@ -11,18 +11,15 @@ const defaultFormProps = {
   onSubmit: noop,
 }
 
-it('should be possible to add and delete invoice items', () => {
-  render(
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    <InvoiceForm {...defaultFormProps} />
-  )
+it('should be possible to add and delete invoice items', async () => {
+  render(<InvoiceForm {...defaultFormProps} />)
 
   const itemsList = screen.getByRole('table', { name: /item list/i })
 
   // we should only have a header row on a brand new invoice
   expect(within(itemsList).getAllByRole('row')).toHaveLength(1)
 
-  userEvent.click(screen.getByRole('button', { name: /add new item/i }))
+  await userEvent.click(screen.getByRole('button', { name: /add new item/i }))
   const [firstAddedItemRow] = within(itemsList).getAllByRole('row').slice(-1)
   userEvent.type(
     within(firstAddedItemRow).getByLabelText(/item name/i),
@@ -48,7 +45,7 @@ it('should be possible to add and delete invoice items', () => {
   expect(screen.getByDisplayValue(/my second item/i)).toBeInTheDocument()
   expect(screen.queryByDisplayValue(/my first item/i)).not.toBeInTheDocument()
 })
-it('should default invoice issue date to today', () => {
+it('should default invoice issue date to today', async () => {
   const today = new Date()
   render(<InvoiceForm {...defaultFormProps} />)
 

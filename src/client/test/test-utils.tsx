@@ -46,9 +46,11 @@ export function validateTextfieldEntry(
   entryValue: string | undefined,
   expectedValue: string | number | undefined = entryValue
 ): void {
-  if (!entryValue) return
+  if (entryValue === undefined) return
   userEvent.clear(field)
-  userEvent.type(field, entryValue)
+  if (entryValue !== '') {
+    userEvent.type(field, entryValue)
+  }
   expect(field).toHaveValue(expectedValue)
 }
 
