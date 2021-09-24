@@ -1,6 +1,3 @@
-import 'src/client/shared/styles/global'
-import 'src/client/shared/styles/reset.css'
-
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 
 import { Button } from './button'

@@ -1,6 +1,3 @@
-import 'src/client/shared/styles/global.css'
-import 'src/client/shared/styles/reset.css'
-
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 
 import { Input } from './input'
