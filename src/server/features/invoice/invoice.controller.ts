@@ -19,6 +19,7 @@ import {
 
 import { InvoiceDetail } from './invoice.types'
 import { parseJSON } from 'date-fns'
+import { toArray } from 'src/shared/array'
 
 export type ControllerResponse<TData = unknown> = Promise<
   ControllerSuccessResponse<TData> | ControllerErrorResponse
@@ -51,13 +52,6 @@ export const getInvoiceSummaries = withErrorHandler(
       .then((invoices) => ({ code: 200, response: { data: { invoices } } }))
   }
 )
-
-function toArray<T>(input: T | T[]): T[] {
-  if (Array.isArray(input)) {
-    return input
-  }
-  return [input]
-}
 
 export const getInvoiceDetail = withErrorHandler(function getInvoiceDetail(
   id: string

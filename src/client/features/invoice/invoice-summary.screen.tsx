@@ -4,6 +4,7 @@ import {
   TableHTMLAttributes,
   useCallback,
   useRef,
+  useState,
 } from 'react'
 import {
   cell,
@@ -36,7 +37,15 @@ import { useId } from '@react-aria/utils'
 import { useScreenReaderNotification } from 'src/client/shared/components/screen-reader-notification'
 
 export function InvoiceSummaryScreen(): JSX.Element {
-  const listQuery = useInvoiceSummaries()
+  const [filterStatus, setFilterStatus] = useState<InvoiceSummary['status'][]>(
+    []
+  )
+
+  const listQuery = useInvoiceSummaries({
+    filters: {
+      status: filterStatus,
+    },
+  })
   const { notify } = useScreenReaderNotification()
   const headingId = useId()
   const { open, close, titleId: drawerTitleId } = useDrawer()
@@ -63,6 +72,23 @@ export function InvoiceSummaryScreen(): JSX.Element {
           </Heading>
           <TotalInvoiceCount />
         </div>
+        <label>
+          Filter by status
+          <select
+            multiple
+            onChange={(event) =>
+              setFilterStatus(
+                Array.from(event.target.selectedOptions).map(
+                  (option) => option.value as InvoiceSummary['status']
+                )
+              )
+            }
+          >
+            <option value="draft">Draft</option>
+            <option value="pending">Pending</option>
+            <option value="paid">Paid</option>
+          </select>
+        </label>
         <Button type="button" icon="plus" onClick={() => open()}>
           New Invoice
         </Button>

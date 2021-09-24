@@ -2,6 +2,7 @@ import {
   DeleteInvoiceReturnDTO,
   GetInvoiceDetailDTO,
   GetInvoiceSummaryDTO,
+  GetInvoiceSummaryQueryParams,
   NewInvoiceInputDTO,
   NewInvoiceReturnDTO,
   Stringify,
@@ -13,6 +14,7 @@ import { InvoiceDetail, InvoiceSummary } from './invoice.types'
 
 import { destringifyInvoiceDetail } from './invoice.mappers'
 import { parseJSON } from 'date-fns'
+import { toArray } from 'src/shared/array'
 
 type EmptyObject = Record<string, never>
 type ClientOptions<TData> = RequestInit & {
@@ -42,8 +44,22 @@ async function client<TResponse, TBody = EmptyObject>(
   return responseData
 }
 
-export async function getInvoices(): Promise<Array<InvoiceSummary>> {
-  const { data } = await client<GetInvoiceSummaryDTO>('/api/invoices')
+export async function getInvoices(
+  filter?: GetInvoiceSummaryQueryParams
+): Promise<Array<InvoiceSummary>> {
+  const searchParams = new URLSearchParams()
+
+  if (filter?.status) {
+    const statuses = toArray(filter.status)
+    statuses.forEach((status) => {
+      searchParams.append('status', status)
+    })
+  }
+
+  const { data } = await client<GetInvoiceSummaryDTO>(
+    `/api/invoices?${searchParams}`
+  )
+
   return data.invoices.map(({ paymentDue, ...invoice }) => ({
     ...invoice,
     paymentDue: parseJSON(paymentDue),

@@ -59,6 +59,49 @@ it('should show list of invoice summaries', async () => {
     expect(inInvoice.getByText(mockInvoice.status)).toBeInTheDocument()
   })
 })
+it('should show a list of invoice summaries filtered by status', async () => {
+  const draftInvoice = buildMockInvoiceDetail({ status: 'draft' })
+  const pendingInvoice = buildMockInvoiceDetail({ status: 'pending' })
+  const paidInvoice = buildMockInvoiceDetail({ status: 'paid' })
+
+  invoiceModel.initialise([draftInvoice, pendingInvoice, paidInvoice])
+
+  render(<InvoiceSummaryScreen />)
+  await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
+  expect(screen.getByText(draftInvoice.id)).toBeInTheDocument()
+  expect(screen.getByText(pendingInvoice.id)).toBeInTheDocument()
+  expect(screen.getByText(paidInvoice.id)).toBeInTheDocument()
+
+  const filterSelect = screen.getByRole('listbox', {
+    name: /filter by status/i,
+  })
+  const draftOption = screen.getByRole('option', { name: /draft/i })
+  // select only draft invoices
+  userEvent.selectOptions(filterSelect, draftOption)
+
+  await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
+
+  expect(screen.getByText(draftInvoice.id)).toBeInTheDocument()
+  expect(screen.queryByText(pendingInvoice.id)).not.toBeInTheDocument()
+  expect(screen.queryByText(paidInvoice.id)).not.toBeInTheDocument()
+
+  // select additionally pending invoices (it's a multi-select)
+  const pendingOption = screen.getByRole('option', { name: /pending/i })
+  userEvent.selectOptions(filterSelect, pendingOption)
+
+  await screen.findByText(pendingInvoice.id)
+  expect(screen.getByText(draftInvoice.id)).toBeInTheDocument()
+  expect(screen.getByText(pendingInvoice.id)).toBeInTheDocument()
+  expect(screen.queryByText(paidInvoice.id)).not.toBeInTheDocument()
+
+  // deselect both so filter is empty
+  userEvent.deselectOptions(filterSelect, [draftOption, pendingOption])
+
+  await screen.findByText(paidInvoice.id)
+  expect(screen.getByText(draftInvoice.id)).toBeInTheDocument()
+  expect(screen.getByText(pendingInvoice.id)).toBeInTheDocument()
+  expect(screen.getByText(paidInvoice.id)).toBeInTheDocument()
+})
 
 it('should show empty state when there are no invoices', async () => {
   invoiceModel.initialise([])

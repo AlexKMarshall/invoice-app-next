@@ -1,8 +1,9 @@
 import * as invoiceController from 'src/server/features/invoice/invoice.controller'
-import * as z from 'zod'
 
 import { GetInvoiceSummaryDTO, NewInvoiceReturnDTO } from 'src/shared/dtos'
 import { NextApiRequest, NextApiResponse } from 'next'
+
+import { getInvoicesQuerySchema } from 'src/shared/invoice.schema'
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,7 +13,7 @@ export default async function handler(
 ): Promise<void> {
   switch (req.method) {
     case 'GET': {
-      const query = querySchema.parse(req.query)
+      const query = getInvoicesQuerySchema.parse(req.query)
       const { code, response } = await invoiceController.getInvoiceSummaries(
         query
       )
@@ -26,9 +27,3 @@ export default async function handler(
     }
   }
 }
-
-const statusSchema = z.enum(['draft', 'pending', 'paid'])
-
-const querySchema = z.object({
-  status: z.union([statusSchema, z.array(statusSchema)]).optional(),
-})
