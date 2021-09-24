@@ -88,6 +88,7 @@ it('should show a list of invoice summaries filtered by status', async () => {
   // select only draft invoices
   userEvent.selectOptions(filterSelect, draftOption)
 
+  await waitForElementToBeRemoved(() => screen.getByText(pendingInvoice.id))
   await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
 
   expect(screen.getByText(draftInvoice.id)).toBeInTheDocument()
@@ -102,11 +103,36 @@ it('should show a list of invoice summaries filtered by status', async () => {
   expect(screen.getByText(draftInvoice.id)).toBeInTheDocument()
   expect(screen.getByText(pendingInvoice.id)).toBeInTheDocument()
   expect(screen.queryByText(paidInvoice.id)).not.toBeInTheDocument()
+})
+it('should allow filtering through the URL', async () => {
+  const draftInvoice = buildMockInvoiceDetail({ status: 'draft' })
+  const pendingInvoice = buildMockInvoiceDetail({ status: 'pending' })
+  const paidInvoice = buildMockInvoiceDetail({ status: 'paid' })
 
-  // deselect both so filter is empty
-  userEvent.deselectOptions(filterSelect, [draftOption, pendingOption])
+  invoiceModel.initialise([draftInvoice, pendingInvoice, paidInvoice])
 
-  await screen.findByText(paidInvoice.id)
+  const { render } = await getPage({
+    route: '/?status=draft',
+  })
+
+  render()
+
+  await waitForElementToBeRemoved(screen.getByText(/loading/i))
+
+  const filterSelect = screen.getByRole('listbox', {
+    name: /filter by status/i,
+  })
+  const draftOption = screen.getByRole('option', { name: /draft/i })
+  expect(draftOption).toHaveProperty('selected', true)
+
+  expect(screen.getByText(draftInvoice.id)).toBeInTheDocument()
+  expect(screen.queryByText(pendingInvoice.id)).not.toBeInTheDocument()
+  expect(screen.queryByText(paidInvoice.id)).not.toBeInTheDocument()
+
+  userEvent.deselectOptions(filterSelect, draftOption)
+
+  await screen.findByText(pendingInvoice.id)
+
   expect(screen.getByText(draftInvoice.id)).toBeInTheDocument()
   expect(screen.getByText(pendingInvoice.id)).toBeInTheDocument()
   expect(screen.getByText(paidInvoice.id)).toBeInTheDocument()

@@ -1,11 +1,12 @@
-import { Drawer, useDrawer } from 'src/client/shared/components/drawer'
 import {
+  ChangeEventHandler,
   MouseEventHandler,
   TableHTMLAttributes,
   useCallback,
+  useMemo,
   useRef,
-  useState,
 } from 'react'
+import { Drawer, useDrawer } from 'src/client/shared/components/drawer'
 import {
   cell,
   drawerTitle,
@@ -33,18 +34,33 @@ import { StatusBadge } from 'src/client/shared/components/status-badge'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { inflect } from 'src/client/shared/grammar'
+import { toArray } from 'src/shared/array'
 import { useId } from '@react-aria/utils'
+import { useRouter } from 'next/router'
 import { useScreenReaderNotification } from 'src/client/shared/components/screen-reader-notification'
 
+type InvoiceStatus = InvoiceSummary['status']
+const statuses: InvoiceSummary['status'][] = ['draft', 'pending', 'paid']
+
 export function InvoiceSummaryScreen(): JSX.Element {
-  const [filterStatus, setFilterStatus] = useState<InvoiceSummary['status'][]>(
-    []
-  )
+  const router = useRouter()
+
+  const filterStatusNew: InvoiceSummary['status'][] = useMemo(() => {
+    if (router.isReady && router.query.status) {
+      const unvalidatedStatuses = toArray(router.query.status)
+      // TODO fix the typing
+      return unvalidatedStatuses.filter((unvalidatedStatus) =>
+        statuses.includes(unvalidatedStatus as InvoiceStatus)
+      ) as InvoiceStatus[]
+    }
+    return []
+  }, [router.isReady, router.query.status])
 
   const listQuery = useInvoiceSummaries({
     filters: {
-      status: filterStatus,
+      status: filterStatusNew,
     },
+    enabled: router.isReady,
   })
   const { notify } = useScreenReaderNotification()
   const headingId = useId()
@@ -63,6 +79,26 @@ export function InvoiceSummaryScreen(): JSX.Element {
     [close, createInvoiceMutation]
   )
 
+  const handleFilterSelectChange: ChangeEventHandler<HTMLSelectElement> =
+    useCallback(
+      ({ target: { selectedOptions } }) => {
+        const selectedStatuses = Array.from(selectedOptions).map(
+          (option) => option.value as InvoiceSummary['status']
+        )
+
+        const searchParams = new URLSearchParams()
+        selectedStatuses.forEach((status) => {
+          searchParams.append('status', status)
+        })
+
+        const searchParamsString = searchParams.toString()
+        const queryString = searchParamsString ? `?${searchParamsString}` : ''
+
+        router.push(`${router.pathname}${queryString}`)
+      },
+      [router]
+    )
+
   return (
     <>
       <header className={header}>
@@ -76,25 +112,21 @@ export function InvoiceSummaryScreen(): JSX.Element {
           Filter by status
           <select
             multiple
-            value={filterStatus}
-            onChange={(event) =>
-              setFilterStatus(
-                Array.from(event.target.selectedOptions).map(
-                  (option) => option.value as InvoiceSummary['status']
-                )
-              )
-            }
+            value={filterStatusNew}
+            onChange={handleFilterSelectChange}
           >
-            <option value="draft">Draft</option>
-            <option value="pending">Pending</option>
-            <option value="paid">Paid</option>
+            {statuses.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
           </select>
         </label>
         <Button type="button" icon="plus" onClick={() => open()}>
           New Invoice
         </Button>
       </header>
-      {listQuery.isLoading ? <div>Loading...</div> : null}
+      {listQuery.isLoading || listQuery.isIdle ? <div>Loading...</div> : null}
       {listQuery.isSuccess ? (
         <Table
           aria-labelledby={headingId}

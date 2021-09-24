@@ -49,14 +49,17 @@ const invoiceKeys = {
 type UseInvoiceSummariesProps<TData> = {
   filters?: { status?: InvoiceSummary['status'][] }
   select?: (invoices: Array<InvoiceSummary>) => TData
+  enabled?: boolean
 }
 
 export function useInvoiceSummaries<TData = Array<InvoiceSummary>>({
   filters = emptyFilters,
   select,
+  enabled,
 }: UseInvoiceSummariesProps<TData> = {}): UseQueryResult<TData> {
   return useQuery(invoiceKeys.list(filters), () => getInvoices(filters), {
     select,
+    enabled,
   })
 }
 
