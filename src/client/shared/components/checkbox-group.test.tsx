@@ -4,6 +4,10 @@ import { render, screen, within } from '@testing-library/react'
 import { useState } from 'react'
 import { userEvent } from 'src/client/test/test-utils'
 
+afterEach(() => {
+  jest.restoreAllMocks()
+})
+
 it('should render a group of checkboxes, defaulting to unchecked', () => {
   render(
     <CheckboxGroup label="pet">
@@ -94,4 +98,17 @@ it('should accept default values', () => {
 
   expect(screen.getByRole('checkbox', { name: /cat/i })).toBeChecked()
   expect(screen.getByRole('checkbox', { name: /dog/i })).not.toBeChecked()
+})
+it('should throw if Checkbox used outside CheckboxGroup', () => {
+  const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation()
+
+  expect(() =>
+    render(<Checkbox value="bad">Bad</Checkbox>)
+  ).toThrowErrorMatchingInlineSnapshot(
+    `"A <Checkbox> can only be used within a <CheckboxGroup> component"`
+  )
+
+  expect(consoleErrorMock).toHaveBeenCalled()
+
+  consoleErrorMock.mockRestore()
 })
