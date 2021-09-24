@@ -76,6 +76,7 @@ export function InvoiceSummaryScreen(): JSX.Element {
           Filter by status
           <select
             multiple
+            value={filterStatus}
             onChange={(event) =>
               setFilterStatus(
                 Array.from(event.target.selectedOptions).map(
