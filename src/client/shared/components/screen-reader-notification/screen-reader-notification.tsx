@@ -1,6 +1,6 @@
 import { ReactNode, createContext, useContext, useMemo, useState } from 'react'
 
-import { screenReaderOnly } from '../styles/accessibility.css'
+import { screenReaderOnly } from 'src/client/shared/styles/accessibility.css'
 
 type ScreenReaderNotificationContext = {
   notify: (message: string) => void

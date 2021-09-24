@@ -5,7 +5,7 @@ import {
 } from '@vanilla-extract/css'
 
 import { recipe } from '@vanilla-extract/recipes'
-import { themeVars } from '../styles/theme.css'
+import { themeVars } from 'src/client/shared/styles/theme.css'
 
 const size = createVar()
 

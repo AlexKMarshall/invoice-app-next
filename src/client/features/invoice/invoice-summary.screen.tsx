@@ -1,4 +1,12 @@
 import {
+  Button,
+  Drawer,
+  Heading,
+  StatusBadge,
+  useDrawer,
+  useScreenReaderNotification,
+} from 'src/client/shared/components'
+import {
   ChangeEventHandler,
   MouseEventHandler,
   TableHTMLAttributes,
@@ -6,7 +14,6 @@ import {
   useMemo,
   useRef,
 } from 'react'
-import { Drawer, useDrawer } from 'src/client/shared/components/drawer'
 import {
   cell,
   drawerTitle,
@@ -22,22 +29,18 @@ import {
 } from './invoice-summary.screen.css'
 import { useCreateInvoice, useInvoiceSummaries } from './invoice.queries'
 
-import { ArrowRight } from 'src/client/shared/icons/arrow-right'
-import { Button } from 'src/client/shared/components/button'
-import { Heading } from 'src/client/shared/components/typography'
+import { ArrowRight } from 'src/client/shared/icons/'
 import Image from 'next/image'
 import { InvoiceForm } from './invoice-form'
 import { InvoiceSummary } from './invoice.types'
 import Link from 'next/link'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
-import { StatusBadge } from 'src/client/shared/components/status-badge'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { inflect } from 'src/client/shared/grammar'
 import { toArray } from 'src/shared/array'
 import { useId } from '@react-aria/utils'
 import { useRouter } from 'next/router'
-import { useScreenReaderNotification } from 'src/client/shared/components/screen-reader-notification'
 
 type InvoiceStatus = InvoiceSummary['status']
 const statuses: InvoiceSummary['status'][] = ['draft', 'pending', 'paid']

@@ -1,3 +1,4 @@
+import { Button, IconButton, Input } from 'src/client/shared/components'
 import { NewInvoiceInputDTO, UpdateInvoiceInputDTO } from 'src/shared/dtos'
 import {
   buttonGroup,
@@ -17,10 +18,7 @@ import {
 } from './invoice-form.css'
 import { useFieldArray, useForm } from 'react-hook-form'
 
-import { Button } from 'src/client/shared/components/button'
-import { Delete } from 'src/client/shared/icons/delete'
-import { IconButton } from 'src/client/shared/components/icon-button'
-import { Input } from 'src/client/shared/components/input'
+import { Delete } from 'src/client/shared/icons'
 import { format } from 'date-fns'
 import { newInvoiceInputDtoSchema } from 'src/shared/invoice.schema'
 import { useId } from '@react-aria/utils'

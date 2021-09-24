@@ -1,3 +1,5 @@
+import * as styles from './checkbox-group.css'
+
 import {
   AriaCheckboxGroupItemProps,
   AriaCheckboxGroupProps,
@@ -7,16 +9,10 @@ import {
   useCheckboxGroupState,
 } from '@react-stately/checkbox'
 import { ReactNode, createContext, useContext, useRef } from 'react'
-import {
-  checkbox,
-  checkboxGroup,
-  checkboxWrapper,
-  checkmark,
-} from './checkbox-group.css'
 import { useCheckboxGroup, useCheckboxGroupItem } from '@react-aria/checkbox'
 
-import { Check } from '../icons/check'
-import { screenReaderOnly } from '../styles/accessibility.css'
+import { Check } from 'src/client/shared/icons'
+import { screenReaderOnly } from 'src/client/shared/styles/accessibility.css'
 
 const CheckboxGroupContext = createContext<CheckboxGroupState | null>(null)
 
@@ -28,7 +24,7 @@ export function CheckboxGroup(
   const { groupProps, labelProps } = useCheckboxGroup(props, state)
 
   return (
-    <div {...groupProps} className={checkboxGroup}>
+    <div {...groupProps} className={styles.checkboxGroup}>
       {label ? <span {...labelProps}>{label}</span> : null}
       <CheckboxGroupContext.Provider value={state}>
         {children}
@@ -51,10 +47,10 @@ export function Checkbox(
   const { inputProps } = useCheckboxGroupItem(props, state, ref)
 
   return (
-    <label className={checkboxWrapper}>
+    <label className={styles.checkboxWrapper}>
       <input {...inputProps} ref={ref} className={screenReaderOnly} />
-      <div aria-hidden className={checkbox}>
-        <Check className={checkmark} />
+      <div aria-hidden className={styles.checkbox}>
+        <Check className={styles.checkmark} />
       </div>
       <span>{children}</span>
     </label>

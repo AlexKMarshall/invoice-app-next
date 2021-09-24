@@ -9,7 +9,7 @@ import {
 } from './layout.css'
 
 import Image from 'next/image'
-import { Logo } from '../icons/logo'
+import { Logo } from 'src/client/shared/icons'
 import { ReactNode } from 'react'
 
 type Props = {

@@ -2,14 +2,14 @@ import 'src/client/shared/styles/global.css'
 import 'src/client/shared/styles/reset.css'
 
 import {
+  ConfirmationDialogProvider,
   DrawerContainer,
   DrawerOverlayContainer,
   DrawerProvider,
-} from 'src/client/shared/components/drawer'
+} from 'src/client/shared/components'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { AppProps } from 'next/app'
-import { ConfirmationDialogProvider } from 'src/client/shared/components/confirmation-dialog'
 import { Layout } from 'src/client/shared/components/layout'
 import { OverlayProvider } from '@react-aria/overlays'
 import { SSRProvider } from '@react-aria/ssr'
