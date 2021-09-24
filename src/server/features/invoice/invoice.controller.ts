@@ -36,13 +36,28 @@ type ControllerErrorResponse<TError = unknown> = {
   }
 }
 
+type InvoiceStatus = InvoiceDetail['status']
+type GetInvoiceQuery = {
+  status?: InvoiceStatus | InvoiceStatus[]
+}
 export const getInvoiceSummaries = withErrorHandler(
-  function getInvoiceSummaries(): ControllerResponse<GetInvoiceSummaryDTO> {
+  function getInvoiceSummaries({
+    status,
+  }: GetInvoiceQuery = {}): ControllerResponse<GetInvoiceSummaryDTO> {
+    const filterQuery = status ? { status: toArray(status) } : {}
+
     return invoiceModel
-      .findAll()
+      .findAll(filterQuery)
       .then((invoices) => ({ code: 200, response: { data: { invoices } } }))
   }
 )
+
+function toArray<T>(input: T | T[]): T[] {
+  if (Array.isArray(input)) {
+    return input
+  }
+  return [input]
+}
 
 export const getInvoiceDetail = withErrorHandler(function getInvoiceDetail(
   id: string

@@ -8,6 +8,7 @@ import {
   invoiceDetailToSummary,
 } from 'src/server/features/invoice/invoice.mappers'
 
+import { InvoiceDetail } from 'src/server/features/invoice/invoice.types'
 import handler from 'src/pages/api/invoices'
 import { idRegex } from 'src/shared/identifier'
 import { testApiHandler } from 'next-test-api-route-handler'
@@ -36,7 +37,7 @@ it('should get invoice summaries', async () => {
 
       expect(data).toEqual({
         data: {
-          invoices: expect.arrayContaining(
+          invoices: expect.toIncludeSameMembers(
             JSON.parse(JSON.stringify(mockInvoices.map(invoiceDetailToSummary)))
           ),
         },
@@ -44,6 +45,93 @@ it('should get invoice summaries', async () => {
     },
   })
 })
+it('should allow filtering the invoice summaries by a single status', async () => {
+  expect.hasAssertions()
+
+  const allInvoices = [
+    buildMockInvoiceDetail({ status: 'draft' }),
+    buildMockInvoiceDetail({ status: 'pending' }),
+    buildMockInvoiceDetail({ status: 'paid' }),
+  ]
+
+  await database.seedInvoices(...allInvoices)
+
+  const status: InvoiceDetail['status'] = 'draft'
+
+  const expectedInvoices = allInvoices.filter(
+    (invoice) => invoice.status === status
+  )
+
+  const params = new URLSearchParams()
+  params.append('status', status)
+
+  await testApiHandler({
+    handler,
+    url: `/?${params}`,
+    test: async ({ fetch }) => {
+      const response = await fetch({ method: 'GET' })
+
+      expect(response.status).toBe(200)
+
+      const data = await response.json()
+
+      expect(data).toEqual({
+        data: {
+          invoices: expect.toIncludeSameMembers(
+            JSON.parse(
+              JSON.stringify(expectedInvoices.map(invoiceDetailToSummary))
+            )
+          ),
+        },
+      })
+    },
+  })
+})
+it('should allow filtering the invoice summaries by multiple status as OR', async () => {
+  expect.hasAssertions()
+
+  const allInvoices = [
+    buildMockInvoiceDetail({ status: 'draft' }),
+    buildMockInvoiceDetail({ status: 'pending' }),
+    buildMockInvoiceDetail({ status: 'paid' }),
+  ]
+
+  await database.seedInvoices(...allInvoices)
+
+  const statuses: InvoiceDetail['status'][] = ['draft', 'paid']
+
+  const expectedInvoices = allInvoices.filter((invoice) =>
+    statuses.includes(invoice.status)
+  )
+
+  const params = new URLSearchParams()
+  statuses.forEach((status) => {
+    params.append('status', status)
+  })
+
+  await testApiHandler({
+    handler,
+    url: `/?${params}`,
+    test: async ({ fetch }) => {
+      const response = await fetch({ method: 'GET' })
+
+      expect(response.status).toBe(200)
+
+      const data = await response.json()
+
+      expect(data).toEqual({
+        data: {
+          invoices: expect.toIncludeSameMembers(
+            JSON.parse(
+              JSON.stringify(expectedInvoices.map(invoiceDetailToSummary))
+            )
+          ),
+        },
+      })
+    },
+  })
+})
+it.todo('should reject invalid query params')
 
 it('should post a pending invoice', async () => {
   expect.hasAssertions()

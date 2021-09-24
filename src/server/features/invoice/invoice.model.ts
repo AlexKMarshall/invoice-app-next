@@ -11,7 +11,7 @@ import { generateAlphanumericId } from 'src/shared/identifier'
 import prisma from 'src/server/prisma'
 import { round2dp } from 'src/shared/number'
 
-function dbFindAllSummaries() {
+function dbFindAllSummaries(where?: Prisma.InvoiceWhereInput) {
   return prisma.invoice.findMany({
     select: {
       id: true,
@@ -34,6 +34,7 @@ function dbFindAllSummaries() {
       },
       status: true,
     },
+    where,
   })
 }
 
@@ -90,8 +91,12 @@ function dbSummaryToInvoiceSummary(
   return { id, paymentDue, clientName, amountDue, status }
 }
 
-export function findAll(): Promise<Array<InvoiceSummary>> {
-  return dbFindAllSummaries().then((rawInvoices) =>
+export function findAll({ status }: { status?: InvoiceStatus[] } = {}): Promise<
+  Array<InvoiceSummary>
+> {
+  const where = status ? { status: { in: status } } : {}
+
+  return dbFindAllSummaries(where).then((rawInvoices) =>
     rawInvoices
       .map((rawInvoice) => invoiceSummaryDbSchema.parse(rawInvoice))
       .map(dbSummaryToInvoiceSummary)
