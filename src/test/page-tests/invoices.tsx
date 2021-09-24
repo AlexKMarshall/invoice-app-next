@@ -7,7 +7,6 @@ import {
 } from 'src/client/test/mocks/invoice.fixtures'
 import {
   fillInInvoiceForm,
-  render,
   screen,
   userEvent,
   waitFor,
@@ -15,10 +14,10 @@ import {
   within,
 } from 'src/client/test/test-utils'
 
-import { InvoiceSummaryScreen } from './invoice-summary.screen'
 import { format } from 'date-fns'
+import { getPage } from 'next-page-tester'
 import { idRegex } from 'src/shared/identifier'
-import { invoiceDetailFromInput } from './invoice.mappers'
+import { invoiceDetailFromInput } from 'src/client/features/invoice/invoice.mappers'
 import { validateGBPValue } from 'src/test/validators'
 
 it('should show list of invoice summaries', async () => {
@@ -30,7 +29,12 @@ it('should show list of invoice summaries', async () => {
   const mockInvoiceSummaries = mockInvoiceDetails.map(
     invoiceModel.invoiceDetailToSummary
   )
-  render(<InvoiceSummaryScreen />)
+
+  const { render } = await getPage({
+    route: '/',
+  })
+
+  render()
 
   expect(screen.getByRole('heading', { name: /invoices/i })).toBeInTheDocument()
   await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
@@ -66,7 +70,12 @@ it('should show a list of invoice summaries filtered by status', async () => {
 
   invoiceModel.initialise([draftInvoice, pendingInvoice, paidInvoice])
 
-  render(<InvoiceSummaryScreen />)
+  const { render } = await getPage({
+    route: '/',
+  })
+
+  render()
+
   await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
   expect(screen.getByText(draftInvoice.id)).toBeInTheDocument()
   expect(screen.getByText(pendingInvoice.id)).toBeInTheDocument()
@@ -106,7 +115,11 @@ it('should show a list of invoice summaries filtered by status', async () => {
 it('should show empty state when there are no invoices', async () => {
   invoiceModel.initialise([])
 
-  render(<InvoiceSummaryScreen />)
+  const { render } = await getPage({
+    route: '/',
+  })
+
+  render()
 
   await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
   expect(screen.getByText(/no invoices/i)).toBeInTheDocument()
@@ -114,15 +127,24 @@ it('should show empty state when there are no invoices', async () => {
     screen.getByRole('heading', { name: /there is nothing here/i })
   ).toBeInTheDocument()
 })
-it('should not show new invoice form until button is clicked', () => {
-  render(<InvoiceSummaryScreen />)
+it('should not show new invoice form until button is clicked', async () => {
+  const { render } = await getPage({
+    route: '/',
+  })
+
+  render()
 
   expect(
     screen.queryByRole('form', { name: /new invoice/i })
   ).not.toBeInTheDocument()
 })
 it('should validate that fields are filled in when creating pending invoice', async () => {
-  render(<InvoiceSummaryScreen />)
+  const { render } = await getPage({
+    route: '/',
+  })
+
+  render()
+
   userEvent.click(screen.getByRole('button', { name: /new invoice/i }))
 
   userEvent.click(screen.getByRole('button', { name: /save & send/i }))
@@ -205,7 +227,12 @@ it('should allow new draft invoices to be creacted', async () => {
   const mockInvoiceSummary = invoiceModel.invoiceDetailToSummary(
     invoiceDetailFromInput(mockDraftInvoiceInput)
   )
-  render(<InvoiceSummaryScreen />)
+
+  const { render } = await getPage({
+    route: '/',
+  })
+
+  render()
 
   await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
 
@@ -282,7 +309,11 @@ it('should allow new pending invoices to be creacted', async () => {
   const mockInvoiceSummary = invoiceModel.invoiceDetailToSummary(
     invoiceDetailFromInput(mockPendingInvoiceInput)
   )
-  render(<InvoiceSummaryScreen />)
+  const { render } = await getPage({
+    route: '/',
+  })
+
+  render()
 
   await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
 
@@ -346,8 +377,12 @@ it('should allow new pending invoices to be creacted', async () => {
     inInvoiceTable.getByRole('link', { name: savedInvoiceId })
   ).toHaveAttribute('href', `/invoices/${savedInvoiceId}`)
 }, 10000)
-it('should be possible to cancel the new invoice form', () => {
-  render(<InvoiceSummaryScreen />)
+it('should be possible to cancel the new invoice form', async () => {
+  const { render } = await getPage({
+    route: '/',
+  })
+
+  render()
 
   expect(screen.getByRole('heading', { name: /invoices/i })).toBeInTheDocument()
 
@@ -363,4 +398,25 @@ it('should be possible to cancel the new invoice form', () => {
     screen.queryByRole('form', { name: /new invoice/i })
   ).not.toBeInTheDocument()
   expect(screen.getByRole('heading', { name: /invoices/i })).toBeInTheDocument()
+})
+it('should go to invoice detail page when clicking on invoice link', async () => {
+  const invoice = buildMockInvoiceDetail()
+  invoiceModel.initialise([invoice])
+
+  const { render } = await getPage({
+    route: '/',
+  })
+
+  render()
+
+  await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
+  userEvent.click(screen.getByRole('row'))
+
+  await waitForElementToBeRemoved(() =>
+    screen.getByRole('heading', { name: /invoices/i })
+  )
+
+  await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
+
+  expect(screen.getByRole('heading', { name: invoice.id }))
 })

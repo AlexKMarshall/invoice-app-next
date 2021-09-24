@@ -15,8 +15,6 @@ import { OverlayProvider } from '@react-aria/overlays'
 import { SSRProvider } from '@react-aria/ssr'
 import { ScreenReaderNotificationProvider } from 'src/client/shared/components/screen-reader-notification'
 
-const queryClient = new QueryClient()
-
 if (
   process.env.NEXT_PUBLIC_API_MOCKING === 'enabled' &&
   typeof window !== 'undefined'
@@ -27,6 +25,8 @@ if (
 }
 
 function MyApp({ Component, pageProps }: AppProps): JSX.Element {
+  const queryClient = new QueryClient()
+
   return (
     <SSRProvider>
       <QueryClientProvider client={queryClient}>
