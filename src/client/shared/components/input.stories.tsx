@@ -4,7 +4,7 @@ import { Input } from './input'
 import React from 'react'
 
 export default {
-  title: 'Example/Input',
+  title: 'Input',
   component: Input,
   argTypes: {
     backgroundColor: { control: 'color' },
