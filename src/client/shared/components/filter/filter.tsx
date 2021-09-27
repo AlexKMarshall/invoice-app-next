@@ -8,9 +8,11 @@ import {
   useOverlayTrigger,
 } from '@react-aria/overlays'
 import React, { ReactNode, RefObject, useRef } from 'react'
+import { downChevron, filterButton } from './filter.css'
 import { mergeProps, useId } from '@react-aria/utils'
 
 import { AriaLabelingProps } from '@react-types/shared'
+import { ArrowDown } from '../../icons/arrow-down'
 import { FocusScope } from '@react-aria/focus'
 import { useButton } from '@react-aria/button'
 import { useDialog } from '@react-aria/dialog'
@@ -54,9 +56,15 @@ function Popover({
 type FilterProps = {
   label: string
   id?: string
+  className?: string
   children: ReactNode
 }
-export function Filter({ label, children, id }: FilterProps): JSX.Element {
+export function Filter({
+  label,
+  children,
+  id,
+  className,
+}: FilterProps): JSX.Element {
   const state = useOverlayTriggerState({})
 
   const triggerRef = useRef(null)
@@ -86,8 +94,14 @@ export function Filter({ label, children, id }: FilterProps): JSX.Element {
 
   return (
     <>
-      <button {...buttonProps} {...triggerProps} ref={triggerRef}>
+      <button
+        {...buttonProps}
+        {...triggerProps}
+        ref={triggerRef}
+        className={`${filterButton} ${className}`}
+      >
         {label}
+        <ArrowDown className={downChevron} />
       </button>
       {state.isOpen && (
         <OverlayContainer>

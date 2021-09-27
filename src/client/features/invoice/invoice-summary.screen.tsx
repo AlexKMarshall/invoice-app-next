@@ -125,20 +125,7 @@ export function InvoiceSummaryScreen(): JSX.Element {
             <Checkbox value="paid">Paid</Checkbox>
           </CheckboxGroup>
         </Filter>
-        {/* <label>
-          Filter by status
-          <select
-            multiple
-            value={filterStatuses}
-            onChange={handleFilterSelectChange}
-          >
-            {statuses.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-        </label> */}
+
         <Button type="button" icon="plus" onClick={() => open()}>
           New Invoice
         </Button>
