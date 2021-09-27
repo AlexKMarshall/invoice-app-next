@@ -44,6 +44,7 @@ export const invoiceId = style({
   color: themeVars.color.text.strong,
   fontWeight: themeVars.typography.fontWeight.bold,
   textDecoration: 'none',
+  textTransform: 'uppercase',
 
   ':before': {
     content: `'#'`,

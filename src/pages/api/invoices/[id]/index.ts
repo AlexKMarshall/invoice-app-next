@@ -45,5 +45,8 @@ export default async function handler(
 }
 
 const queryParamsSchema = z.object({
-  id: z.string().regex(idRegex),
+  id: z
+    .string()
+    .regex(new RegExp(idRegex, 'i')) // we don't care about casing in the url
+    .transform((id) => id.toLowerCase()), // however in database it's stored as lowercase
 })
