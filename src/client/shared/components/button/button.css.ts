@@ -2,7 +2,7 @@ import { createThemeContract, createVar, style } from '@vanilla-extract/css'
 
 import { calc } from '@vanilla-extract/css-utils'
 import { recipe } from '@vanilla-extract/recipes'
-import { themeVars } from '../styles/theme.css'
+import { themeVars } from 'src/client/shared/styles/theme.css'
 
 const horizontalPadding = createVar()
 const verticalPadding = createVar()

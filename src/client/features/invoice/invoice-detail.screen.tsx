@@ -2,7 +2,14 @@ import {
   Address as AddressType,
   InvoiceDetail,
 } from 'src/client/features/invoice/invoice.types'
-import { Drawer, useDrawer } from 'src/client/shared/components/drawer'
+import {
+  Button,
+  Drawer,
+  StatusBadge,
+  useConfirmationDialog,
+  useDrawer,
+  useScreenReaderNotification,
+} from 'src/client/shared/components'
 import {
   addressWrapper,
   backButton,
@@ -31,19 +38,15 @@ import {
   useUpdateInvoice,
 } from './invoice.queries'
 
-import { ArrowLeft } from 'src/client/shared/icons/arrow-left'
-import { Button } from 'src/client/shared/components/button'
+import { ArrowLeft } from 'src/client/shared/icons'
 import { Except } from 'type-fest'
 import { InvoiceForm } from './invoice-form'
 import { ReactNode } from 'hoist-non-react-statics/node_modules/@types/react'
-import { StatusBadge } from 'src/client/shared/components/status-badge'
 import { UpdateInvoiceInputDTO } from 'src/shared/dtos'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { useCallback } from 'react'
-import { useConfirmationDialog } from 'src/client/shared/components/confirmation-dialog'
 import { useRouter } from 'next/router'
-import { useScreenReaderNotification } from 'src/client/shared/components/screen-reader-notification'
 
 type Props = {
   id: InvoiceDetail['id']

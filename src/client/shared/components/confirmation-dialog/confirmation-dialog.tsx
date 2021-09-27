@@ -23,7 +23,7 @@ import {
 } from './confirmation-dialog.css'
 
 import { AriaDialogProps } from '@react-types/dialog'
-import { Button } from './button'
+import { Button } from 'src/client/shared/components'
 import { FocusScope } from '@react-aria/focus'
 import { useDialog } from '@react-aria/dialog'
 

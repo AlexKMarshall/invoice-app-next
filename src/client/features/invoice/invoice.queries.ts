@@ -20,24 +20,47 @@ import {
 import { invoiceDetailFromInput } from './invoice.mappers'
 import { nanoid } from 'nanoid'
 
+type InvoiceSummaryFilters = {
+  status?: InvoiceSummary['status'][]
+}
+
+const emptyFilters: InvoiceSummaryFilters = { status: [] }
+
+function normaliseFilters(
+  filters: InvoiceSummaryFilters
+): InvoiceSummaryFilters {
+  if (filters.status) {
+    const sortedStatus = [...filters.status].sort()
+    return { status: sortedStatus }
+  }
+
+  return filters
+}
+
 const invoiceKeys = {
   all: ['invoices'] as const,
   lists: () => [...invoiceKeys.all, 'list'] as const,
-  list: (filters = '') => [...invoiceKeys.lists(), { filters }] as const,
+  list: (filters: InvoiceSummaryFilters = emptyFilters) =>
+    [...invoiceKeys.lists(), { filters: normaliseFilters(filters) }] as const,
   details: () => [...invoiceKeys.all, 'detail'] as const,
   detail: (id: string) => [...invoiceKeys.details(), id] as const,
 }
 
 type UseInvoiceSummariesProps<TData> = {
-  filters?: string
+  filters?: { status?: InvoiceSummary['status'][] }
   select?: (invoices: Array<InvoiceSummary>) => TData
+  enabled?: boolean
 }
 
 export function useInvoiceSummaries<TData = Array<InvoiceSummary>>({
-  filters = '',
+  filters = emptyFilters,
   select,
+  enabled,
 }: UseInvoiceSummariesProps<TData> = {}): UseQueryResult<TData> {
-  return useQuery(invoiceKeys.list(filters), getInvoices, { select })
+  return useQuery(invoiceKeys.list(filters), () => getInvoices(filters), {
+    select,
+    enabled,
+  })
 }
 
 type useInvoiceDetailOptions = {

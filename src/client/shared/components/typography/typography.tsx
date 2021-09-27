@@ -1,5 +1,5 @@
 import { BaseHTMLAttributes } from 'react'
-import { heading } from 'src/client/shared/components/typography.css'
+import { heading } from './typography.css'
 
 type HeadingLevel = 1 | 2 | 3
 

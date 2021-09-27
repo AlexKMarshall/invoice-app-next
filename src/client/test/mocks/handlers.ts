@@ -16,6 +16,7 @@ import {
   invoiceDetailFromInput,
 } from 'src/client/features/invoice/invoice.mappers'
 
+import { InvoiceDetail } from 'src/server/features/invoice/invoice.types'
 import { parseJSON } from 'date-fns'
 import { rest } from 'msw'
 
@@ -25,7 +26,11 @@ export const handlers = [
   rest.get<EmptyObject, GetInvoiceSummaryDTO, EmptyObject>(
     '/api/invoices',
     async (req, res, ctx) => {
-      const invoices = await invoiceModel.findAll()
+      const status = req.url.searchParams.getAll('status') as
+        | InvoiceDetail['status'][]
+        | undefined
+      const filter = status && status.length > 0 ? { status } : {}
+      const invoices = await invoiceModel.findAll(filter)
       return res(ctx.status(200), ctx.json({ data: { invoices } }))
     }
   ),

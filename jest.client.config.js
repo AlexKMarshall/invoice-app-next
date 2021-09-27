@@ -28,4 +28,5 @@ module.exports = {
     '<rootDir>/src/client/test',
   ],
   coverageDirectory: './coverage/client',
+  testTimeout: 20000,
 }

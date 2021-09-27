@@ -4,7 +4,7 @@ import React from 'react'
 import { StatusBadge } from './status-badge'
 
 export default {
-  title: 'Example/StatusBadge',
+  title: 'StatusBadge',
   component: StatusBadge,
 } as ComponentMeta<typeof StatusBadge>
 

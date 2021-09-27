@@ -1,8 +1,8 @@
-import { button, iconSvg, iconWrapper, prefixContent } from './button.css'
+import * as styles from './button.css'
 
 import { ButtonHTMLAttributes } from 'react'
 import { Except } from 'type-fest'
-import { Plus } from '../icons/plus'
+import { Plus } from 'src/client/shared/icons'
 import { assignInlineVars } from '@vanilla-extract/dynamic'
 
 type Icon = 'plus'
@@ -29,7 +29,7 @@ export function Button({
 
   const additionalStyle = prefix
     ? assignInlineVars({
-        [prefixContent]: `'${prefix}`,
+        [styles.prefixContent]: `'${prefix}`,
       })
     : undefined
 
@@ -37,7 +37,7 @@ export function Button({
     <button
       type="button"
       {...props}
-      className={`${button({ color, kind })} ${className}`}
+      className={`${styles.button({ color, kind })} ${className}`}
       style={additionalStyle}
     >
       {icon ? <Icon icon={icon} /> : null}
@@ -56,8 +56,8 @@ type IconProps = {
 function Icon({ icon }: IconProps) {
   const SvgComponent = ICON_SVGS[icon]
   return (
-    <div className={iconWrapper}>
-      <SvgComponent className={iconSvg} />
+    <div className={styles.iconWrapper}>
+      <SvgComponent className={styles.iconSvg} />
     </div>
   )
 }

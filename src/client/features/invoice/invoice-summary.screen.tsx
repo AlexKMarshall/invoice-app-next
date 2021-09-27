@@ -1,8 +1,19 @@
-import { Drawer, useDrawer } from 'src/client/shared/components/drawer'
+import {
+  Button,
+  Checkbox,
+  CheckboxGroup,
+  Drawer,
+  Filter,
+  Heading,
+  StatusBadge,
+  useDrawer,
+  useScreenReaderNotification,
+} from 'src/client/shared/components'
 import {
   MouseEventHandler,
   TableHTMLAttributes,
   useCallback,
+  useMemo,
   useRef,
 } from 'react'
 import {
@@ -20,23 +31,42 @@ import {
 } from './invoice-summary.screen.css'
 import { useCreateInvoice, useInvoiceSummaries } from './invoice.queries'
 
-import { ArrowRight } from 'src/client/shared/icons/arrow-right'
-import { Button } from 'src/client/shared/components/button'
-import { Heading } from 'src/client/shared/components/typography'
+import { ArrowRight } from 'src/client/shared/icons/'
 import Image from 'next/image'
 import { InvoiceForm } from './invoice-form'
 import { InvoiceSummary } from './invoice.types'
 import Link from 'next/link'
 import { NewInvoiceInputDTO } from 'src/shared/dtos'
-import { StatusBadge } from 'src/client/shared/components/status-badge'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { inflect } from 'src/client/shared/grammar'
+import { toArray } from 'src/shared/array'
 import { useId } from '@react-aria/utils'
-import { useScreenReaderNotification } from 'src/client/shared/components/screen-reader-notification'
+import { useRouter } from 'next/router'
+
+type InvoiceStatus = InvoiceSummary['status']
+const statuses: InvoiceSummary['status'][] = ['draft', 'pending', 'paid']
 
 export function InvoiceSummaryScreen(): JSX.Element {
-  const listQuery = useInvoiceSummaries()
+  const router = useRouter()
+
+  const filterStatuses: InvoiceSummary['status'][] = useMemo(() => {
+    if (router.isReady && router.query.status) {
+      const unvalidatedStatuses = toArray(router.query.status)
+      // TODO fix the typing
+      return unvalidatedStatuses.filter((unvalidatedStatus) =>
+        statuses.includes(unvalidatedStatus as InvoiceStatus)
+      ) as InvoiceStatus[]
+    }
+    return []
+  }, [router.isReady, router.query.status])
+
+  const listQuery = useInvoiceSummaries({
+    filters: {
+      status: filterStatuses,
+    },
+    enabled: router.isReady,
+  })
   const { notify } = useScreenReaderNotification()
   const headingId = useId()
   const { open, close, titleId: drawerTitleId } = useDrawer()
@@ -54,6 +84,27 @@ export function InvoiceSummaryScreen(): JSX.Element {
     [close, createInvoiceMutation]
   )
 
+  const handleFilterSelectChange = useCallback(
+    (selectedStatuses: string[]) => {
+      // const selectedStatuses = Array.from(selectedOptions).map(
+      //   (option) => option.value as InvoiceSummary['status']
+      // )
+
+      const searchParams = new URLSearchParams()
+      selectedStatuses.forEach((status) => {
+        searchParams.append('status', status)
+      })
+
+      const searchParamsString = searchParams.toString()
+      const queryString = searchParamsString ? `?${searchParamsString}` : ''
+
+      router.push(`${router.pathname}${queryString}`)
+    },
+    [router]
+  )
+
+  const filterButtonId = useId()
+
   return (
     <>
       <header className={header}>
@@ -63,11 +114,23 @@ export function InvoiceSummaryScreen(): JSX.Element {
           </Heading>
           <TotalInvoiceCount />
         </div>
+        <Filter label="Filter by status" id={filterButtonId}>
+          <CheckboxGroup
+            aria-labelledby={filterButtonId}
+            value={filterStatuses}
+            onChange={handleFilterSelectChange}
+          >
+            <Checkbox value="draft">Draft</Checkbox>
+            <Checkbox value="pending">Pending</Checkbox>
+            <Checkbox value="paid">Paid</Checkbox>
+          </CheckboxGroup>
+        </Filter>
+
         <Button type="button" icon="plus" onClick={() => open()}>
           New Invoice
         </Button>
       </header>
-      {listQuery.isLoading ? <div>Loading...</div> : null}
+      {listQuery.isLoading || listQuery.isIdle ? <div>Loading...</div> : null}
       {listQuery.isSuccess ? (
         <Table
           aria-labelledby={headingId}

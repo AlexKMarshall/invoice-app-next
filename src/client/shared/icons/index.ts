@@ -1,0 +1,6 @@
+export * from './arrow-left'
+export * from './arrow-right'
+export * from './check'
+export * from './delete'
+export * from './logo'
+export * from './plus'

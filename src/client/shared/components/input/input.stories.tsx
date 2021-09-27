@@ -1,13 +1,10 @@
-import 'src/client/shared/styles/global.css'
-import 'src/client/shared/styles/reset.css'
-
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 
 import { Input } from './input'
 import React from 'react'
 
 export default {
-  title: 'Example/Input',
+  title: 'Input',
   component: Input,
   argTypes: {
     backgroundColor: { control: 'color' },

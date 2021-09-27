@@ -8,6 +8,7 @@ export const header = style({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
+  gap: '1.5rem',
   paddingTop: '72px',
   paddingBottom: '65px',
 })

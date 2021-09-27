@@ -22,6 +22,10 @@ export type GetInvoiceSummaryDTO = {
   }
 }
 
+export type GetInvoiceSummaryQueryParams = {
+  status?: InvoiceStatus[] | InvoiceStatus
+}
+
 export type GetInvoiceDetailDTO = {
   data: {
     invoice: InvoiceDetail

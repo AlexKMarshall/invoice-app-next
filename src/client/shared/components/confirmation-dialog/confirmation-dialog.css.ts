@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css'
-import { themeVars } from '../styles/theme.css'
+import { themeVars } from 'src/client/shared/styles/theme.css'
 
 export const underlay = style({
   position: 'fixed',

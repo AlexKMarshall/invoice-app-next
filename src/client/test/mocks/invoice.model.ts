@@ -14,8 +14,17 @@ type Store = {
 
 const store: Store = { invoices: [] }
 
-export function findAll(): Promise<Array<InvoiceSummary>> {
-  return Promise.resolve(store.invoices.map(invoiceDetailToSummary))
+export function findAll({
+  status,
+}: {
+  status?: InvoiceDetail['status'][]
+} = {}): Promise<Array<InvoiceSummary>> {
+  const invoices =
+    status && status.length > 0
+      ? store.invoices.filter((invoice) => status.includes(invoice.status))
+      : store.invoices
+
+  return Promise.resolve(invoices.map(invoiceDetailToSummary))
 }
 
 export function findById(id: InvoiceDetail['id']): Promise<InvoiceDetail> {
