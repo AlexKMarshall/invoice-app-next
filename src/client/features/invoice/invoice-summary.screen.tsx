@@ -1,13 +1,15 @@
 import {
   Button,
+  Checkbox,
+  CheckboxGroup,
   Drawer,
+  Filter,
   Heading,
   StatusBadge,
   useDrawer,
   useScreenReaderNotification,
 } from 'src/client/shared/components'
 import {
-  ChangeEventHandler,
   MouseEventHandler,
   TableHTMLAttributes,
   useCallback,
@@ -48,7 +50,7 @@ const statuses: InvoiceSummary['status'][] = ['draft', 'pending', 'paid']
 export function InvoiceSummaryScreen(): JSX.Element {
   const router = useRouter()
 
-  const filterStatusNew: InvoiceSummary['status'][] = useMemo(() => {
+  const filterStatuses: InvoiceSummary['status'][] = useMemo(() => {
     if (router.isReady && router.query.status) {
       const unvalidatedStatuses = toArray(router.query.status)
       // TODO fix the typing
@@ -61,7 +63,7 @@ export function InvoiceSummaryScreen(): JSX.Element {
 
   const listQuery = useInvoiceSummaries({
     filters: {
-      status: filterStatusNew,
+      status: filterStatuses,
     },
     enabled: router.isReady,
   })
@@ -82,25 +84,26 @@ export function InvoiceSummaryScreen(): JSX.Element {
     [close, createInvoiceMutation]
   )
 
-  const handleFilterSelectChange: ChangeEventHandler<HTMLSelectElement> =
-    useCallback(
-      ({ target: { selectedOptions } }) => {
-        const selectedStatuses = Array.from(selectedOptions).map(
-          (option) => option.value as InvoiceSummary['status']
-        )
+  const handleFilterSelectChange = useCallback(
+    (selectedStatuses: string[]) => {
+      // const selectedStatuses = Array.from(selectedOptions).map(
+      //   (option) => option.value as InvoiceSummary['status']
+      // )
 
-        const searchParams = new URLSearchParams()
-        selectedStatuses.forEach((status) => {
-          searchParams.append('status', status)
-        })
+      const searchParams = new URLSearchParams()
+      selectedStatuses.forEach((status) => {
+        searchParams.append('status', status)
+      })
 
-        const searchParamsString = searchParams.toString()
-        const queryString = searchParamsString ? `?${searchParamsString}` : ''
+      const searchParamsString = searchParams.toString()
+      const queryString = searchParamsString ? `?${searchParamsString}` : ''
 
-        router.push(`${router.pathname}${queryString}`)
-      },
-      [router]
-    )
+      router.push(`${router.pathname}${queryString}`)
+    },
+    [router]
+  )
+
+  const filterButtonId = useId()
 
   return (
     <>
@@ -111,11 +114,22 @@ export function InvoiceSummaryScreen(): JSX.Element {
           </Heading>
           <TotalInvoiceCount />
         </div>
-        <label>
+        <Filter label="Filter by status" id={filterButtonId}>
+          <CheckboxGroup
+            aria-labelledby={filterButtonId}
+            value={filterStatuses}
+            onChange={handleFilterSelectChange}
+          >
+            <Checkbox value="draft">Draft</Checkbox>
+            <Checkbox value="pending">Pending</Checkbox>
+            <Checkbox value="paid">Paid</Checkbox>
+          </CheckboxGroup>
+        </Filter>
+        {/* <label>
           Filter by status
           <select
             multiple
-            value={filterStatusNew}
+            value={filterStatuses}
             onChange={handleFilterSelectChange}
           >
             {statuses.map((status) => (
@@ -124,7 +138,7 @@ export function InvoiceSummaryScreen(): JSX.Element {
               </option>
             ))}
           </select>
-        </label>
+        </label> */}
         <Button type="button" icon="plus" onClick={() => open()}>
           New Invoice
         </Button>

@@ -81,12 +81,18 @@ it('should show a list of invoice summaries filtered by status', async () => {
   expect(screen.getByText(pendingInvoice.id)).toBeInTheDocument()
   expect(screen.getByText(paidInvoice.id)).toBeInTheDocument()
 
-  const filterSelect = screen.getByRole('listbox', {
-    name: /filter by status/i,
-  })
-  const draftOption = screen.getByRole('option', { name: /draft/i })
-  // select only draft invoices
-  userEvent.selectOptions(filterSelect, draftOption)
+  const filterButton = screen.getByRole('button', { name: /filter by status/i })
+  userEvent.click(filterButton)
+  let checkboxGroup = screen.getByRole('group', { name: /filter by status/i })
+  userEvent.click(
+    within(checkboxGroup).getByRole('checkbox', { name: /draft/i })
+  )
+  // close the filter popover
+  // leaving it open causes state issues with subsequent tests
+  // also it hides underneath elements, so you can't getByRole as they're hidden
+  // RTL doesn't check for aria hidden on getByText though, so get weird results
+  // best to just close it each time
+  userEvent.type(checkboxGroup, '{esc}')
 
   await waitForElementToBeRemoved(() => screen.getByText(pendingInvoice.id))
   await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
@@ -95,9 +101,13 @@ it('should show a list of invoice summaries filtered by status', async () => {
   expect(screen.queryByText(pendingInvoice.id)).not.toBeInTheDocument()
   expect(screen.queryByText(paidInvoice.id)).not.toBeInTheDocument()
 
-  // select additionally pending invoices (it's a multi-select)
-  const pendingOption = screen.getByRole('option', { name: /pending/i })
-  userEvent.selectOptions(filterSelect, pendingOption)
+  // // select additionally pending invoices (it's a multi-select)
+  userEvent.click(filterButton)
+  checkboxGroup = screen.getByRole('group', { name: /filter by status/i })
+  userEvent.click(
+    within(checkboxGroup).getByRole('checkbox', { name: /pending/i })
+  )
+  userEvent.type(checkboxGroup, '{esc}')
 
   await screen.findByText(pendingInvoice.id)
   expect(screen.getByText(draftInvoice.id)).toBeInTheDocument()
@@ -119,17 +129,33 @@ it('should allow filtering through the URL', async () => {
 
   await waitForElementToBeRemoved(screen.getByText(/loading/i))
 
-  const filterSelect = screen.getByRole('listbox', {
+  const filterButton = screen.getByRole('button', {
     name: /filter by status/i,
   })
-  const draftOption = screen.getByRole('option', { name: /draft/i })
-  expect(draftOption).toHaveProperty('selected', true)
+  userEvent.click(filterButton)
+  let checkboxGroup = screen.getByRole('group', {
+    name: /filter by status/i,
+  })
+  const draftOption = within(checkboxGroup).getByRole('checkbox', {
+    name: /draft/i,
+  })
+  expect(draftOption).toBeChecked()
+  userEvent.type(checkboxGroup, '{esc}')
 
   expect(screen.getByText(draftInvoice.id)).toBeInTheDocument()
   expect(screen.queryByText(pendingInvoice.id)).not.toBeInTheDocument()
   expect(screen.queryByText(paidInvoice.id)).not.toBeInTheDocument()
 
-  userEvent.deselectOptions(filterSelect, draftOption)
+  userEvent.click(filterButton)
+  checkboxGroup = screen.getByRole('group', {
+    name: /filter by status/i,
+  })
+  userEvent.click(
+    within(checkboxGroup).getByRole('checkbox', {
+      name: /draft/i,
+    })
+  )
+  userEvent.type(checkboxGroup, '{esc}')
 
   await screen.findByText(pendingInvoice.id)
 

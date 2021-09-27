@@ -24,4 +24,5 @@ Primary.args = {
       <Checkbox value="paid">Paid</Checkbox>
     </>
   ),
+  value: ['draft', 'paid'],
 }
