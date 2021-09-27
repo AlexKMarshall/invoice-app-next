@@ -17,3 +17,11 @@ export const downChevron = style({
   width: '10px',
   color: themeVars.color.text.normal,
 })
+
+export const popover = style({
+  padding: '1.5rem',
+  minWidth: '10rem',
+  backgroundColor: 'white',
+  borderRadius: '8px',
+  boxShadow: `0px 10px 10px ${themeVars.color.shadow}`,
+})

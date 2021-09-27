@@ -8,7 +8,7 @@ import {
   useOverlayTrigger,
 } from '@react-aria/overlays'
 import React, { ReactNode, RefObject, useRef } from 'react'
-import { downChevron, filterButton } from './filter.css'
+import { downChevron, filterButton, popover } from './filter.css'
 import { mergeProps, useId } from '@react-aria/utils'
 
 import { AriaLabelingProps } from '@react-types/shared'
@@ -44,6 +44,7 @@ function Popover({
     <FocusScope restoreFocus autoFocus>
       <div
         {...mergeProps(overlayProps, dialogProps, otherProps, modalProps)}
+        className={popover}
         ref={overlayRef}
       >
         {children}
