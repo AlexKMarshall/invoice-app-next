@@ -1,4 +1,4 @@
-import { createVar, globalStyle, style } from '@vanilla-extract/css'
+import { createVar, style } from '@vanilla-extract/css'
 
 import { calc } from '@vanilla-extract/css-utils'
 import { themeVars } from 'src/client/shared/styles/theme.css'
@@ -77,13 +77,14 @@ export const tableInput = style({
 export const buttonGroup = style([
   {
     display: 'flex',
+    justifyContent: 'flex-end',
     gap: '8px',
   },
   spanFull,
 ])
 
-globalStyle(`${buttonGroup} > :first-child`, {
-  marginRight: 'auto',
+export const marginLeftAuto = style({
+  marginLeft: 'auto',
 })
 
 export const deleteButton = style({

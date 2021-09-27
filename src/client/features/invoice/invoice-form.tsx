@@ -9,6 +9,7 @@ import {
   form,
   gridWrapper,
   itemListHeader,
+  marginLeftAuto,
   spanFull,
   spanHalf,
   spanThird,
@@ -272,16 +273,7 @@ export function InvoiceForm({
         {kind === 'update' ? (
           <>
             <Button type="button" color="muted" onClick={() => onCancel?.()}>
-              Discard
-            </Button>
-            <Button
-              type="submit"
-              color="mono"
-              onClick={() => {
-                setValue('status', 'draft')
-              }}
-            >
-              Save as Draft
+              Cancel
             </Button>
             <Button
               type="submit"
@@ -305,6 +297,7 @@ export function InvoiceForm({
               onClick={() => {
                 setValue('status', 'draft')
               }}
+              className={marginLeftAuto}
             >
               Save as Draft
             </Button>
