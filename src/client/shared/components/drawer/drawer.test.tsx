@@ -137,8 +137,7 @@ it('should close drawer on pressing Esc', () => {
     screen.queryByRole('heading', { name: /my title/i })
   ).not.toBeInTheDocument()
 })
-// not sure why this one isn't working
-it.skip('should close drawer on clicking outside', () => {
+it('should close drawer on clicking outside', () => {
   render(
     <DrawerProvider>
       <Example
