@@ -16,7 +16,7 @@ export const overlay = style({
   maxWidth: '80vw',
   padding: '56px',
   // TODO make this dynamic based on sidebar width
-  paddingLeft: `calc(104px + ${sidebarWidth})`,
+  paddingLeft: `calc(56px + ${sidebarWidth})`,
   backgroundColor: 'white',
   overflowY: 'auto',
 
