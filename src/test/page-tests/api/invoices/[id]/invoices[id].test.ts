@@ -81,7 +81,7 @@ it('should allow updating a pending invoice', async () => {
   const updatedInvoiceInput = buildMockInvoiceInput({ status: 'pending' })
 
   const updatedInvoiceDetail = invoiceDetailFromInput(
-    updatedInvoiceInput,
+    { ...updatedInvoiceInput, issuedAt: existingInvoice.issuedAt }, // we don't expect the issuedAt to change
     existingInvoice.id
   )
 
@@ -125,7 +125,7 @@ it('should allow draft invoices to be updated to pending', async () => {
   const updatedInvoiceInput = buildMockInvoiceInput({ status: 'pending' })
 
   const updatedInvoiceDetail = invoiceDetailFromInput(
-    updatedInvoiceInput,
+    { ...updatedInvoiceInput, issuedAt: existingDraftInvoice.issuedAt }, // we don't expect the issued at to change
     existingDraftInvoice.id
   )
 

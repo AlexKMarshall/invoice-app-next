@@ -29,7 +29,12 @@ export function Drawer(props: Props): JSX.Element {
     <DrawerPortal>
       <div className={underlay} {...underlayProps}>
         <FocusScope contain autoFocus restoreFocus>
-          <div className={overlay} {...dialogProps} {...overlayProps}>
+          <div
+            className={overlay}
+            {...dialogProps}
+            {...overlayProps}
+            ref={overlayRef}
+          >
             {children}
           </div>
         </FocusScope>

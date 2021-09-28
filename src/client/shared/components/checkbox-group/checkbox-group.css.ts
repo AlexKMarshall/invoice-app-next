@@ -27,7 +27,7 @@ export const checkbox = style({
     'input[aria-checked="true"] ~ &': {
       backgroundColor: themeVars.color.primary.main,
     },
-    'input:hover ~ &, input:focus ~ &': {
+    'input:hover ~ &': {
       border: '2px solid',
       borderColor: themeVars.color.primary.main,
     },

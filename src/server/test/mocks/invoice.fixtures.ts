@@ -25,7 +25,7 @@ export function buildMockPendingInvoiceInput(
   const itemList = buildMockItemList(overrideItemList)
 
   const issuedAt =
-    overrideIssuedAt instanceof Date ? overrideIssuedAt : faker.date.recent()
+    overrideIssuedAt instanceof Date ? overrideIssuedAt : faker.date.recent(90)
 
   return {
     status: 'pending',

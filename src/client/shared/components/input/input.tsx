@@ -10,7 +10,7 @@ type Props = {
 } & InputHTMLAttributes<HTMLInputElement>
 
 export const Input = forwardRef(function Input(
-  { label, className, errorMessage, ...props }: Props,
+  { label, className, errorMessage, disabled, ...props }: Props,
   ref: ForwardedRef<HTMLInputElement>
 ): JSX.Element {
   const inputId = useId()
@@ -20,6 +20,7 @@ export const Input = forwardRef(function Input(
 
   const inputWrapperClassName = inputWrapper({
     status,
+    disabled: disabled || undefined,
   })
 
   return (
@@ -38,6 +39,7 @@ export const Input = forwardRef(function Input(
         type="text"
         aria-invalid={status === 'error'}
         aria-describedby={status === 'error' ? errorId : undefined}
+        disabled={disabled}
         {...props}
       />
     </div>

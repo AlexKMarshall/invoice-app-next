@@ -55,7 +55,8 @@ export function validateTextfieldEntry(
 }
 
 export function fillInInvoiceForm(
-  invoice: NewInvoiceInputDTO | UpdateInvoiceInputDTO
+  invoice: NewInvoiceInputDTO | UpdateInvoiceInputDTO,
+  mode: 'create' | 'update' = 'create'
 ): void {
   const elBillFromGroup = screen.getByRole('group', { name: /bill from/i })
   const inBillFrom = within(elBillFromGroup)
@@ -105,10 +106,13 @@ export function fillInInvoiceForm(
     invoice.clientAddress.country
   )
 
-  validateTextfieldEntry(
-    screen.getByLabelText(/issue date/i),
-    format(invoice.issuedAt, 'yyyy-MM-dd')
-  )
+  // Can only set issue date on new invoice
+  if (mode === 'create') {
+    validateTextfieldEntry(
+      screen.getByLabelText(/issue date/i),
+      format(invoice.issuedAt, 'yyyy-MM-dd')
+    )
+  }
   validateTextfieldEntry(
     screen.getByLabelText(/payment terms/i),
     invoice.paymentTerms.toString(),
