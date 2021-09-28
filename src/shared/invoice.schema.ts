@@ -1,6 +1,6 @@
 import * as z from 'zod'
 
-import { NewInvoiceInputDTO } from './dtos'
+import { CreateInvoiceRequest } from './dtos'
 
 function schemaForType<T>() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -21,7 +21,7 @@ const draftAddressSchema = z.object({
   postcode: z.string(),
 })
 
-const newDraftInvoiceInputDtoSchema = schemaForType<NewInvoiceInputDTO>()(
+const newDraftInvoiceInputDtoSchema = schemaForType<CreateInvoiceRequest>()(
   z.object({
     status: z.literal('draft'),
     senderAddress: draftAddressSchema,
@@ -41,7 +41,7 @@ const newDraftInvoiceInputDtoSchema = schemaForType<NewInvoiceInputDTO>()(
   })
 )
 
-const newPendingInvoiceInputDtoSchema = schemaForType<NewInvoiceInputDTO>()(
+const newPendingInvoiceInputDtoSchema = schemaForType<CreateInvoiceRequest>()(
   z.object({
     status: z.literal('pending'),
     senderAddress: addressSchema,

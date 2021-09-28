@@ -1,7 +1,7 @@
 import * as invoiceController from './invoice.controller'
 import * as invoiceModel from './invoice.model'
 
-import { NewInvoiceInputDTO, Stringify } from 'src/shared/dtos'
+import { CreateInvoiceRequest, Stringify } from 'src/shared/dtos'
 import {
   buildMockInvoiceDetail,
   buildMockInvoiceInput,
@@ -45,7 +45,7 @@ describe('postInvoice', () => {
     const mockDraftInvoiceInput = buildMockInvoiceInput({ status: 'draft' })
     const dtoInput = JSON.parse(
       JSON.stringify(mockDraftInvoiceInput)
-    ) as Stringify<NewInvoiceInputDTO>
+    ) as Stringify<CreateInvoiceRequest>
 
     const result = await invoiceController.postInvoice(dtoInput)
 

@@ -1,14 +1,14 @@
 import {
-  DeleteInvoiceReturnDTO,
-  GetInvoiceDetailDTO,
-  GetInvoiceSummaryDTO,
-  GetInvoiceSummaryQueryParams,
-  NewInvoiceInputDTO,
-  NewInvoiceReturnDTO,
+  CreateInvoiceRequest,
+  CreateInvoiceResponse,
+  DeleteInvoiceResponse,
+  GetInvoiceByIdResponse,
+  GetInvoicesResponse,
   Stringify,
-  UpdateInvoiceInputDTO,
-  UpdateInvoiceReturnDTO,
-  UpdateInvoiceStatusInputDTO,
+  UpdateInvoiceRequest,
+  UpdateInvoiceResponse,
+  UpdateInvoiceStatusRequest,
+  getInvoicesQueryParams,
 } from 'src/shared/dtos'
 import { InvoiceDetail, InvoiceSummary } from './invoice.types'
 
@@ -45,7 +45,7 @@ async function client<TResponse, TBody = EmptyObject>(
 }
 
 export async function getInvoices(
-  filter?: GetInvoiceSummaryQueryParams
+  filter?: getInvoicesQueryParams
 ): Promise<Array<InvoiceSummary>> {
   const searchParams = new URLSearchParams()
 
@@ -56,7 +56,7 @@ export async function getInvoices(
     })
   }
 
-  const { data } = await client<GetInvoiceSummaryDTO>(
+  const { data } = await client<GetInvoicesResponse>(
     `/api/invoices?${searchParams}`
   )
 
@@ -71,7 +71,7 @@ export async function getInvoiceDetail(
 ): Promise<InvoiceDetail> {
   const {
     data: { invoice },
-  } = await client<GetInvoiceDetailDTO>(`/api/invoices/${id}`)
+  } = await client<GetInvoiceByIdResponse>(`/api/invoices/${id}`)
 
   return {
     ...invoice,
@@ -81,13 +81,16 @@ export async function getInvoiceDetail(
 }
 
 export async function postInvoice(
-  newInvoice: NewInvoiceInputDTO
+  newInvoice: CreateInvoiceRequest
 ): Promise<InvoiceDetail> {
   const {
     data: { savedInvoice },
-  } = await client<NewInvoiceReturnDTO, NewInvoiceInputDTO>('/api/invoices', {
-    data: newInvoice,
-  })
+  } = await client<CreateInvoiceResponse, CreateInvoiceRequest>(
+    '/api/invoices',
+    {
+      data: newInvoice,
+    }
+  )
   return destringifyInvoiceDetail(savedInvoice)
 }
 
@@ -97,7 +100,7 @@ export async function updateStatus(
 ): Promise<InvoiceDetail> {
   const {
     data: { updatedInvoice },
-  } = await client<UpdateInvoiceReturnDTO, UpdateInvoiceStatusInputDTO>(
+  } = await client<UpdateInvoiceResponse, UpdateInvoiceStatusRequest>(
     `/api/invoices/${invoiceId}/status`,
     {
       data: { status },
@@ -110,11 +113,11 @@ export async function updateStatus(
 
 export async function updateInvoice(
   invoiceId: InvoiceDetail['id'],
-  invoice: UpdateInvoiceInputDTO
+  invoice: UpdateInvoiceRequest
 ): Promise<InvoiceDetail> {
   const {
     data: { updatedInvoice },
-  } = await client<UpdateInvoiceReturnDTO, UpdateInvoiceInputDTO>(
+  } = await client<UpdateInvoiceResponse, UpdateInvoiceRequest>(
     `/api/invoices/${invoiceId}`,
     {
       data: invoice,
@@ -130,7 +133,7 @@ export async function deleteInvoice(
 ): Promise<InvoiceDetail> {
   const {
     data: { deletedInvoice },
-  } = await client<DeleteInvoiceReturnDTO>(`/api/invoices/${invoiceId}`, {
+  } = await client<DeleteInvoiceResponse>(`/api/invoices/${invoiceId}`, {
     method: 'DELETE',
   })
 

@@ -3,7 +3,7 @@ import {
   InvoiceSummary,
 } from 'src/client/features/invoice/invoice.types'
 
-import { NewInvoiceInputDTO } from 'src/shared/dtos'
+import { CreateInvoiceRequest } from 'src/shared/dtos'
 import { add } from 'date-fns'
 import { generateAlphanumericId } from 'src/shared/identifier'
 import { invoiceDetailFromInput } from 'src/client/features/invoice/invoice.mappers'
@@ -34,7 +34,7 @@ export function findById(id: InvoiceDetail['id']): Promise<InvoiceDetail> {
   return Promise.resolve(foundInvoice)
 }
 
-export function create(invoice: NewInvoiceInputDTO): Promise<InvoiceDetail> {
+export function create(invoice: CreateInvoiceRequest): Promise<InvoiceDetail> {
   const invoiceWithId = invoiceDetailFromInput(
     invoice,
     generateAlphanumericId()

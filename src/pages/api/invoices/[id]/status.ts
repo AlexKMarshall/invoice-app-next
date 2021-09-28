@@ -3,12 +3,12 @@ import * as z from 'zod'
 
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { UpdateInvoiceReturnDTO } from 'src/shared/dtos'
+import { UpdateInvoiceResponse } from 'src/shared/dtos'
 import { idRegex } from 'src/shared/identifier'
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<UpdateInvoiceReturnDTO | { error: unknown }>
+  res: NextApiResponse<UpdateInvoiceResponse | { error: unknown }>
 ): Promise<void> {
   switch (req.method) {
     case 'PUT': {

@@ -1,5 +1,5 @@
 import { Button, IconButton, Input } from 'src/client/shared/components'
-import { NewInvoiceInputDTO, UpdateInvoiceInputDTO } from 'src/shared/dtos'
+import { CreateInvoiceRequest, UpdateInvoiceRequest } from 'src/shared/dtos'
 import {
   buttonGroup,
   deleteButton,
@@ -31,8 +31,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 type Props = {
   kind: 'create' | 'update'
   onCancel?: () => void
-  onSubmit: (data: NewInvoiceInputDTO) => void
-  defaultValues?: NewInvoiceInputDTO | UpdateInvoiceInputDTO
+  onSubmit: (data: CreateInvoiceRequest) => void
+  defaultValues?: CreateInvoiceRequest | UpdateInvoiceRequest
   'aria-labelledby': string
 }
 
@@ -81,7 +81,7 @@ export function InvoiceForm({
     control,
     formState: { errors },
     setValue,
-  } = useForm<NewInvoiceInputDTO>({
+  } = useForm<CreateInvoiceRequest>({
     defaultValues: formattedDefaultValues,
     resolver: zodResolver(
       kind === 'create' ? newInvoiceInputDtoSchema : updateInvoiceInputDtoSchema

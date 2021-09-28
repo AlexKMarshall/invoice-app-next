@@ -32,11 +32,11 @@ import {
 import { useCreateInvoice, useInvoiceSummaries } from './invoice.queries'
 
 import { ArrowRight } from 'src/client/shared/icons/'
+import { CreateInvoiceRequest } from 'src/shared/dtos'
 import Image from 'next/image'
 import { InvoiceForm } from './invoice-form'
 import { InvoiceSummary } from './invoice.types'
 import Link from 'next/link'
-import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { inflect } from 'src/client/shared/grammar'
@@ -77,7 +77,7 @@ export function InvoiceSummaryScreen(): JSX.Element {
   })
 
   const handleCreateFormSubmit = useCallback(
-    (data: NewInvoiceInputDTO) => {
+    (data: CreateInvoiceRequest) => {
       createInvoiceMutation.mutate(data)
       close()
     },

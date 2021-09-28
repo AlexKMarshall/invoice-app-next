@@ -1,11 +1,11 @@
-import { GetInvoiceSummaryDTO, NewInvoiceReturnDTO } from 'src/shared/dtos'
+import { CreateInvoiceResponse, GetInvoicesResponse } from 'src/shared/dtos'
 
 import { IterableElement } from 'type-fest'
 
-export type InvoiceDetail = NewInvoiceReturnDTO['data']['savedInvoice']
+export type InvoiceDetail = CreateInvoiceResponse['data']['savedInvoice']
 
 export type InvoiceSummary = IterableElement<
-  GetInvoiceSummaryDTO['data']['invoices']
+  GetInvoicesResponse['data']['invoices']
 >
 
 export type Address = {

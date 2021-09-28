@@ -42,7 +42,7 @@ import { ArrowLeft } from 'src/client/shared/icons'
 import { Except } from 'type-fest'
 import { InvoiceForm } from './invoice-form'
 import { ReactNode } from 'hoist-non-react-statics/node_modules/@types/react'
-import { UpdateInvoiceInputDTO } from 'src/shared/dtos'
+import { UpdateInvoiceRequest } from 'src/shared/dtos'
 import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { useCallback } from 'react'
@@ -113,7 +113,7 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
   })
 
   const handleEditFormSubmit = useCallback(
-    (data: UpdateInvoiceInputDTO) => {
+    (data: UpdateInvoiceRequest) => {
       updateInvoiceMutation.mutate({ id, invoice: data })
       drawer.close()
     },

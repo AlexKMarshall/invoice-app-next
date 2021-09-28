@@ -2,8 +2,8 @@ import * as z from 'zod'
 
 import { ActionNotPermittedError, NotFoundError } from 'src/server/errors'
 import { AsyncReturnType, IterableElement } from 'type-fest'
+import { CreateInvoiceRequest, UpdateInvoiceRequest } from 'src/shared/dtos'
 import { InvoiceDetail, InvoiceSummary } from './invoice.types'
-import { NewInvoiceInputDTO, UpdateInvoiceInputDTO } from 'src/shared/dtos'
 
 import { Prisma } from '@prisma/client'
 import { add } from 'date-fns'
@@ -103,7 +103,9 @@ export function findAll({ status }: { status?: InvoiceStatus[] } = {}): Promise<
   )
 }
 
-export function create(newInvoice: NewInvoiceInputDTO): Promise<InvoiceDetail> {
+export function create(
+  newInvoice: CreateInvoiceRequest
+): Promise<InvoiceDetail> {
   const invoiceToSave = prepareInvoiceForCreate(newInvoice)
 
   return dbCreate(invoiceToSave)
@@ -255,7 +257,7 @@ const invoiceDetailSchema = z.union([
 ])
 
 function prepareInvoiceForCreate(
-  newInvoice: NewInvoiceInputDTO
+  newInvoice: CreateInvoiceRequest
 ): Prisma.InvoiceCreateInput {
   const {
     clientName,
@@ -310,7 +312,7 @@ function prepareInvoiceForCreate(
 }
 function prepareInvoiceForUpdate(
   id: InvoiceDetail['id'],
-  updatedInvoice: UpdateInvoiceInputDTO
+  updatedInvoice: UpdateInvoiceRequest
 ): Prisma.InvoiceUpdateInput {
   const {
     clientName,
@@ -453,7 +455,7 @@ function isStatusTransitionValid(
 
 export async function update(
   id: InvoiceDetail['id'],
-  updatedInvoice: UpdateInvoiceInputDTO
+  updatedInvoice: UpdateInvoiceRequest
 ): Promise<InvoiceDetail> {
   const existingInvoice = await findInvoiceDetail(id)
 

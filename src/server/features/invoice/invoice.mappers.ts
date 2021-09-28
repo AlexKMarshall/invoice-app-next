@@ -7,7 +7,7 @@ import {
   generateNumericId,
 } from 'src/shared/identifier'
 
-import { NewInvoiceInputDTO } from 'src/shared/dtos'
+import { CreateInvoiceRequest } from 'src/shared/dtos'
 import { add } from 'date-fns'
 import { round2dp } from 'src/shared/number'
 
@@ -28,7 +28,7 @@ export function invoiceDetailToSummary({
 }
 
 export function invoiceDetailFromInput(
-  input: NewInvoiceInputDTO,
+  input: CreateInvoiceRequest,
   invoiceId = generateAlphanumericId()
 ): InvoiceDetail {
   return {

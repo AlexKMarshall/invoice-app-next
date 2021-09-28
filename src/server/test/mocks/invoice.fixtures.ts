@@ -1,8 +1,8 @@
 import { IterableElement, PartialDeep } from 'type-fest'
 import { maybeEmpty, randomPick } from 'src/shared/random'
 
+import { CreateInvoiceRequest } from 'src/shared/dtos'
 import { InvoiceDetail } from 'src/server/features/invoice/invoice.types'
-import { NewInvoiceInputDTO } from 'src/shared/dtos'
 import faker from 'faker'
 import { generateAlphanumericId } from 'src/shared/identifier'
 import { invoiceDetailFromInput } from 'src/server/features/invoice/invoice.mappers'
@@ -12,8 +12,8 @@ function randomStatus() {
 }
 
 export function buildMockPendingInvoiceInput(
-  overrides: PartialDeep<NewInvoiceInputDTO> = {}
-): NewInvoiceInputDTO {
+  overrides: PartialDeep<CreateInvoiceRequest> = {}
+): CreateInvoiceRequest {
   const {
     senderAddress: overrideSenderAddress,
     clientAddress: overrideClientAddress,
@@ -54,8 +54,8 @@ export function buildMockPendingInvoiceInput(
 }
 
 export function buildMockDraftInvoiceInput(
-  overrides: PartialDeep<NewInvoiceInputDTO> = {}
-): NewInvoiceInputDTO {
+  overrides: PartialDeep<CreateInvoiceRequest> = {}
+): CreateInvoiceRequest {
   const {
     senderAddress: overrideSenderAddress,
     clientAddress: overrideClientAddress,
@@ -96,8 +96,8 @@ export function buildMockDraftInvoiceInput(
 }
 
 export function buildMockInvoiceInput(
-  overrides: PartialDeep<NewInvoiceInputDTO> = {}
-): NewInvoiceInputDTO {
+  overrides: PartialDeep<CreateInvoiceRequest> = {}
+): CreateInvoiceRequest {
   const { status: overrideStatus, ...rest } = overrides
 
   const status = overrideStatus ?? randomPick(['draft', 'pending'])
@@ -110,7 +110,7 @@ export function buildMockInvoiceInput(
   }
 }
 
-type NewItemListInput = NewInvoiceInputDTO['itemList']
+type NewItemListInput = CreateInvoiceRequest['itemList']
 function buildMockItemList(
   overrides?: PartialDeep<NewItemListInput>
 ): NewItemListInput {
@@ -141,7 +141,7 @@ export function buildMockInvoiceDetail(
 
   const status = overrideStatus ?? randomStatus()
 
-  let input: NewInvoiceInputDTO
+  let input: CreateInvoiceRequest
   if (status === 'draft') {
     input = buildMockDraftInvoiceInput(rest)
   } else if (status === 'pending') {

@@ -1,6 +1,6 @@
 import * as invoiceController from 'src/server/features/invoice/invoice.controller'
 
-import { GetInvoiceSummaryDTO, NewInvoiceReturnDTO } from 'src/shared/dtos'
+import { CreateInvoiceResponse, GetInvoicesResponse } from 'src/shared/dtos'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import { getInvoicesQuerySchema } from 'src/shared/invoice.schema'
@@ -8,7 +8,7 @@ import { getInvoicesQuerySchema } from 'src/shared/invoice.schema'
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<
-    GetInvoiceSummaryDTO | NewInvoiceReturnDTO | { error: unknown }
+    GetInvoicesResponse | CreateInvoiceResponse | { error: unknown }
   >
 ): Promise<void> {
   switch (req.method) {

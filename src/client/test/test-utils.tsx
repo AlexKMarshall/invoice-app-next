@@ -1,9 +1,9 @@
+import { CreateInvoiceRequest, UpdateInvoiceRequest } from 'src/shared/dtos'
 import {
   DrawerContainer,
   DrawerOverlayContainer,
   DrawerProvider,
 } from '../shared/components/drawer'
-import { NewInvoiceInputDTO, UpdateInvoiceInputDTO } from 'src/shared/dtos'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { render as rtlRender, screen, within } from '@testing-library/react'
 
@@ -55,7 +55,7 @@ export function validateTextfieldEntry(
 }
 
 export function fillInInvoiceForm(
-  invoice: NewInvoiceInputDTO | UpdateInvoiceInputDTO,
+  invoice: CreateInvoiceRequest | UpdateInvoiceRequest,
   mode: 'create' | 'update' = 'create'
 ): void {
   const elBillFromGroup = screen.getByRole('group', { name: /bill from/i })
