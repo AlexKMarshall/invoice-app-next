@@ -1,7 +1,7 @@
 import * as invoiceModel from './invoice.model'
 import * as z from 'zod'
 
-import { ActionNotPermittedError, NotFoundError } from 'src/server/errors'
+import { ControllerResponse, withErrorHandler } from 'src/server/response'
 import {
   CreateInvoiceRequest,
   CreateInvoiceResponse,
@@ -20,22 +20,6 @@ import {
 import { InvoiceDetail } from './invoice.types'
 import { parseJSON } from 'date-fns'
 import { toArray } from 'src/shared/array'
-
-export type ControllerResponse<TData = unknown> = Promise<
-  ControllerSuccessResponse<TData> | ControllerErrorResponse
->
-
-type ControllerSuccessResponse<TData = unknown> = {
-  code: number
-  response: TData
-}
-
-type ControllerErrorResponse<TError = unknown> = {
-  code: number
-  response: {
-    error: TError
-  }
-}
 
 type InvoiceStatus = InvoiceDetail['status']
 type GetInvoiceQuery = {
@@ -196,23 +180,4 @@ function flattenError(
     }
   }
   return { fieldErrors }
-}
-
-function errorHandler(error: unknown) {
-  if (error instanceof NotFoundError) {
-    return { code: 404, response: { error: error.message } }
-  }
-  if (error instanceof ActionNotPermittedError) {
-    return { code: 403, response: { error: error.message } }
-  }
-  return {
-    code: 500,
-    response: { error: JSON.stringify(error) },
-  }
-}
-
-function withErrorHandler<TArgs extends Array<unknown>, TResult>(
-  func: (...args: TArgs) => Promise<TResult>
-): (...args: TArgs) => Promise<TResult | ControllerErrorResponse> {
-  return (...args: TArgs) => func(...args).catch(errorHandler)
 }
