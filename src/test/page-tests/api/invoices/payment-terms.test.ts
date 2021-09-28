@@ -1,20 +1,13 @@
-import { database, prepareDbForTests } from 'src/server/test/test-utils'
-
 import handler from 'src/pages/api/payment-terms'
-import { invoiceDetailToSummary } from 'src/server/features/invoice/invoice.mappers'
+import { prepareDbForTests } from 'src/server/test/test-utils'
 import { testApiHandler } from 'next-test-api-route-handler'
 
-prepareDbForTests()
+const referenceDataStore = prepareDbForTests()
 
 it('should get payment terms', async () => {
   expect.hasAssertions()
 
-  const paymentTerms = [
-    { name: 'Net 1 Day', value: 1 },
-    { name: 'Net 7 Days', value: 7 },
-  ]
-
-  await database.seedPaymentTerms(...paymentTerms)
+  const expectedPaymentTerms = referenceDataStore.paymentTerms
 
   await testApiHandler({
     handler,
@@ -26,7 +19,7 @@ it('should get payment terms', async () => {
       expect(data).toEqual({
         data: {
           paymentTerms: expect.toIncludeSameMembers(
-            paymentTerms.map((paymentTerm) => ({
+            expectedPaymentTerms.map((paymentTerm) => ({
               ...paymentTerm,
               id: expect.any(Number),
             }))
