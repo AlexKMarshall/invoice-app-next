@@ -25,3 +25,10 @@ WithError.args = {
   value: '',
   errorMessage: "can't be empty",
 }
+
+export const Disabled = Template.bind({})
+Disabled.args = {
+  label: 'Street Address',
+  value: '19 Union Terrace',
+  disabled: true,
+}

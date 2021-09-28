@@ -17,11 +17,14 @@ import {
   tableInput,
   th,
 } from './invoice-form.css'
+import {
+  newInvoiceInputDtoSchema,
+  updateInvoiceInputDtoSchema,
+} from 'src/shared/invoice.schema'
 import { useFieldArray, useForm } from 'react-hook-form'
 
 import { Delete } from 'src/client/shared/icons'
 import { format } from 'date-fns'
-import { newInvoiceInputDtoSchema } from 'src/shared/invoice.schema'
 import { useId } from '@react-aria/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -80,7 +83,9 @@ export function InvoiceForm({
     setValue,
   } = useForm<NewInvoiceInputDTO>({
     defaultValues: formattedDefaultValues,
-    resolver: zodResolver(newInvoiceInputDtoSchema),
+    resolver: zodResolver(
+      kind === 'create' ? newInvoiceInputDtoSchema : updateInvoiceInputDtoSchema
+    ),
   })
   const itemsFieldArray = useFieldArray({
     control,
@@ -173,6 +178,7 @@ export function InvoiceForm({
             {...register('issuedAt', {
               valueAsDate: true,
             })}
+            disabled={kind === 'update'}
           />
           <Input
             className={spanHalf}

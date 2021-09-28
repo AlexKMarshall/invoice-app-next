@@ -104,8 +104,13 @@ export const handlers = [
     const { id } = req.params
     const invoiceInput = req.body
 
+    const oldInvoice = await invoiceModel.findById(id)
+    const updatedInvoiceInput = JSON.parse(
+      JSON.stringify({ ...invoiceInput, issuedAt: oldInvoice.issuedAt })
+    )
+
     const updatedInvoice = invoiceDetailFromInput(
-      destringifyInvoiceInput(invoiceInput),
+      destringifyInvoiceInput(updatedInvoiceInput),
       id
     )
 

@@ -318,6 +318,8 @@ function prepareInvoiceForUpdate(
     clientAddress,
     senderAddress,
     itemList,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    issuedAt: _thrownAwayIssuedAt,
     ...restInvoice
   } = updatedInvoice
 

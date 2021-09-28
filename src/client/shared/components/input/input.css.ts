@@ -35,6 +35,11 @@ export const inputWrapper = recipe({
         }),
       },
     },
+    disabled: {
+      true: {
+        opacity: '50%',
+      },
+    },
   },
 
   defaultVariants: {

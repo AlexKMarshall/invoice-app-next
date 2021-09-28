@@ -223,7 +223,10 @@ export function useUpdateInvoice({
         if (previousInvoiceDetail) {
           queryClient.setQueryData<InvoiceDetail>(
             invoiceKeys.detail(id),
-            invoiceDetailFromInput(invoice, id)
+            invoiceDetailFromInput(
+              { ...invoice, issuedAt: previousInvoiceDetail.issuedAt },
+              id
+            )
           )
         }
 

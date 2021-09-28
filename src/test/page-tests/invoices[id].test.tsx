@@ -92,7 +92,10 @@ it('should allow pending invoices to be edited', async () => {
   // generate a new set of invoice data
   const updatedInvoiceInput = buildMockPendingInvoiceInput()
   const updatedInvoiceDetail = invoiceDetailFromInput(
-    updatedInvoiceInput,
+    {
+      ...updatedInvoiceInput,
+      issuedAt: initialPendingInvoice.issuedAt,
+    },
     initialPendingInvoice.id
   )
 
@@ -107,7 +110,7 @@ it('should allow pending invoices to be edited', async () => {
     screen.getByRole('heading', { name: `Edit ${initialPendingInvoice.id}` })
   ).toBeInTheDocument()
 
-  fillInInvoiceForm(updatedInvoiceInput)
+  fillInInvoiceForm(updatedInvoiceInput, 'update')
 
   userEvent.click(screen.getByRole('button', { name: /save changes/i }))
 
@@ -136,7 +139,7 @@ it('should convert draft invoices to pending on edit so long as every field vali
     status: 'draft' as const,
   }
   const updatedInvoiceDetail = invoiceDetailFromInput(
-    updatedInvoiceInput,
+    { ...updatedInvoiceInput, issuedAt: initialDraftInvoice.issuedAt },
     initialDraftInvoice.id
   )
 
@@ -151,7 +154,7 @@ it('should convert draft invoices to pending on edit so long as every field vali
     screen.getByRole('heading', { name: `Edit ${initialDraftInvoice.id}` })
   ).toBeInTheDocument()
 
-  fillInInvoiceForm(updatedInvoiceInput)
+  fillInInvoiceForm(updatedInvoiceInput, 'update')
 
   userEvent.click(screen.getByRole('button', { name: /save changes/i }))
 
@@ -192,7 +195,7 @@ it('should not allow saving an update to draft invoice if not everything is fill
     screen.getByRole('heading', { name: `Edit ${initialDraftInvoice.id}` })
   ).toBeInTheDocument()
 
-  fillInInvoiceForm(updatedInvoiceInput)
+  fillInInvoiceForm(updatedInvoiceInput, 'update')
 
   const clientNameField = screen.getByRole('textbox', {
     name: /client's name/i,
