@@ -1,8 +1,14 @@
+import { GetPaymentTermsResponse } from 'src/shared/dtos'
 import { InvoiceDetail } from './features/invoice/invoice.types'
+import { IterableElement } from 'type-fest'
 import { Client as PGClient } from 'pg'
 import { Prisma } from '@prisma/client'
 import { execSync } from 'child_process'
 import prisma from 'src/server/prisma'
+
+type PaymentTerm = IterableElement<
+  GetPaymentTermsResponse['data']['paymentTerms']
+>
 
 type Props = {
   connectionString: string
@@ -29,6 +35,23 @@ export class Database {
     const savePromises = invoices.map((invoice) => this.createInvoice(invoice))
 
     return Promise.all(savePromises)
+  }
+
+  createPaymentTerm(
+    paymentTerm: Omit<PaymentTerm, 'id'>
+  ): Promise<PaymentTerm> {
+    return prisma.paymentTerm.create({
+      data: paymentTerm,
+      select: { id: true, value: true, name: true },
+    })
+  }
+
+  seedPaymentTerms(
+    ...paymentTerms: Array<Omit<PaymentTerm, 'id'>>
+  ): Promise<PaymentTerm[]> {
+    return Promise.all(
+      paymentTerms.map((paymentTerm) => this.createPaymentTerm(paymentTerm))
+    )
   }
 
   migrate(): void {

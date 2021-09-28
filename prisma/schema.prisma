@@ -64,3 +64,9 @@ model Invoice {
   clientId           Int
   invoiceItems       InvoiceItem[]
 }
+
+model PaymentTerm {
+  id    Int    @id @default(autoincrement())
+  value Int
+  name  String
+}

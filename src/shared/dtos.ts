@@ -100,3 +100,13 @@ export type DeleteInvoiceResponse = {
 }
 
 export type UpdateInvoiceRequest = CreateInvoiceRequest
+
+export type GetPaymentTermsResponse = {
+  data: {
+    paymentTerms: Array<{
+      id: number
+      value: number
+      name: string
+    }>
+  }
+}
