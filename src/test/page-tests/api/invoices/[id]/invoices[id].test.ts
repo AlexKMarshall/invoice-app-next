@@ -1,27 +1,25 @@
-import {
-  buildMockInvoiceDetail,
-  buildMockInvoiceRequest,
-  invoiceDetailFromRequest,
-} from 'src/server/test/mocks/invoice.fixtures'
 import { database, prepareDbForTests } from 'src/server/test/test-utils'
 
 import { generateAlphanumericId } from 'src/shared/identifier'
 import handler from 'src/pages/api/invoices/[id]'
+import { invoiceFixtureFactory } from 'src/server/test/mocks/invoice.fixtures'
 import invoicesHandler from 'src/pages/api/invoices'
 import { randomPick } from 'src/shared/random'
 import { testApiHandler } from 'next-test-api-route-handler'
 
 const referenceDataStore = prepareDbForTests()
+const {
+  buildMockInvoiceDetail,
+  buildMockInvoiceRequest,
+  invoiceDetailFromRequest,
+} = invoiceFixtureFactory(referenceDataStore)
 
 it('should get individual invoice detail', async () => {
   expect.hasAssertions()
 
-  const expectedInvoiceDetail = buildMockInvoiceDetail({}, referenceDataStore)
+  const expectedInvoiceDetail = buildMockInvoiceDetail({})
 
-  const mockInvoices = [
-    expectedInvoiceDetail,
-    buildMockInvoiceDetail({}, referenceDataStore),
-  ]
+  const mockInvoices = [expectedInvoiceDetail, buildMockInvoiceDetail({})]
 
   await database.seedInvoices(...mockInvoices)
 
@@ -78,21 +76,14 @@ it('should return 404 if no invoice for given id', async () => {
 it('should allow updating a pending invoice', async () => {
   expect.hasAssertions()
 
-  const existingInvoice = buildMockInvoiceDetail(
-    { status: 'pending' },
-    referenceDataStore
-  )
+  const existingInvoice = buildMockInvoiceDetail({ status: 'pending' })
   await database.seedInvoices(existingInvoice)
 
-  const updatedInvoiceInput = buildMockInvoiceRequest(
-    { status: 'pending' },
-    referenceDataStore
-  )
+  const updatedInvoiceInput = buildMockInvoiceRequest({ status: 'pending' })
 
   const updatedInvoiceDetail = invoiceDetailFromRequest(
     { ...updatedInvoiceInput, issuedAt: existingInvoice.issuedAt }, // we don't expect the issuedAt to change
-    existingInvoice.id,
-    referenceDataStore
+    existingInvoice.id
   )
 
   await testApiHandler({
@@ -129,21 +120,14 @@ it('should allow updating a pending invoice', async () => {
 it('should allow draft invoices to be updated to pending', async () => {
   expect.hasAssertions()
 
-  const existingDraftInvoice = buildMockInvoiceDetail(
-    { status: 'draft' },
-    referenceDataStore
-  )
+  const existingDraftInvoice = buildMockInvoiceDetail({ status: 'draft' })
   await database.seedInvoices(existingDraftInvoice)
 
-  const updatedInvoiceInput = buildMockInvoiceRequest(
-    { status: 'pending' },
-    referenceDataStore
-  )
+  const updatedInvoiceInput = buildMockInvoiceRequest({ status: 'pending' })
 
   const updatedInvoiceDetail = invoiceDetailFromRequest(
     { ...updatedInvoiceInput, issuedAt: existingDraftInvoice.issuedAt }, // we don't expect the issued at to change
-    existingDraftInvoice.id,
-    referenceDataStore
+    existingDraftInvoice.id
   )
 
   await testApiHandler({
@@ -180,16 +164,10 @@ it('should allow draft invoices to be updated to pending', async () => {
 it('should not allow pending invoices to be updated to draft', async () => {
   expect.hasAssertions()
 
-  const existingPendingInvoice = buildMockInvoiceDetail(
-    { status: 'pending' },
-    referenceDataStore
-  )
+  const existingPendingInvoice = buildMockInvoiceDetail({ status: 'pending' })
   await database.seedInvoices(existingPendingInvoice)
 
-  const updatedInvoiceInput = buildMockInvoiceRequest(
-    { status: 'draft' },
-    referenceDataStore
-  )
+  const updatedInvoiceInput = buildMockInvoiceRequest({ status: 'draft' })
 
   await testApiHandler({
     handler,
@@ -214,12 +192,9 @@ it('should not allow pending invoices to be updated to draft', async () => {
 it('should allow deleting an invoice', async () => {
   expect.hasAssertions()
 
-  const invoiceToDelete = buildMockInvoiceDetail(
-    {
-      status: randomPick(['draft', 'pending']),
-    },
-    referenceDataStore
-  )
+  const invoiceToDelete = buildMockInvoiceDetail({
+    status: randomPick(['draft', 'pending']),
+  })
   await database.seedInvoices(invoiceToDelete)
 
   await testApiHandler({

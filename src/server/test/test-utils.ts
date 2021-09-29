@@ -1,7 +1,5 @@
 import { Database, ReferenceDataStore } from '../database'
 
-import { PaymentTerm } from '.prisma/client'
-
 let database: Database
 
 function prepareDbForTests(): ReferenceDataStore {

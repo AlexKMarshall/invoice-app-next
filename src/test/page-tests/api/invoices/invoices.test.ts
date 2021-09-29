@@ -1,25 +1,27 @@
-import {
-  buildMockInvoiceDetail,
-  buildMockPendingInvoiceRequest,
-  invoiceDetailFromRequest,
-} from 'src/server/test/mocks/invoice.fixtures'
 import { database, prepareDbForTests } from 'src/server/test/test-utils'
 import { generateAlphanumericId, idRegex } from 'src/shared/identifier'
 
 import { InvoiceDetail } from 'src/server/features/invoice/invoice.types'
 import handler from 'src/pages/api/invoices'
 import { invoiceDetailToSummary } from 'src/server/features/invoice/invoice.mappers'
+import { invoiceFixtureFactory } from 'src/server/test/mocks/invoice.fixtures'
 import { testApiHandler } from 'next-test-api-route-handler'
 
 const referenceDataStore = prepareDbForTests()
+
+const {
+  buildMockInvoiceDetail,
+  buildMockPendingInvoiceRequest,
+  invoiceDetailFromRequest,
+} = invoiceFixtureFactory(referenceDataStore)
 
 it('should get invoice summaries', async () => {
   expect.hasAssertions()
 
   const mockInvoices = [
-    buildMockInvoiceDetail({ status: 'draft' }, referenceDataStore),
-    buildMockInvoiceDetail({ status: 'pending' }, referenceDataStore),
-    buildMockInvoiceDetail({ status: 'paid' }, referenceDataStore),
+    buildMockInvoiceDetail({ status: 'draft' }),
+    buildMockInvoiceDetail({ status: 'pending' }),
+    buildMockInvoiceDetail({ status: 'paid' }),
   ]
 
   await database.seedInvoices(...mockInvoices)
@@ -155,10 +157,7 @@ it('should post a pending invoice', async () => {
         },
       })
 
-      const newInvoiceInput = buildMockPendingInvoiceRequest(
-        {},
-        referenceDataStore
-      )
+      const newInvoiceInput = buildMockPendingInvoiceRequest({})
 
       const response = await fetch({
         method: 'POST',
@@ -175,8 +174,7 @@ it('should post a pending invoice', async () => {
       // a post request should give us back the full saved invoice object
       const mockInvoiceDetail = invoiceDetailFromRequest(
         newInvoiceInput,
-        generateAlphanumericId(),
-        referenceDataStore
+        generateAlphanumericId()
       )
       expect(result).toMatchObject({
         data: {

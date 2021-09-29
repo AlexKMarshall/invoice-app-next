@@ -2,18 +2,20 @@ import * as invoiceController from './invoice.controller'
 import * as invoiceModel from './invoice.model'
 
 import { CreateInvoiceRequest, Stringify } from 'src/shared/dtos'
-import {
-  buildMockInvoiceDetail,
-  buildMockInvoiceRequest,
-  buildMockPendingInvoiceRequest,
-} from '../../test/mocks/invoice.fixtures'
 
 import { generateAlphanumericId } from 'src/shared/identifier'
+import { invoiceFixtureFactory } from '../../test/mocks/invoice.fixtures'
 import { mocked } from 'ts-jest/utils'
 
 jest.mock('./invoice.model')
 
 const mockInvoiceModel = mocked(invoiceModel, true)
+
+const {
+  buildMockInvoiceDetail,
+  buildMockInvoiceRequest,
+  buildMockPendingInvoiceRequest,
+} = invoiceFixtureFactory()
 
 afterEach(() => {
   jest.resetAllMocks()

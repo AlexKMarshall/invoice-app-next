@@ -13,7 +13,7 @@ import {
 import { validateGBPValue, validateTextIfNonEmpty } from '../validators'
 
 import { InvoiceDetail } from 'src/client/features/invoice/invoice.types'
-import { buildMockDraftInvoiceRequest } from 'src/server/test/mocks/invoice.fixtures'
+import { buildMockDraftInvoiceInput } from 'src/client/test/mocks/invoice.fixtures'
 import { fillInInvoiceForm } from 'src/client/test/test-utils'
 import { format } from 'date-fns'
 import { getPage } from 'next-page-tester'
@@ -182,7 +182,7 @@ it('should not allow saving an update to draft invoice if not everything is fill
   invoiceModel.initialise([initialDraftInvoice])
 
   // generate a new set of invoice data, making sure some is empty
-  const updatedInvoiceInput = buildMockDraftInvoiceRequest({ clientName: '' })
+  const updatedInvoiceInput = buildMockDraftInvoiceInput({ clientName: '' })
 
   const { render } = await getPage({
     route: `/invoices/${initialDraftInvoice.id}`,
