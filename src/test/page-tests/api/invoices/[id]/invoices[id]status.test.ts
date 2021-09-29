@@ -5,12 +5,15 @@ import { generateAlphanumericId } from 'src/shared/identifier'
 import handler from 'src/pages/api/invoices/[id]/status'
 import { testApiHandler } from 'next-test-api-route-handler'
 
-prepareDbForTests()
+const referenceDataStore = prepareDbForTests()
 
 it('should mark pending invoice as paid', async () => {
   expect.hasAssertions()
 
-  const pendingInvoice = buildMockInvoiceDetail({ status: 'pending' })
+  const pendingInvoice = buildMockInvoiceDetail(
+    { status: 'pending' },
+    referenceDataStore
+  )
 
   await database.seedInvoices(pendingInvoice)
 
@@ -73,7 +76,10 @@ it('should reject if invoice does not exist', async () => {
 it('should reject if invoice is draft', async () => {
   expect.hasAssertions()
 
-  const draftInvoice = buildMockInvoiceDetail({ status: 'draft' })
+  const draftInvoice = buildMockInvoiceDetail(
+    { status: 'draft' },
+    referenceDataStore
+  )
   await database.seedInvoices(draftInvoice)
 
   await testApiHandler({

@@ -18,7 +18,7 @@ import {
   th,
 } from './invoice-form.css'
 import {
-  newInvoiceInputDtoSchema,
+  createInvoiceRequestDtoSchema,
   updateInvoiceInputDtoSchema,
 } from 'src/shared/invoice.schema'
 import { useFieldArray, useForm } from 'react-hook-form'
@@ -84,7 +84,9 @@ export function InvoiceForm({
   } = useForm<CreateInvoiceRequest>({
     defaultValues: formattedDefaultValues,
     resolver: zodResolver(
-      kind === 'create' ? newInvoiceInputDtoSchema : updateInvoiceInputDtoSchema
+      kind === 'create'
+        ? createInvoiceRequestDtoSchema
+        : updateInvoiceInputDtoSchema
     ),
   })
   const itemsFieldArray = useFieldArray({

@@ -1,9 +1,8 @@
-import { Database } from '../database'
+import { Database, ReferenceDataStore } from '../database'
+
 import { PaymentTerm } from '.prisma/client'
 
 let database: Database
-
-type ReferenceDataStore = Record<'paymentTerms', PaymentTerm[]>
 
 function prepareDbForTests(): ReferenceDataStore {
   let schema: string

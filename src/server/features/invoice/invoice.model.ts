@@ -17,6 +17,11 @@ function dbFindAllSummaries(where?: Prisma.InvoiceWhereInput) {
       id: true,
       issuedAt: true,
       paymentTerms: true,
+      paymentTerm: {
+        select: {
+          value: true,
+        },
+      },
       client: {
         select: {
           name: true,
@@ -52,6 +57,11 @@ const invoiceSummaryDbSchema = schemaForType<DbInvoiceSummary>()(
     id: z.string(),
     issuedAt: z.date(),
     paymentTerms: z.number(),
+    paymentTerm: z
+      .object({
+        value: z.number(),
+      })
+      .nullable(),
     client: z.object({
       name: z.string(),
     }),
@@ -74,12 +84,18 @@ function dbSummaryToInvoiceSummary(
     id,
     issuedAt,
     paymentTerms,
+    paymentTerm,
     client: { name: clientName },
     invoiceItems,
     status,
   } = invoice
 
-  const paymentDue = add(issuedAt, { days: paymentTerms })
+  let paymentTermValue = paymentTerms
+  if (paymentTerm) {
+    paymentTermValue = paymentTerm.value
+  }
+
+  const paymentDue = add(issuedAt, { days: paymentTermValue })
 
   const amountDue = round2dp(
     invoiceItems.reduce(
@@ -122,6 +138,7 @@ function flattenInvoiceDetail(
     invoiceItems,
     issuedAt,
     paymentTerms,
+    paymentTerm,
     ...restInvoice
   } = invoice
 
@@ -135,7 +152,12 @@ function flattenInvoiceDetail(
     })
   )
 
-  const paymentDue = add(issuedAt, { days: paymentTerms })
+  let paymentTermValue = paymentTerms
+  if (paymentTerm) {
+    paymentTermValue = paymentTerm.value
+  }
+
+  const paymentDue = add(issuedAt, { days: paymentTermValue })
 
   const amountDue = round2dp(
     itemList.reduce((acc, { total: itemTotal }) => round2dp(acc + itemTotal), 0)
@@ -149,6 +171,7 @@ function flattenInvoiceDetail(
     itemList,
     issuedAt,
     paymentTerms,
+    paymentTerm: paymentTerm ?? undefined,
     paymentDue,
     amountDue,
     ...restInvoice,
@@ -198,6 +221,13 @@ const draftInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
     status: z.literal('draft'),
     issuedAt: z.date(),
     paymentTerms: z.number(),
+    paymentTerm: z
+      .object({
+        id: z.number(),
+        value: z.number(),
+        name: z.string(),
+      })
+      .nullable(),
     projectDescription: possiblyEmptyString,
     sender: z.object({
       address: draftAddressSchema,
@@ -225,6 +255,13 @@ const pendingInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
     status: z.literal('pending'),
     issuedAt: z.date(),
     paymentTerms: z.number(),
+    paymentTerm: z
+      .object({
+        id: z.number(),
+        value: z.number(),
+        name: z.string(),
+      })
+      .nullable(),
     projectDescription: z.string(),
     sender: z.object({
       address: addressSchema,
@@ -265,6 +302,7 @@ function prepareInvoiceForCreate(
     clientAddress,
     senderAddress,
     itemList,
+    paymentTermId,
     ...restInvoice
   } = newInvoice
 
@@ -300,11 +338,15 @@ function prepareInvoiceForCreate(
     })),
   }
 
+  const paymentTerm =
+    paymentTermId !== undefined ? { connect: { id: paymentTermId } } : undefined
+
   const invoiceToSave = {
     id,
     sender,
     client,
     invoiceItems,
+    paymentTerm,
     ...restInvoice,
   }
 
@@ -320,6 +362,7 @@ function prepareInvoiceForUpdate(
     clientAddress,
     senderAddress,
     itemList,
+    paymentTermId,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     issuedAt: _thrownAwayIssuedAt,
     ...restInvoice
@@ -355,10 +398,14 @@ function prepareInvoiceForUpdate(
     })),
   }
 
+  const paymentTerm =
+    paymentTermId !== undefined ? { connect: { id: paymentTermId } } : undefined
+
   const invoiceToSave: Prisma.InvoiceUpdateInput = {
     id,
     sender,
     client,
+    paymentTerm,
     invoiceItems: {
       // delete the existing items
       deleteMany: {},
@@ -376,6 +423,13 @@ const invoiceDetailSelect = {
   status: true,
   issuedAt: true,
   paymentTerms: true,
+  paymentTerm: {
+    select: {
+      id: true,
+      value: true,
+      name: true,
+    },
+  },
   projectDescription: true,
   sender: {
     select: {

@@ -58,6 +58,8 @@ model Invoice {
   issuedAt           DateTime
   projectDescription String
   paymentTerms       Int
+  paymentTerm        PaymentTerm?  @relation(fields: [paymentTermId], references: [id])
+  paymentTermId      Int?
   sender             Sender        @relation(fields: [senderId], references: [id])
   senderId           Int
   client             Client        @relation(fields: [clientId], references: [id])
@@ -66,7 +68,8 @@ model Invoice {
 }
 
 model PaymentTerm {
-  id    Int    @id @default(autoincrement())
-  value Int
-  name  String
+  id      Int       @id @default(autoincrement())
+  value   Int
+  name    String
+  invoice Invoice[]
 }

@@ -21,54 +21,58 @@ const draftAddressSchema = z.object({
   postcode: z.string(),
 })
 
-const newDraftInvoiceInputDtoSchema = schemaForType<CreateInvoiceRequest>()(
-  z.object({
-    status: z.literal('draft'),
-    senderAddress: draftAddressSchema,
-    clientName: z.string(),
-    clientEmail: z.union([z.string().email(), z.literal('')]),
-    clientAddress: draftAddressSchema,
-    issuedAt: z.date(),
-    paymentTerms: z.number().min(0),
-    projectDescription: z.string(),
-    itemList: z.array(
-      z.object({
-        name: z.string().min(1),
-        quantity: z.number().min(1),
-        price: z.number().min(0),
-      })
-    ),
-  })
-)
+const createDraftInvoiceRequestDtoSchema =
+  schemaForType<CreateInvoiceRequest>()(
+    z.object({
+      status: z.literal('draft'),
+      senderAddress: draftAddressSchema,
+      clientName: z.string(),
+      clientEmail: z.union([z.string().email(), z.literal('')]),
+      clientAddress: draftAddressSchema,
+      issuedAt: z.date(),
+      paymentTerms: z.number().min(0),
+      paymentTermId: z.number().optional(),
+      projectDescription: z.string(),
+      itemList: z.array(
+        z.object({
+          name: z.string().min(1),
+          quantity: z.number().min(1),
+          price: z.number().min(0),
+        })
+      ),
+    })
+  )
 
-const newPendingInvoiceInputDtoSchema = schemaForType<CreateInvoiceRequest>()(
-  z.object({
-    status: z.literal('pending'),
-    senderAddress: addressSchema,
-    clientName: z.string().min(1, { message: "can't be empty" }),
-    clientEmail: z.string().min(1, { message: "can't be empty" }).email(),
-    clientAddress: addressSchema,
-    issuedAt: z.date(),
-    paymentTerms: z.number().min(0),
-    projectDescription: z.string().min(1, { message: "can't be empty" }),
-    itemList: z.array(
-      z.object({
-        name: z.string().min(1, { message: "can't be empty" }),
-        quantity: z.number().min(1),
-        price: z.number().min(0),
-      })
-    ),
-  })
-)
+const createPendingInvoiceRequestDtoSchema =
+  schemaForType<CreateInvoiceRequest>()(
+    z.object({
+      status: z.literal('pending'),
+      senderAddress: addressSchema,
+      clientName: z.string().min(1, { message: "can't be empty" }),
+      clientEmail: z.string().min(1, { message: "can't be empty" }).email(),
+      clientAddress: addressSchema,
+      issuedAt: z.date(),
+      paymentTerms: z.number().min(0),
+      paymentTermId: z.number().optional(),
+      projectDescription: z.string().min(1, { message: "can't be empty" }),
+      itemList: z.array(
+        z.object({
+          name: z.string().min(1, { message: "can't be empty" }),
+          quantity: z.number().min(1),
+          price: z.number().min(0),
+        })
+      ),
+    })
+  )
 
-export const newInvoiceInputDtoSchema = z.union([
-  newDraftInvoiceInputDtoSchema,
-  newPendingInvoiceInputDtoSchema,
+export const createInvoiceRequestDtoSchema = z.union([
+  createDraftInvoiceRequestDtoSchema,
+  createPendingInvoiceRequestDtoSchema,
 ])
 
 export const updateInvoiceInputDtoSchema = z.union([
-  newDraftInvoiceInputDtoSchema.omit({ issuedAt: true }),
-  newPendingInvoiceInputDtoSchema.omit({ issuedAt: true }),
+  createDraftInvoiceRequestDtoSchema.omit({ issuedAt: true }),
+  createPendingInvoiceRequestDtoSchema.omit({ issuedAt: true }),
 ])
 
 export const updateStatusInputDtoSchema = z.object({

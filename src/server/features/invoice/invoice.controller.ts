@@ -13,7 +13,7 @@ import {
 } from 'src/shared/dtos'
 import { JsonArray, JsonObject } from 'type-fest'
 import {
-  newInvoiceInputDtoSchema,
+  createInvoiceRequestDtoSchema,
   updateStatusInputDtoSchema,
 } from 'src/shared/invoice.schema'
 
@@ -89,7 +89,6 @@ export const updateInvoice = withErrorHandler(function updateInvoice(
   updatedInvoice: JsonArray | JsonObject
 ): ControllerResponse<UpdateInvoiceResponse> {
   const parsingResult = parseUpdateInvoiceInputDto(updatedInvoice)
-
   if (!parsingResult.success) {
     return Promise.resolve({
       code: 400,
@@ -136,7 +135,7 @@ function parseNewInvoiceInputDto(
     })
   }
 
-  const result = newInvoiceInputDtoSchema.safeParse(buildingInvoice)
+  const result = createInvoiceRequestDtoSchema.safeParse(buildingInvoice)
 
   if (result.success === false) {
     return { ...result, error: flattenError(result.error) }
@@ -154,7 +153,7 @@ function parseUpdateInvoiceInputDto(
 }
 
 function flattenError(
-  error: z.ZodError<z.infer<typeof newInvoiceInputDtoSchema>>
+  error: z.ZodError<z.infer<typeof createInvoiceRequestDtoSchema>>
 ) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fieldErrors: any = {}

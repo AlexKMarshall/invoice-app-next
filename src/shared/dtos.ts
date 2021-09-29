@@ -36,10 +36,11 @@ type InvoiceStatus = 'draft' | 'pending' | 'paid'
 
 export type CreateInvoiceRequest = Except<
   InvoiceDetail,
-  'id' | 'paymentDue' | 'itemList' | 'amountDue' | 'status'
+  'id' | 'paymentDue' | 'itemList' | 'amountDue' | 'status' | 'paymentTerm'
 > & {
   itemList: Array<CreateInvoiceItemRequest>
   status: Exclude<InvoiceStatus, 'paid'>
+  paymentTermId?: number
 }
 
 type CreateInvoiceItemRequest = Except<InvoiceItem, 'id' | 'total'>
@@ -63,6 +64,11 @@ type InvoiceDetail = {
   }
   issuedAt: Date
   paymentTerms: number
+  paymentTerm?: {
+    id: number
+    value: number
+    name: string
+  }
   paymentDue: Date
   projectDescription: string
   itemList: Array<InvoiceItem>

@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { buildMockInvoiceInput } from '../src/server/test/mocks/invoice.fixtures'
+import { buildMockInvoiceRequest } from '../src/server/test/mocks/invoice.fixtures'
 import { create } from '../src/server/features/invoice/invoice.model'
 import { randomBetween } from 'src/shared/random'
 const prisma = new PrismaClient()
@@ -10,7 +10,7 @@ function main() {
   console.log(numberOfInvoices)
 
   const invoiceInputs = Array.from({ length: numberOfInvoices }, () =>
-    buildMockInvoiceInput()
+    buildMockInvoiceRequest()
   )
 
   const savePromises = invoiceInputs.map((invoice) =>

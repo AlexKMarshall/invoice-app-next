@@ -10,6 +10,8 @@ type PaymentTerm = IterableElement<
   GetPaymentTermsResponse['data']['paymentTerms']
 >
 
+export type ReferenceDataStore = Record<'paymentTerms', PaymentTerm[]>
+
 type Props = {
   connectionString: string
 }
@@ -72,6 +74,7 @@ function prepareInvoiceToCreate(
     status,
     issuedAt,
     paymentTerms,
+    paymentTerm: paymentTermDetail,
     projectDescription,
     clientName,
     clientEmail,
@@ -109,11 +112,20 @@ function prepareInvoiceToCreate(
     })),
   }
 
+  const paymentTerm = paymentTermDetail
+    ? {
+        connect: {
+          id: paymentTermDetail.id,
+        },
+      }
+    : undefined
+
   const invoiceToSave = {
     id,
     status,
     issuedAt,
     paymentTerms,
+    paymentTerm,
     projectDescription,
     sender,
     client,

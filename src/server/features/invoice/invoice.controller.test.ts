@@ -4,8 +4,8 @@ import * as invoiceModel from './invoice.model'
 import { CreateInvoiceRequest, Stringify } from 'src/shared/dtos'
 import {
   buildMockInvoiceDetail,
-  buildMockInvoiceInput,
-  buildMockPendingInvoiceInput,
+  buildMockInvoiceRequest,
+  buildMockPendingInvoiceRequest,
 } from '../../test/mocks/invoice.fixtures'
 
 import { generateAlphanumericId } from 'src/shared/identifier'
@@ -42,7 +42,7 @@ describe('postInvoice', () => {
     const mockError = new Error('Some error message')
     mockInvoiceModel.create.mockRejectedValueOnce(mockError)
 
-    const mockDraftInvoiceInput = buildMockInvoiceInput({ status: 'draft' })
+    const mockDraftInvoiceInput = buildMockInvoiceRequest({ status: 'draft' })
     const dtoInput = JSON.parse(
       JSON.stringify(mockDraftInvoiceInput)
     ) as Stringify<CreateInvoiceRequest>
@@ -56,7 +56,7 @@ describe('postInvoice', () => {
   })
   it('should allow draft input with optional fields', async () => {
     mockInvoiceModel.create.mockResolvedValueOnce(buildMockInvoiceDetail())
-    const mockInput = buildMockInvoiceInput({
+    const mockInput = buildMockInvoiceRequest({
       status: 'draft',
       senderAddress: {
         street: '',
@@ -79,7 +79,7 @@ describe('postInvoice', () => {
     })
   })
   it('should return error when pending input has empty strings', async () => {
-    const mockInput = buildMockPendingInvoiceInput({
+    const mockInput = buildMockPendingInvoiceRequest({
       clientName: '',
       clientEmail: '',
       clientAddress: {
@@ -131,7 +131,7 @@ describe('postInvoice', () => {
   })
 
   it('should return error on invalid numbers', async () => {
-    const mockInput = buildMockInvoiceInput({
+    const mockInput = buildMockInvoiceRequest({
       paymentTerms: -1,
       itemList: [{ quantity: 0, price: -1 }],
     })

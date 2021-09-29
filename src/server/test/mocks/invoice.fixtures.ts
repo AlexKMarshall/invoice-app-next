@@ -1,18 +1,28 @@
 import { IterableElement, PartialDeep } from 'type-fest'
+import {
+  generateAlphanumericId,
+  generateNumericId,
+} from 'src/shared/identifier'
 import { maybeEmpty, randomPick } from 'src/shared/random'
 
 import { CreateInvoiceRequest } from 'src/shared/dtos'
 import { InvoiceDetail } from 'src/server/features/invoice/invoice.types'
+import { ReferenceDataStore } from 'src/server/database'
+import { add } from 'date-fns'
 import faker from 'faker'
-import { generateAlphanumericId } from 'src/shared/identifier'
-import { invoiceDetailFromInput } from 'src/server/features/invoice/invoice.mappers'
+import { round2dp } from 'src/shared/number'
 
 function randomStatus() {
   return randomPick(['draft', 'pending', 'paid'] as const)
 }
 
-export function buildMockPendingInvoiceInput(
-  overrides: PartialDeep<CreateInvoiceRequest> = {}
+const emptyDataStore: ReferenceDataStore = {
+  paymentTerms: [],
+}
+
+export function buildMockPendingInvoiceRequest(
+  overrides: PartialDeep<CreateInvoiceRequest> = {},
+  referenceDataStore: ReferenceDataStore = emptyDataStore
 ): CreateInvoiceRequest {
   const {
     senderAddress: overrideSenderAddress,
@@ -26,6 +36,11 @@ export function buildMockPendingInvoiceInput(
 
   const issuedAt =
     overrideIssuedAt instanceof Date ? overrideIssuedAt : faker.date.recent(90)
+
+  const paymentTermId =
+    referenceDataStore.paymentTerms.length > 0
+      ? randomPick(referenceDataStore.paymentTerms).id
+      : undefined
 
   return {
     status: 'pending',
@@ -47,14 +62,16 @@ export function buildMockPendingInvoiceInput(
     },
     issuedAt,
     paymentTerms: faker.datatype.number({ max: 30 }),
+    paymentTermId,
     projectDescription: faker.commerce.productDescription(),
     itemList,
     ...otherOverrides,
   }
 }
 
-export function buildMockDraftInvoiceInput(
-  overrides: PartialDeep<CreateInvoiceRequest> = {}
+export function buildMockDraftInvoiceRequest(
+  overrides: PartialDeep<CreateInvoiceRequest> = {},
+  referenceDataStore: ReferenceDataStore = emptyDataStore
 ): CreateInvoiceRequest {
   const {
     senderAddress: overrideSenderAddress,
@@ -68,6 +85,11 @@ export function buildMockDraftInvoiceInput(
 
   const issuedAt =
     overrideIssuedAt instanceof Date ? overrideIssuedAt : faker.date.recent()
+
+  const paymentTermId =
+    referenceDataStore.paymentTerms.length > 0
+      ? randomPick(referenceDataStore.paymentTerms).id
+      : undefined
 
   return {
     status: 'draft',
@@ -89,21 +111,25 @@ export function buildMockDraftInvoiceInput(
     },
     issuedAt,
     paymentTerms: faker.datatype.number({ max: 30 }),
+    paymentTermId: paymentTermId,
     projectDescription: maybeEmpty(faker.commerce.productDescription()),
     itemList,
     ...otherOverrides,
   }
 }
 
-export function buildMockInvoiceInput(
-  overrides: PartialDeep<CreateInvoiceRequest> = {}
+export function buildMockInvoiceRequest(
+  overrides: PartialDeep<CreateInvoiceRequest> = {},
+  referenceDataStore: ReferenceDataStore = emptyDataStore
 ): CreateInvoiceRequest {
   const { status: overrideStatus, ...rest } = overrides
 
   const status = overrideStatus ?? randomPick(['draft', 'pending'])
 
-  if (status === 'draft') return buildMockDraftInvoiceInput(rest)
-  if (status === 'pending') return buildMockPendingInvoiceInput(rest)
+  if (status === 'draft')
+    return buildMockDraftInvoiceRequest(rest, referenceDataStore)
+  if (status === 'pending')
+    return buildMockPendingInvoiceRequest(rest, referenceDataStore)
   else {
     const _exhaustiveCheck: never = status
     return _exhaustiveCheck
@@ -135,7 +161,8 @@ function buildMockItem(
 }
 
 export function buildMockInvoiceDetail(
-  overrides: PartialDeep<InvoiceDetail> = {}
+  overrides: PartialDeep<InvoiceDetail> = {},
+  referenceDataStore: ReferenceDataStore = emptyDataStore
 ): InvoiceDetail {
   const { status: overrideStatus, ...rest } = overrides
 
@@ -143,18 +170,59 @@ export function buildMockInvoiceDetail(
 
   let input: CreateInvoiceRequest
   if (status === 'draft') {
-    input = buildMockDraftInvoiceInput(rest)
+    input = buildMockDraftInvoiceRequest(rest, referenceDataStore)
   } else if (status === 'pending') {
-    input = buildMockPendingInvoiceInput(rest)
+    input = buildMockPendingInvoiceRequest(rest, referenceDataStore)
   } else if (status === 'paid') {
-    input = buildMockPendingInvoiceInput(rest)
+    input = buildMockPendingInvoiceRequest(rest, referenceDataStore)
   } else {
     const _exhaustiveCheck: never = status
     return _exhaustiveCheck
   }
 
   return {
-    ...invoiceDetailFromInput(input, generateAlphanumericId()),
+    ...invoiceDetailFromRequest(
+      input,
+      generateAlphanumericId(),
+      referenceDataStore
+    ),
     status: input.status,
+  }
+}
+
+export function invoiceDetailFromRequest(
+  { paymentTermId, ...input }: CreateInvoiceRequest,
+  invoiceId: InvoiceDetail['id'],
+  referenceDataStore: ReferenceDataStore
+): InvoiceDetail {
+  let paymentTermValue = input.paymentTerms
+  let paymentTerm: { id: number; value: number; name: string } | undefined
+
+  if (paymentTermId !== undefined) {
+    paymentTerm = referenceDataStore.paymentTerms.find(
+      (pt) => pt.id === paymentTermId
+    )
+    if (paymentTerm) {
+      paymentTermValue = paymentTerm.value
+    }
+  }
+
+  return {
+    ...input,
+    paymentDue: add(input.issuedAt, { days: paymentTermValue }),
+    paymentTerm,
+    id: invoiceId,
+    itemList: input.itemList.map((itemInput) => ({
+      ...itemInput,
+      id: generateNumericId(),
+      total: itemInput.quantity * itemInput.price,
+    })),
+    amountDue: round2dp(
+      input.itemList.reduce(
+        (acc, { quantity, price }) =>
+          round2dp(acc + round2dp(quantity * price)),
+        0
+      )
+    ),
   }
 }
