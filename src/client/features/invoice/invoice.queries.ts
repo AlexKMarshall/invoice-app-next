@@ -102,6 +102,8 @@ export function useCreateInvoice({
           queryClient.getQueryData<Array<InvoiceSummary>>(invoiceKeys.list()) ??
           []
 
+        const queriesData = queryClient.getQueriesData(invoiceKeys.lists())
+
         const pendingId = `SAVING-${nanoid()}`
         if (previousInvoices) {
           queryClient.setQueryData<Array<InvoiceSummary>>(invoiceKeys.list(), [
@@ -134,6 +136,8 @@ export function useCreateInvoice({
             updatedInvoices
           )
         }
+
+        queryClient.invalidateQueries(invoiceKeys.lists())
 
         onSuccess?.(savedInvoiceDetail, _newInvoiceInput, context)
       },
@@ -187,6 +191,8 @@ export function useMarkAsPaid({
           invoiceKeys.detail(invoiceId),
           updatedInvoiceDetail
         )
+
+        queryClient.invalidateQueries(invoiceKeys.lists())
 
         onSuccess?.(updatedInvoiceDetail, invoiceId, context)
       },
@@ -242,6 +248,8 @@ export function useUpdateInvoice({
           invoiceKeys.detail(mutationProps.id),
           updatedInvoiceDetail
         )
+
+        queryClient.invalidateQueries(invoiceKeys.lists())
 
         onSuccess?.(updatedInvoiceDetail, mutationProps, context)
       },
