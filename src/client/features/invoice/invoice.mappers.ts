@@ -21,7 +21,7 @@ export function invoiceMapperFactory(referenceDataStore: ReferenceDataStore) {
       (term) => term.id === input.paymentTermId
     )
 
-    let paymentTermValue = input.paymentTerms
+    let paymentTermValue = 0
 
     if (paymentTerm) {
       paymentTermValue = paymentTerm.value

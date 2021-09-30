@@ -19,6 +19,7 @@ export const Select = forwardRef(function Select(
     isLoading = false,
     options: optionsProp = [],
     errorMessage,
+    className,
     ...delegatedProps
   }: Props,
   ref: ForwardedRef<HTMLSelectElement>
@@ -34,7 +35,7 @@ export const Select = forwardRef(function Select(
   })
 
   return (
-    <div className={`${wrapperClassName}`}>
+    <div className={`${wrapperClassName} ${className}`}>
       <div className={labelWrapper}>
         <label htmlFor={controlId}>{label}</label>
 

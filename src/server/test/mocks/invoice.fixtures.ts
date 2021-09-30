@@ -65,7 +65,6 @@ export function invoiceFixtureFactory(
         ...overrideClientAddress,
       },
       issuedAt,
-      paymentTerms: faker.datatype.number({ max: 30 }),
       paymentTermId,
       projectDescription: faker.commerce.productDescription(),
       itemList,
@@ -113,7 +112,6 @@ export function invoiceFixtureFactory(
         ...overrideClientAddress,
       },
       issuedAt,
-      paymentTerms: faker.datatype.number({ max: 30 }),
       paymentTermId: paymentTermId,
       projectDescription: maybeEmpty(faker.commerce.productDescription()),
       itemList,
@@ -189,7 +187,7 @@ export function invoiceFixtureFactory(
     { paymentTermId, ...input }: CreateInvoiceRequest,
     invoiceId: InvoiceDetail['id']
   ): InvoiceDetail {
-    let paymentTermValue = input.paymentTerms
+    let paymentTermValue = 0
     let paymentTerm: { id: number; value: number; name: string } | undefined
 
     if (paymentTermId !== undefined) {

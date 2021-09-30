@@ -16,7 +16,6 @@ function dbFindAllSummaries(where?: Prisma.InvoiceWhereInput) {
     select: {
       id: true,
       issuedAt: true,
-      paymentTerms: true,
       paymentTerm: {
         select: {
           value: true,
@@ -56,7 +55,6 @@ const invoiceSummaryDbSchema = schemaForType<DbInvoiceSummary>()(
   z.object({
     id: z.string(),
     issuedAt: z.date(),
-    paymentTerms: z.number(),
     paymentTerm: z
       .object({
         value: z.number(),
@@ -83,14 +81,13 @@ function dbSummaryToInvoiceSummary(
   const {
     id,
     issuedAt,
-    paymentTerms,
     paymentTerm,
     client: { name: clientName },
     invoiceItems,
     status,
   } = invoice
 
-  let paymentTermValue = paymentTerms
+  let paymentTermValue = 0
   if (paymentTerm) {
     paymentTermValue = paymentTerm.value
   }
@@ -137,7 +134,6 @@ function flattenInvoiceDetail(
     client,
     invoiceItems,
     issuedAt,
-    paymentTerms,
     paymentTerm,
     ...restInvoice
   } = invoice
@@ -152,7 +148,7 @@ function flattenInvoiceDetail(
     })
   )
 
-  let paymentTermValue = paymentTerms
+  let paymentTermValue = 0
   if (paymentTerm) {
     paymentTermValue = paymentTerm.value
   }
@@ -170,7 +166,6 @@ function flattenInvoiceDetail(
     clientAddress: client.address,
     itemList,
     issuedAt,
-    paymentTerms,
     paymentTerm: paymentTerm ?? undefined,
     paymentDue,
     amountDue,
@@ -220,7 +215,6 @@ const draftInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
     id: z.string().min(1),
     status: z.literal('draft'),
     issuedAt: z.date(),
-    paymentTerms: z.number(),
     paymentTerm: z
       .object({
         id: z.number(),
@@ -254,7 +248,6 @@ const pendingInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
     id: z.string().min(1),
     status: z.literal('pending'),
     issuedAt: z.date(),
-    paymentTerms: z.number(),
     paymentTerm: z
       .object({
         id: z.number(),
@@ -422,7 +415,6 @@ const invoiceDetailSelect = {
   id: true,
   status: true,
   issuedAt: true,
-  paymentTerms: true,
   paymentTerm: {
     select: {
       id: true,

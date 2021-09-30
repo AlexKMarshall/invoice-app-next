@@ -185,13 +185,8 @@ export function InvoiceForm({
             })}
             disabled={kind === 'update'}
           />
-          <Input
-            className={spanHalf}
-            label="Payment Terms Old"
-            type="number"
-            {...register('paymentTerms', { valueAsNumber: true })}
-          />
           <Select
+            className={spanHalf}
             label="Payment Terms"
             isLoading={paymentTermsQuery.isLoading}
             options={

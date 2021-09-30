@@ -62,4 +62,5 @@ export const select = style({
   color: 'inherit',
   borderRadius: '4px',
   fontWeight: themeVars.typography.fontWeight.bold,
+  lineHeight: themeVars.typography.body1.lineHeight,
 })

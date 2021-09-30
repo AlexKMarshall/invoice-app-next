@@ -116,11 +116,6 @@ export async function fillInInvoiceForm(
       format(invoice.issuedAt, 'yyyy-MM-dd')
     )
   }
-  validateTextfieldEntry(
-    screen.getByLabelText(/payment terms old/i),
-    invoice.paymentTerms.toString(),
-    invoice.paymentTerms
-  )
 
   // select paymentTerm
   if (invoice.paymentTerm) {

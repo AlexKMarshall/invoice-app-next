@@ -30,7 +30,6 @@ const createDraftInvoiceRequestDtoSchema =
       clientEmail: z.union([z.string().email(), z.literal('')]),
       clientAddress: draftAddressSchema,
       issuedAt: z.date(),
-      paymentTerms: z.number().min(0),
       paymentTermId: z.number().optional(),
       projectDescription: z.string(),
       itemList: z.array(
@@ -52,7 +51,6 @@ const createPendingInvoiceRequestDtoSchema =
       clientEmail: z.string().min(1, { message: "can't be empty" }).email(),
       clientAddress: addressSchema,
       issuedAt: z.date(),
-      paymentTerms: z.number().min(0),
       paymentTermId: z.number().optional(),
       projectDescription: z.string().min(1, { message: "can't be empty" }),
       itemList: z.array(

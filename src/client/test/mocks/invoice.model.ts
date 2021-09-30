@@ -82,7 +82,7 @@ export function initialise(invoices: Array<InvoiceDetail>): void {
 }
 
 export function invoiceDetailToSummary(invoice: InvoiceDetail): InvoiceSummary {
-  let paymentTermValue = invoice.paymentTerms
+  let paymentTermValue = 0
 
   if (invoice.paymentTerm) {
     paymentTermValue = invoice.paymentTerm.value

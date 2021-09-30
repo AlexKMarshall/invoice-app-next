@@ -57,7 +57,6 @@ model Invoice {
   status             String
   issuedAt           DateTime
   projectDescription String
-  paymentTerms       Int
   paymentTerm        PaymentTerm?  @relation(fields: [paymentTermId], references: [id])
   paymentTermId      Int?
   sender             Sender        @relation(fields: [senderId], references: [id])

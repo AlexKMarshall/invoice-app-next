@@ -134,7 +134,6 @@ describe('postInvoice', () => {
 
   it('should return error on invalid numbers', async () => {
     const mockInput = buildMockInvoiceRequest({
-      paymentTerms: -1,
       itemList: [{ quantity: 0, price: -1 }],
     })
     const dtoInput = JSON.parse(JSON.stringify(mockInput))
@@ -145,7 +144,6 @@ describe('postInvoice', () => {
     expect(result.response).toEqual({
       error: {
         fieldErrors: {
-          paymentTerms: ['Value should be greater than or equal to 0'],
           itemList: {
             '0': {
               quantity: ['Value should be greater than or equal to 1'],

@@ -63,7 +63,6 @@ type InvoiceDetail = {
     country: string
   }
   issuedAt: Date
-  paymentTerms: number
   paymentTerm?: {
     id: number
     value: number
