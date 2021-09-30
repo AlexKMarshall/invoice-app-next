@@ -54,7 +54,7 @@ const defaultFormValues = {
     country: '',
   },
   issuedAt: new Date(), //format(new Date(), 'yyyy-MM-dd'),
-  paymentTerms: 0,
+  paymentTermId: 0,
   projectDescription: '',
   itemList: [],
   status: 'draft' as const,

@@ -111,13 +111,11 @@ function prepareInvoiceToCreate(
     })),
   }
 
-  const paymentTerm = paymentTermDetail
-    ? {
-        connect: {
-          id: paymentTermDetail.id,
-        },
-      }
-    : undefined
+  const paymentTerm = {
+    connect: {
+      id: paymentTermDetail.id,
+    },
+  }
 
   const invoiceToSave = {
     id,

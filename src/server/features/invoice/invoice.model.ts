@@ -55,11 +55,9 @@ const invoiceSummaryDbSchema = schemaForType<DbInvoiceSummary>()(
   z.object({
     id: z.string(),
     issuedAt: z.date(),
-    paymentTerm: z
-      .object({
-        value: z.number(),
-      })
-      .nullable(),
+    paymentTerm: z.object({
+      value: z.number(),
+    }),
     client: z.object({
       name: z.string(),
     }),
@@ -215,13 +213,12 @@ const draftInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
     id: z.string().min(1),
     status: z.literal('draft'),
     issuedAt: z.date(),
-    paymentTerm: z
-      .object({
-        id: z.number(),
-        value: z.number(),
-        name: z.string(),
-      })
-      .nullable(),
+    paymentTermId: z.number(),
+    paymentTerm: z.object({
+      id: z.number(),
+      value: z.number(),
+      name: z.string(),
+    }),
     projectDescription: possiblyEmptyString,
     sender: z.object({
       address: draftAddressSchema,
@@ -248,13 +245,12 @@ const pendingInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
     id: z.string().min(1),
     status: z.literal('pending'),
     issuedAt: z.date(),
-    paymentTerm: z
-      .object({
-        id: z.number(),
-        value: z.number(),
-        name: z.string(),
-      })
-      .nullable(),
+    paymentTermId: z.number(),
+    paymentTerm: z.object({
+      id: z.number(),
+      value: z.number(),
+      name: z.string(),
+    }),
     projectDescription: z.string(),
     sender: z.object({
       address: addressSchema,
@@ -331,8 +327,7 @@ function prepareInvoiceForCreate(
     })),
   }
 
-  const paymentTerm =
-    paymentTermId !== undefined ? { connect: { id: paymentTermId } } : undefined
+  const paymentTerm = { connect: { id: paymentTermId } }
 
   const invoiceToSave = {
     id,
@@ -391,8 +386,7 @@ function prepareInvoiceForUpdate(
     })),
   }
 
-  const paymentTerm =
-    paymentTermId !== undefined ? { connect: { id: paymentTermId } } : undefined
+  const paymentTerm = { connect: { id: paymentTermId } }
 
   const invoiceToSave: Prisma.InvoiceUpdateInput = {
     id,
@@ -415,6 +409,7 @@ const invoiceDetailSelect = {
   id: true,
   status: true,
   issuedAt: true,
+  paymentTermId: true,
   paymentTerm: {
     select: {
       id: true,

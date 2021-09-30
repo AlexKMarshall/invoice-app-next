@@ -41,10 +41,7 @@ export function invoiceFixtureFactory(
         ? overrideIssuedAt
         : faker.date.recent(90)
 
-    const paymentTermId =
-      referenceDataStore.paymentTerms.length > 0
-        ? randomPick(referenceDataStore.paymentTerms).id
-        : undefined
+    const paymentTermId = randomPick(referenceDataStore.paymentTerms).id
 
     return {
       status: 'pending',
@@ -88,10 +85,7 @@ export function invoiceFixtureFactory(
     const issuedAt =
       overrideIssuedAt instanceof Date ? overrideIssuedAt : faker.date.recent()
 
-    const paymentTermId =
-      referenceDataStore.paymentTerms.length > 0
-        ? randomPick(referenceDataStore.paymentTerms).id
-        : undefined
+    const paymentTermId = randomPick(referenceDataStore.paymentTerms).id
 
     return {
       status: 'draft',
@@ -187,22 +181,18 @@ export function invoiceFixtureFactory(
     { paymentTermId, ...input }: CreateInvoiceRequest,
     invoiceId: InvoiceDetail['id']
   ): InvoiceDetail {
-    let paymentTermValue = 0
-    let paymentTerm: { id: number; value: number; name: string } | undefined
+    const paymentTerm = referenceDataStore.paymentTerms.find(
+      (pt) => pt.id === paymentTermId
+    )
 
-    if (paymentTermId !== undefined) {
-      paymentTerm = referenceDataStore.paymentTerms.find(
-        (pt) => pt.id === paymentTermId
-      )
-      if (paymentTerm) {
-        paymentTermValue = paymentTerm.value
-      }
-    }
+    if (!paymentTerm)
+      throw new Error(`Cannot find paymentTerm with id ${paymentTermId}`)
 
     return {
       ...input,
-      paymentDue: add(input.issuedAt, { days: paymentTermValue }),
+      paymentDue: add(input.issuedAt, { days: paymentTerm.value }),
       paymentTerm,
+      paymentTermId: paymentTerm.id,
       id: invoiceId,
       itemList: input.itemList.map((itemInput) => ({
         ...itemInput,

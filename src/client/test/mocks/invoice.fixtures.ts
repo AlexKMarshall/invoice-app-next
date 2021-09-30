@@ -23,7 +23,7 @@ export function invoiceFixturesFactory(
 
   function buildMockPendingInvoiceInput(
     overrides: PartialDeep<CreateInvoiceRequest> = {}
-  ): CreateInvoiceRequest & { paymentTerm?: PaymentTerm } {
+  ): CreateInvoiceRequest & { paymentTerm: PaymentTerm } {
     const {
       senderAddress: overrideSenderAddress,
       clientAddress: overrideClientAddress,
@@ -58,7 +58,7 @@ export function invoiceFixturesFactory(
         ...overrideClientAddress,
       },
       issuedAt,
-      paymentTermId: paymentTerm?.id,
+      paymentTermId: paymentTerm.id,
       paymentTerm,
       projectDescription: faker.commerce.productDescription(),
       itemList,
@@ -68,7 +68,7 @@ export function invoiceFixturesFactory(
 
   function buildMockDraftInvoiceInput(
     overrides: PartialDeep<CreateInvoiceRequest> = {}
-  ): CreateInvoiceRequest & { paymentTerm?: PaymentTerm } {
+  ): CreateInvoiceRequest & { paymentTerm: PaymentTerm } {
     const {
       senderAddress: overrideSenderAddress,
       clientAddress: overrideClientAddress,
@@ -103,7 +103,7 @@ export function invoiceFixturesFactory(
         ...overrideClientAddress,
       },
       issuedAt,
-      paymentTermId: paymentTerm?.id,
+      paymentTermId: paymentTerm.id,
       paymentTerm,
       projectDescription: maybeEmpty(faker.commerce.productDescription()),
       itemList,
@@ -113,7 +113,7 @@ export function invoiceFixturesFactory(
 
   function buildMockInvoiceInput(
     overrides: PartialDeep<CreateInvoiceRequest> = {}
-  ): CreateInvoiceRequest {
+  ): CreateInvoiceRequest & { paymentTerm: PaymentTerm } {
     const { status: overrideStatus, ...rest } = overrides
 
     const status = overrideStatus ?? randomPick(['draft', 'pending'])

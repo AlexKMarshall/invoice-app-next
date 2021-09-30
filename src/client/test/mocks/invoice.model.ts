@@ -82,14 +82,9 @@ export function initialise(invoices: Array<InvoiceDetail>): void {
 }
 
 export function invoiceDetailToSummary(invoice: InvoiceDetail): InvoiceSummary {
-  let paymentTermValue = 0
-
-  if (invoice.paymentTerm) {
-    paymentTermValue = invoice.paymentTerm.value
-  }
   return {
     id: invoice.id,
-    paymentDue: add(invoice.issuedAt, { days: paymentTermValue }),
+    paymentDue: add(invoice.issuedAt, { days: invoice.paymentTerm.value }),
     clientName: invoice.clientName,
     amountDue: invoice.itemList
       .map((item) => item.quantity * item.price)

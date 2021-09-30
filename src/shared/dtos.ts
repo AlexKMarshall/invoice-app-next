@@ -40,7 +40,6 @@ export type CreateInvoiceRequest = Except<
 > & {
   itemList: Array<CreateInvoiceItemRequest>
   status: Exclude<InvoiceStatus, 'paid'>
-  paymentTermId?: number
 }
 
 type CreateInvoiceItemRequest = Except<InvoiceItem, 'id' | 'total'>
@@ -63,7 +62,8 @@ type InvoiceDetail = {
     country: string
   }
   issuedAt: Date
-  paymentTerm?: {
+  paymentTermId: number
+  paymentTerm: {
     id: number
     value: number
     name: string

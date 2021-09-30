@@ -21,15 +21,12 @@ export function invoiceMapperFactory(referenceDataStore: ReferenceDataStore) {
       (term) => term.id === input.paymentTermId
     )
 
-    let paymentTermValue = 0
-
-    if (paymentTerm) {
-      paymentTermValue = paymentTerm.value
-    }
+    if (!paymentTerm)
+      throw new Error(`Cannot find paymentTerm with id ${input.paymentTermId}`)
 
     return {
       ...input,
-      paymentDue: add(input.issuedAt, { days: paymentTermValue }),
+      paymentDue: add(input.issuedAt, { days: paymentTerm?.value }),
       itemList: input.itemList.map((itemInput) => ({
         ...itemInput,
         id: generateNumericId(),

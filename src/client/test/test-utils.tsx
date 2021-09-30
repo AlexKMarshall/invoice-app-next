@@ -57,7 +57,7 @@ export function validateTextfieldEntry(
 
 export async function fillInInvoiceForm(
   invoice: (CreateInvoiceRequest | UpdateInvoiceRequest) & {
-    paymentTerm?: PaymentTerm
+    paymentTerm: PaymentTerm
   },
   mode: 'create' | 'update' = 'create'
 ): Promise<void> {
@@ -118,17 +118,16 @@ export async function fillInInvoiceForm(
   }
 
   // select paymentTerm
-  if (invoice.paymentTerm) {
-    const paymentTermSelect = screen.getByRole('combobox', {
-      name: /payment terms/i,
-    })
-    const termOption = await within(paymentTermSelect).findByRole('option', {
-      name: invoice.paymentTerm.name,
-    })
 
-    userEvent.selectOptions(paymentTermSelect, termOption)
-    expect(paymentTermSelect).toHaveValue(invoice.paymentTerm.id.toString())
-  }
+  const paymentTermSelect = screen.getByRole('combobox', {
+    name: /payment terms/i,
+  })
+  const termOption = await within(paymentTermSelect).findByRole('option', {
+    name: invoice.paymentTerm.name,
+  })
+
+  userEvent.selectOptions(paymentTermSelect, termOption)
+  expect(paymentTermSelect).toHaveValue(invoice.paymentTerm.id.toString())
 
   validateTextfieldEntry(
     screen.getByLabelText(/project description/i),

@@ -15,7 +15,9 @@ const {
   buildMockInvoiceDetail,
   buildMockInvoiceRequest,
   buildMockPendingInvoiceRequest,
-} = invoiceFixtureFactory()
+} = invoiceFixtureFactory({
+  paymentTerms: [{ id: 1, value: 1, name: 'Net 1 Day' }],
+})
 
 afterEach(() => {
   jest.resetAllMocks()
