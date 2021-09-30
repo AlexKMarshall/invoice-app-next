@@ -14,7 +14,7 @@ import {
 } from 'src/shared/dtos'
 import {
   destringifyInvoiceInput,
-  invoiceDetailFromInput,
+  invoiceMapperFactory,
 } from 'src/client/features/invoice/invoice.mappers'
 
 import { InvoiceDetail } from 'src/server/features/invoice/invoice.types'
@@ -22,6 +22,8 @@ import { parseJSON } from 'date-fns'
 import { rest } from 'msw'
 
 type EmptyObject = Record<string, never>
+
+const { invoiceDetailFromInput } = invoiceMapperFactory(invoiceModel.store)
 
 export const handlers = [
   rest.get<EmptyObject, GetInvoicesResponse, EmptyObject>(
@@ -48,10 +50,12 @@ export const handlers = [
     EmptyObject
   >('/api/invoices', async (req, res, ctx) => {
     const newInvoice = req.body
+
     const savedInvoice = await invoiceModel.create({
       ...newInvoice,
       issuedAt: parseJSON(newInvoice.issuedAt),
     })
+
     return res(
       ctx.status(201),
       ctx.json({

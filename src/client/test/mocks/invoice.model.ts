@@ -7,7 +7,7 @@ import {
 import { IterableElement } from 'type-fest'
 import { add } from 'date-fns'
 import { generateAlphanumericId } from 'src/shared/identifier'
-import { invoiceDetailFromInput } from 'src/client/features/invoice/invoice.mappers'
+import { invoiceMapperFactory } from 'src/client/features/invoice/invoice.mappers'
 
 type PaymentTerm = IterableElement<
   GetPaymentTermsResponse['data']['paymentTerms']
@@ -28,6 +28,8 @@ export const store: Store = {
     { id: 5, value: 90, name: 'Net 90 Days' },
   ],
 }
+
+const { invoiceDetailFromInput } = invoiceMapperFactory(store)
 
 export function findAll({
   status,
@@ -80,9 +82,14 @@ export function initialise(invoices: Array<InvoiceDetail>): void {
 }
 
 export function invoiceDetailToSummary(invoice: InvoiceDetail): InvoiceSummary {
+  let paymentTermValue = invoice.paymentTerms
+
+  if (invoice.paymentTerm) {
+    paymentTermValue = invoice.paymentTerm.value
+  }
   return {
     id: invoice.id,
-    paymentDue: add(invoice.issuedAt, { days: invoice.paymentTerms }),
+    paymentDue: add(invoice.issuedAt, { days: paymentTermValue }),
     clientName: invoice.clientName,
     amountDue: invoice.itemList
       .map((item) => item.quantity * item.price)

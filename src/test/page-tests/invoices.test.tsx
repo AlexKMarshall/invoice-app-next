@@ -12,15 +12,17 @@ import {
 import { format } from 'date-fns'
 import { getPage } from 'next-page-tester'
 import { idRegex } from 'src/shared/identifier'
-import { invoiceDetailFromInput } from 'src/client/features/invoice/invoice.mappers'
 import { invoiceFixturesFactory } from 'src/client/test/mocks/invoice.fixtures'
+import { invoiceMapperFactory } from 'src/client/features/invoice/invoice.mappers'
 import { validateGBPValue } from 'src/test/validators'
 
 const {
   buildMockInvoiceDetail,
   buildMockInvoiceInput,
   buildMockPendingInvoiceInput,
-} = invoiceFixturesFactory()
+} = invoiceFixturesFactory(invoiceModel.store)
+
+const { invoiceDetailFromInput } = invoiceMapperFactory(invoiceModel.store)
 
 it('should show list of invoice summaries', async () => {
   const mockInvoiceDetails = [
@@ -83,9 +85,13 @@ it('should show a list of invoice summaries filtered by status', async () => {
   expect(screen.getByText(pendingInvoice.id)).toBeInTheDocument()
   expect(screen.getByText(paidInvoice.id)).toBeInTheDocument()
 
-  const filterButton = screen.getByRole('button', { name: /filter by status/i })
+  const filterButton = screen.getByRole('button', {
+    name: /filter by status/i,
+  })
   userEvent.click(filterButton)
-  let checkboxGroup = screen.getByRole('group', { name: /filter by status/i })
+  let checkboxGroup = screen.getByRole('group', {
+    name: /filter by status/i,
+  })
   userEvent.click(
     within(checkboxGroup).getByRole('checkbox', { name: /draft/i })
   )
@@ -165,7 +171,6 @@ it('should allow filtering through the URL', async () => {
   expect(screen.getByText(pendingInvoice.id)).toBeInTheDocument()
   expect(screen.getByText(paidInvoice.id)).toBeInTheDocument()
 })
-
 it('should show empty state when there are no invoices', async () => {
   invoiceModel.initialise([])
 
@@ -188,6 +193,8 @@ it('should not show new invoice form until button is clicked', async () => {
 
   render()
 
+  await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
+
   expect(
     screen.queryByRole('form', { name: /new invoice/i })
   ).not.toBeInTheDocument()
@@ -198,6 +205,8 @@ it('should validate that fields are filled in when creating pending invoice', as
   })
 
   render()
+
+  await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
 
   userEvent.click(screen.getByRole('button', { name: /new invoice/i }))
 
@@ -274,8 +283,8 @@ it.todo('should check for valid email')
 it.todo('should check for valid issuedAt date')
 it.todo('should check there are invoice items')
 it('should allow new draft invoices to be creacted', async () => {
-  const existingInvoice = buildMockInvoiceDetail()
-  invoiceModel.initialise([existingInvoice])
+  // const existingInvoice = buildMockInvoiceDetail()
+  invoiceModel.initialise([])
   const mockDraftInvoiceInput = buildMockInvoiceInput({ status: 'draft' })
 
   const mockInvoiceSummary = invoiceModel.invoiceDetailToSummary(
@@ -294,7 +303,7 @@ it('should allow new draft invoices to be creacted', async () => {
 
   expect(screen.getByRole('form', { name: /new invoice/i })).toBeInTheDocument()
 
-  fillInInvoiceForm(mockDraftInvoiceInput)
+  await fillInInvoiceForm(mockDraftInvoiceInput)
 
   // save the draft invoice
 
@@ -375,7 +384,7 @@ it('should allow new pending invoices to be creacted', async () => {
 
   expect(screen.getByRole('form', { name: /new invoice/i })).toBeInTheDocument()
 
-  fillInInvoiceForm(mockPendingInvoiceInput)
+  await fillInInvoiceForm(mockPendingInvoiceInput)
 
   // save the pending invoice
 
@@ -437,6 +446,8 @@ it('should be possible to cancel the new invoice form', async () => {
   })
 
   render()
+
+  await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
 
   expect(screen.getByRole('heading', { name: /invoices/i })).toBeInTheDocument()
 

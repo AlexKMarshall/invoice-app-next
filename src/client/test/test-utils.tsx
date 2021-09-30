@@ -3,12 +3,13 @@ import {
   DrawerContainer,
   DrawerOverlayContainer,
   DrawerProvider,
-} from '../shared/components/drawer'
+  ScreenReaderNotificationProvider,
+} from 'src/client/shared/components'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { render as rtlRender, screen, within } from '@testing-library/react'
 
 import { FunctionComponent } from 'react'
-import { ScreenReaderNotificationProvider } from '../shared/components/screen-reader-notification'
+import { PaymentTerm } from 'src/client/features/invoice/payment-term.types'
 import { format } from 'date-fns'
 import userEvent from '@testing-library/user-event'
 
@@ -54,10 +55,12 @@ export function validateTextfieldEntry(
   expect(field).toHaveValue(expectedValue)
 }
 
-export function fillInInvoiceForm(
-  invoice: CreateInvoiceRequest | UpdateInvoiceRequest,
+export async function fillInInvoiceForm(
+  invoice: (CreateInvoiceRequest | UpdateInvoiceRequest) & {
+    paymentTerm?: PaymentTerm
+  },
   mode: 'create' | 'update' = 'create'
-): void {
+): Promise<void> {
   const elBillFromGroup = screen.getByRole('group', { name: /bill from/i })
   const inBillFrom = within(elBillFromGroup)
 
@@ -118,6 +121,20 @@ export function fillInInvoiceForm(
     invoice.paymentTerms.toString(),
     invoice.paymentTerms
   )
+
+  // select paymentTerm
+  if (invoice.paymentTerm) {
+    const paymentTermSelect = screen.getByRole('combobox', {
+      name: /payment terms/i,
+    })
+    const termOption = await within(paymentTermSelect).findByRole('option', {
+      name: invoice.paymentTerm.name,
+    })
+
+    userEvent.selectOptions(paymentTermSelect, termOption)
+    expect(paymentTermSelect).toHaveValue(invoice.paymentTerm.id.toString())
+  }
+
   validateTextfieldEntry(
     screen.getByLabelText(/project description/i),
     invoice.projectDescription

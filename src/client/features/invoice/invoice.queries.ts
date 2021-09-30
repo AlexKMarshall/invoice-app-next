@@ -17,8 +17,9 @@ import {
   updateStatus,
 } from './invoice.api-client'
 
-import { invoiceDetailFromInput } from './invoice.mappers'
+import { invoiceMapperFactory } from './invoice.mappers'
 import { nanoid } from 'nanoid'
+import { usePaymentTerms } from './payment-term.queries'
 
 type InvoiceSummaryFilters = {
   status?: InvoiceSummary['status'][]
@@ -91,6 +92,7 @@ export function useCreateInvoice({
   unknown
 > {
   const queryClient = useQueryClient()
+  const { invoiceDetailFromInput } = useInvoiceMapper()
   return useMutation(
     (newInvoice: CreateInvoiceRequest) => postInvoice(newInvoice),
     {
@@ -208,6 +210,7 @@ export function useUpdateInvoice({
   UseUpdateInvoiceMutationProps
 > {
   const queryClient = useQueryClient()
+  const { invoiceDetailFromInput } = useInvoiceMapper()
 
   return useMutation(
     ({ id, invoice }: UseUpdateInvoiceMutationProps) =>
@@ -294,4 +297,10 @@ export function useDeleteInvoice({
       },
     }
   )
+}
+
+function useInvoiceMapper() {
+  const paymentTermsQuery = usePaymentTerms()
+
+  return invoiceMapperFactory({ paymentTerms: paymentTermsQuery.data ?? [] })
 }

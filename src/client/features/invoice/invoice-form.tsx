@@ -197,11 +197,12 @@ export function InvoiceForm({
             options={
               paymentTermsQuery.isSuccess
                 ? paymentTermsQuery.data.map((pt) => ({
-                    value: pt.value.toString(),
+                    value: pt.id.toString(),
                     label: pt.name,
                   }))
                 : undefined
             }
+            {...register('paymentTermId', { valueAsNumber: true })}
           />
           <Input
             className={spanFull}

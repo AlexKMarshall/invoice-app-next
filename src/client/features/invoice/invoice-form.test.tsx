@@ -73,6 +73,6 @@ it('should have a payment term selector', async () => {
     const option = within(paymentTermsSelect).getByRole('option', {
       name: term.name,
     })
-    expect(option).toHaveValue(term.value.toString())
+    expect(option).toHaveValue(term.id.toString())
   })
 })

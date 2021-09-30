@@ -3,14 +3,27 @@ import { maybeEmpty, randomPick } from 'src/shared/random'
 
 import { CreateInvoiceRequest } from 'src/shared/dtos'
 import { InvoiceDetail } from 'src/client/features/invoice/invoice.types'
+import { PaymentTerm } from 'src/client/features/invoice/payment-term.types'
 import faker from 'faker'
 import { generateAlphanumericId } from 'src/shared/identifier'
-import { invoiceDetailFromInput } from 'src/client/features/invoice/invoice.mappers'
+import { invoiceMapperFactory } from 'src/client/features/invoice/invoice.mappers'
 
-export function invoiceFixturesFactory() {
+type ReferenceDataStore = {
+  paymentTerms: PaymentTerm[]
+}
+
+const emptyReferenceData = {
+  paymentTerms: [],
+}
+
+export function invoiceFixturesFactory(
+  referenceDataStore: ReferenceDataStore = emptyReferenceData
+) {
+  const { invoiceDetailFromInput } = invoiceMapperFactory(referenceDataStore)
+
   function buildMockPendingInvoiceInput(
     overrides: PartialDeep<CreateInvoiceRequest> = {}
-  ): CreateInvoiceRequest {
+  ): CreateInvoiceRequest & { paymentTerm?: PaymentTerm } {
     const {
       senderAddress: overrideSenderAddress,
       clientAddress: overrideClientAddress,
@@ -23,6 +36,8 @@ export function invoiceFixturesFactory() {
 
     const issuedAt =
       overrideIssuedAt instanceof Date ? overrideIssuedAt : faker.date.recent()
+
+    const paymentTerm = randomPick(referenceDataStore.paymentTerms)
 
     return {
       status: 'pending',
@@ -44,6 +59,8 @@ export function invoiceFixturesFactory() {
       },
       issuedAt,
       paymentTerms: faker.datatype.number({ min: 1, max: 30 }),
+      paymentTermId: paymentTerm?.id,
+      paymentTerm,
       projectDescription: faker.commerce.productDescription(),
       itemList,
       ...otherOverrides,
@@ -52,7 +69,7 @@ export function invoiceFixturesFactory() {
 
   function buildMockDraftInvoiceInput(
     overrides: PartialDeep<CreateInvoiceRequest> = {}
-  ): CreateInvoiceRequest {
+  ): CreateInvoiceRequest & { paymentTerm?: PaymentTerm } {
     const {
       senderAddress: overrideSenderAddress,
       clientAddress: overrideClientAddress,
@@ -65,6 +82,8 @@ export function invoiceFixturesFactory() {
 
     const issuedAt =
       overrideIssuedAt instanceof Date ? overrideIssuedAt : faker.date.recent()
+
+    const paymentTerm = randomPick(referenceDataStore.paymentTerms)
 
     return {
       status: 'draft',
@@ -86,6 +105,8 @@ export function invoiceFixturesFactory() {
       },
       issuedAt,
       paymentTerms: faker.datatype.number({ min: 1, max: 30 }),
+      paymentTermId: paymentTerm?.id,
+      paymentTerm,
       projectDescription: maybeEmpty(faker.commerce.productDescription()),
       itemList,
       ...otherOverrides,
@@ -97,7 +118,7 @@ export function invoiceFixturesFactory() {
   ): CreateInvoiceRequest {
     const { status: overrideStatus, ...rest } = overrides
 
-    const status = overrideStatus ?? randomStatus()
+    const status = overrideStatus ?? randomPick(['draft', 'pending'])
 
     if (status === 'draft') return buildMockDraftInvoiceInput(rest)
     if (status === 'pending') return buildMockPendingInvoiceInput(rest)
@@ -165,6 +186,6 @@ function buildMockItem(
 }
 
 function randomStatus() {
-  const statuses = ['draft', 'pending'] as const
+  const statuses = ['draft', 'pending', 'paid'] as const
   return randomPick(statuses)
 }
