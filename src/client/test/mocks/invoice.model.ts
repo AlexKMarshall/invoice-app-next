@@ -1,18 +1,33 @@
+import { CreateInvoiceRequest, GetPaymentTermsResponse } from 'src/shared/dtos'
 import {
   InvoiceDetail,
   InvoiceSummary,
 } from 'src/client/features/invoice/invoice.types'
 
-import { CreateInvoiceRequest } from 'src/shared/dtos'
+import { IterableElement } from 'type-fest'
 import { add } from 'date-fns'
 import { generateAlphanumericId } from 'src/shared/identifier'
 import { invoiceDetailFromInput } from 'src/client/features/invoice/invoice.mappers'
 
+type PaymentTerm = IterableElement<
+  GetPaymentTermsResponse['data']['paymentTerms']
+>
+
 type Store = {
   invoices: Array<InvoiceDetail>
+  paymentTerms: Array<PaymentTerm>
 }
 
-const store: Store = { invoices: [] }
+export const store: Store = {
+  invoices: [],
+  paymentTerms: [
+    { id: 1, value: 1, name: 'Net 1 Day' },
+    { id: 2, value: 7, name: 'Net 7 Days' },
+    { id: 3, value: 14, name: 'Net 14 Days' },
+    { id: 4, value: 30, name: 'Net 30 Days' },
+    { id: 5, value: 90, name: 'Net 90 Days' },
+  ],
+}
 
 export function findAll({
   status,
@@ -74,4 +89,8 @@ export function invoiceDetailToSummary(invoice: InvoiceDetail): InvoiceSummary {
       .reduce((acc, cur) => acc + cur),
     status: invoice.status,
   }
+}
+
+export async function findAllPaymentTerms(): Promise<Array<PaymentTerm>> {
+  return Promise.resolve(store.paymentTerms)
 }

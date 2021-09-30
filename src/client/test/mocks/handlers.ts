@@ -6,6 +6,7 @@ import {
   DeleteInvoiceResponse,
   GetInvoiceByIdResponse,
   GetInvoicesResponse,
+  GetPaymentTermsResponse,
   Stringify,
   UpdateInvoiceRequest,
   UpdateInvoiceResponse,
@@ -126,4 +127,11 @@ export const handlers = [
       })
     )
   }),
+  rest.get<EmptyObject, GetPaymentTermsResponse, EmptyObject>(
+    '/api/payment-terms',
+    async (req, res, ctx) => {
+      const paymentTerms = await invoiceModel.findAllPaymentTerms()
+      return res(ctx.status(200), ctx.json({ data: { paymentTerms } }))
+    }
+  ),
 ]

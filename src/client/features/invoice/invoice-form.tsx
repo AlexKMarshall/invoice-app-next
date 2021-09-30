@@ -1,4 +1,4 @@
-import { Button, IconButton, Input } from 'src/client/shared/components'
+import { Button, IconButton, Input, Select } from 'src/client/shared/components'
 import { CreateInvoiceRequest, UpdateInvoiceRequest } from 'src/shared/dtos'
 import {
   buttonGroup,
@@ -26,6 +26,7 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { Delete } from 'src/client/shared/icons'
 import { format } from 'date-fns'
 import { useId } from '@react-aria/utils'
+import { usePaymentTerms } from './payment-term.queries'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 type Props = {
@@ -74,6 +75,8 @@ export function InvoiceForm({
     ...defaultValues,
     issuedAt: format(defaultValues.issuedAt, 'yyyy-MM-dd'),
   }
+
+  const paymentTermsQuery = usePaymentTerms()
 
   const {
     register,
@@ -184,9 +187,21 @@ export function InvoiceForm({
           />
           <Input
             className={spanHalf}
-            label="Payment Terms"
+            label="Payment Terms Old"
             type="number"
             {...register('paymentTerms', { valueAsNumber: true })}
+          />
+          <Select
+            label="Payment Terms"
+            isLoading={paymentTermsQuery.isLoading}
+            options={
+              paymentTermsQuery.isSuccess
+                ? paymentTermsQuery.data.map((pt) => ({
+                    value: pt.value.toString(),
+                    label: pt.name,
+                  }))
+                : undefined
+            }
           />
           <Input
             className={spanFull}

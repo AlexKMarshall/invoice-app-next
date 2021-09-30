@@ -1,11 +1,6 @@
 import * as invoiceModel from 'src/client/test/mocks/invoice.model'
 
 import {
-  buildMockInvoiceDetail,
-  buildMockInvoiceInput,
-  buildMockPendingInvoiceInput,
-} from 'src/client/test/mocks/invoice.fixtures'
-import {
   fillInInvoiceForm,
   screen,
   userEvent,
@@ -18,7 +13,14 @@ import { format } from 'date-fns'
 import { getPage } from 'next-page-tester'
 import { idRegex } from 'src/shared/identifier'
 import { invoiceDetailFromInput } from 'src/client/features/invoice/invoice.mappers'
+import { invoiceFixturesFactory } from 'src/client/test/mocks/invoice.fixtures'
 import { validateGBPValue } from 'src/test/validators'
+
+const {
+  buildMockInvoiceDetail,
+  buildMockInvoiceInput,
+  buildMockPendingInvoiceInput,
+} = invoiceFixturesFactory()
 
 it('should show list of invoice summaries', async () => {
   const mockInvoiceDetails = [

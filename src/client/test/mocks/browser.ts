@@ -1,8 +1,10 @@
 import * as invoiceModel from './invoice.model'
 
-import { buildMockInvoiceDetail } from './invoice.fixtures'
 import { handlers } from './handlers'
+import { invoiceFixturesFactory } from './invoice.fixtures'
 import { setupWorker } from 'msw'
+
+const { buildMockInvoiceDetail } = invoiceFixturesFactory()
 
 const countSeededInvoices = Math.floor(Math.random() * 10)
 const seededInvoices = new Array(countSeededInvoices)

@@ -114,7 +114,7 @@ export function fillInInvoiceForm(
     )
   }
   validateTextfieldEntry(
-    screen.getByLabelText(/payment terms/i),
+    screen.getByLabelText(/payment terms old/i),
     invoice.paymentTerms.toString(),
     invoice.paymentTerms
   )

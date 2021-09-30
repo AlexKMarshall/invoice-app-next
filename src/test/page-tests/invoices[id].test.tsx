@@ -1,10 +1,6 @@
 import * as invoiceModel from 'src/client/test/mocks/invoice.model'
 
 import {
-  buildMockInvoiceDetail,
-  buildMockPendingInvoiceInput,
-} from 'src/client/test/mocks/invoice.fixtures'
-import {
   screen,
   waitFor,
   waitForElementToBeRemoved,
@@ -13,14 +9,20 @@ import {
 import { validateGBPValue, validateTextIfNonEmpty } from '../validators'
 
 import { InvoiceDetail } from 'src/client/features/invoice/invoice.types'
-import { buildMockDraftInvoiceInput } from 'src/client/test/mocks/invoice.fixtures'
 import { fillInInvoiceForm } from 'src/client/test/test-utils'
 import { format } from 'date-fns'
 import { getPage } from 'next-page-tester'
 import { idRegex } from 'src/shared/identifier'
 import { invoiceDetailFromInput } from 'src/client/features/invoice/invoice.mappers'
+import { invoiceFixturesFactory } from 'src/client/test/mocks/invoice.fixtures'
 import { randomPick } from 'src/shared/random'
 import userEvent from '@testing-library/user-event'
+
+const {
+  buildMockInvoiceDetail,
+  buildMockPendingInvoiceInput,
+  buildMockDraftInvoiceInput,
+} = invoiceFixturesFactory()
 
 it('should show invoice details', async () => {
   const mockInvoice = buildMockInvoiceDetail()
