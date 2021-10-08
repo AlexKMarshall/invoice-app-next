@@ -1,10 +1,6 @@
 import * as invoiceModel from 'src/client/test/mocks/invoice.model'
 
 import {
-  buildMockInvoiceDetail,
-  buildMockPendingInvoiceInput,
-} from 'src/client/test/mocks/invoice.fixtures'
-import {
   screen,
   waitFor,
   waitForElementToBeRemoved,
@@ -13,14 +9,22 @@ import {
 import { validateGBPValue, validateTextIfNonEmpty } from '../validators'
 
 import { InvoiceDetail } from 'src/client/features/invoice/invoice.types'
-import { buildMockDraftInvoiceInput } from 'src/server/test/mocks/invoice.fixtures'
 import { fillInInvoiceForm } from 'src/client/test/test-utils'
 import { format } from 'date-fns'
 import { getPage } from 'next-page-tester'
 import { idRegex } from 'src/shared/identifier'
-import { invoiceDetailFromInput } from 'src/client/features/invoice/invoice.mappers'
+import { invoiceFixturesFactory } from 'src/client/test/mocks/invoice.fixtures'
+import { invoiceMapperFactory } from 'src/client/features/invoice/invoice.mappers'
 import { randomPick } from 'src/shared/random'
 import userEvent from '@testing-library/user-event'
+
+const {
+  buildMockInvoiceDetail,
+  buildMockPendingInvoiceInput,
+  buildMockDraftInvoiceInput,
+} = invoiceFixturesFactory(invoiceModel.store)
+
+const { invoiceDetailFromInput } = invoiceMapperFactory(invoiceModel.store)
 
 it('should show invoice details', async () => {
   const mockInvoice = buildMockInvoiceDetail()
@@ -110,7 +114,7 @@ it('should allow pending invoices to be edited', async () => {
     screen.getByRole('heading', { name: `Edit ${initialPendingInvoice.id}` })
   ).toBeInTheDocument()
 
-  fillInInvoiceForm(updatedInvoiceInput, 'update')
+  await fillInInvoiceForm(updatedInvoiceInput, 'update')
 
   userEvent.click(screen.getByRole('button', { name: /save changes/i }))
 
@@ -154,7 +158,7 @@ it('should convert draft invoices to pending on edit so long as every field vali
     screen.getByRole('heading', { name: `Edit ${initialDraftInvoice.id}` })
   ).toBeInTheDocument()
 
-  fillInInvoiceForm(updatedInvoiceInput, 'update')
+  await fillInInvoiceForm(updatedInvoiceInput, 'update')
 
   userEvent.click(screen.getByRole('button', { name: /save changes/i }))
 
@@ -195,7 +199,7 @@ it('should not allow saving an update to draft invoice if not everything is fill
     screen.getByRole('heading', { name: `Edit ${initialDraftInvoice.id}` })
   ).toBeInTheDocument()
 
-  fillInInvoiceForm(updatedInvoiceInput, 'update')
+  await fillInInvoiceForm(updatedInvoiceInput, 'update')
 
   const clientNameField = screen.getByRole('textbox', {
     name: /client's name/i,

@@ -1,41 +1,25 @@
 import * as invoiceModel from './invoice.model'
 import * as z from 'zod'
 
-import { ActionNotPermittedError, NotFoundError } from 'src/server/errors'
+import { ControllerResponse, withErrorHandler } from 'src/server/response'
 import {
-  DeleteInvoiceReturnDTO,
-  GetInvoiceDetailDTO,
-  GetInvoiceSummaryDTO,
-  NewInvoiceInputDTO,
-  NewInvoiceReturnDTO,
-  UpdateInvoiceInputDTO,
-  UpdateInvoiceReturnDTO,
+  CreateInvoiceRequest,
+  CreateInvoiceResponse,
+  DeleteInvoiceResponse,
+  GetInvoiceByIdResponse,
+  GetInvoicesResponse,
+  UpdateInvoiceRequest,
+  UpdateInvoiceResponse,
 } from 'src/shared/dtos'
 import { JsonArray, JsonObject } from 'type-fest'
 import {
-  newInvoiceInputDtoSchema,
+  createInvoiceRequestDtoSchema,
   updateStatusInputDtoSchema,
 } from 'src/shared/invoice.schema'
 
 import { InvoiceDetail } from './invoice.types'
 import { parseJSON } from 'date-fns'
 import { toArray } from 'src/shared/array'
-
-export type ControllerResponse<TData = unknown> = Promise<
-  ControllerSuccessResponse<TData> | ControllerErrorResponse
->
-
-type ControllerSuccessResponse<TData = unknown> = {
-  code: number
-  response: TData
-}
-
-type ControllerErrorResponse<TError = unknown> = {
-  code: number
-  response: {
-    error: TError
-  }
-}
 
 type InvoiceStatus = InvoiceDetail['status']
 type GetInvoiceQuery = {
@@ -44,7 +28,7 @@ type GetInvoiceQuery = {
 export const getInvoiceSummaries = withErrorHandler(
   function getInvoiceSummaries({
     status,
-  }: GetInvoiceQuery = {}): ControllerResponse<GetInvoiceSummaryDTO> {
+  }: GetInvoiceQuery = {}): ControllerResponse<GetInvoicesResponse> {
     const filterQuery = status ? { status: toArray(status) } : {}
 
     return invoiceModel
@@ -55,7 +39,7 @@ export const getInvoiceSummaries = withErrorHandler(
 
 export const getInvoiceDetail = withErrorHandler(function getInvoiceDetail(
   id: string
-): ControllerResponse<GetInvoiceDetailDTO> {
+): ControllerResponse<GetInvoiceByIdResponse> {
   return invoiceModel
     .findInvoiceDetail(id)
     .then((invoice) => ({ code: 200, response: { data: { invoice } } }))
@@ -63,7 +47,7 @@ export const getInvoiceDetail = withErrorHandler(function getInvoiceDetail(
 
 export const postInvoice = withErrorHandler(function postInvoice(
   newInvoice: JsonObject | JsonArray
-): ControllerResponse<NewInvoiceReturnDTO> {
+): ControllerResponse<CreateInvoiceResponse> {
   const parsingResult = parseNewInvoiceInputDto(newInvoice)
 
   if (!parsingResult.success) {
@@ -84,7 +68,7 @@ export const postInvoice = withErrorHandler(function postInvoice(
 export const updateStatus = withErrorHandler(function updateStatus(
   id: string,
   status: unknown
-): ControllerResponse<UpdateInvoiceReturnDTO> {
+): ControllerResponse<UpdateInvoiceResponse> {
   const parsingResult = updateStatusInputDtoSchema.safeParse(status)
   if (!parsingResult.success) {
     return Promise.resolve({
@@ -103,9 +87,8 @@ export const updateStatus = withErrorHandler(function updateStatus(
 export const updateInvoice = withErrorHandler(function updateInvoice(
   id: InvoiceDetail['id'],
   updatedInvoice: JsonArray | JsonObject
-): ControllerResponse<UpdateInvoiceReturnDTO> {
+): ControllerResponse<UpdateInvoiceResponse> {
   const parsingResult = parseUpdateInvoiceInputDto(updatedInvoice)
-
   if (!parsingResult.success) {
     return Promise.resolve({
       code: 400,
@@ -123,7 +106,7 @@ export const updateInvoice = withErrorHandler(function updateInvoice(
 
 export const deleteInvoice = withErrorHandler(function deleteInvoice(
   id: InvoiceDetail['id']
-): ControllerResponse<DeleteInvoiceReturnDTO> {
+): ControllerResponse<DeleteInvoiceResponse> {
   return invoiceModel.remove(id).then((deletedInvoice) => ({
     code: 200,
     response: { data: { deletedInvoice } },
@@ -140,7 +123,7 @@ type SafeParse<T> =
 
 function parseNewInvoiceInputDto(
   newInvoiceInput: JsonObject | JsonArray
-): SafeParse<NewInvoiceInputDTO> {
+): SafeParse<CreateInvoiceRequest> {
   const buildingInvoice = { ...newInvoiceInput }
 
   if (
@@ -152,7 +135,7 @@ function parseNewInvoiceInputDto(
     })
   }
 
-  const result = newInvoiceInputDtoSchema.safeParse(buildingInvoice)
+  const result = createInvoiceRequestDtoSchema.safeParse(buildingInvoice)
 
   if (result.success === false) {
     return { ...result, error: flattenError(result.error) }
@@ -163,14 +146,14 @@ function parseNewInvoiceInputDto(
 
 function parseUpdateInvoiceInputDto(
   updatedInvoiceInput: JsonObject | JsonArray
-): SafeParse<UpdateInvoiceInputDTO> {
+): SafeParse<UpdateInvoiceRequest> {
   // at the moment there's no difference between the new and update schemas so we can
   // reuse this function. Created a separate declaration in case of future change
   return parseNewInvoiceInputDto(updatedInvoiceInput)
 }
 
 function flattenError(
-  error: z.ZodError<z.infer<typeof newInvoiceInputDtoSchema>>
+  error: z.ZodError<z.infer<typeof createInvoiceRequestDtoSchema>>
 ) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fieldErrors: any = {}
@@ -196,23 +179,4 @@ function flattenError(
     }
   }
   return { fieldErrors }
-}
-
-function errorHandler(error: unknown) {
-  if (error instanceof NotFoundError) {
-    return { code: 404, response: { error: error.message } }
-  }
-  if (error instanceof ActionNotPermittedError) {
-    return { code: 403, response: { error: error.message } }
-  }
-  return {
-    code: 500,
-    response: { error: JSON.stringify(error) },
-  }
-}
-
-function withErrorHandler<TArgs extends Array<unknown>, TResult>(
-  func: (...args: TArgs) => Promise<TResult>
-): (...args: TArgs) => Promise<TResult | ControllerErrorResponse> {
-  return (...args: TArgs) => func(...args).catch(errorHandler)
 }

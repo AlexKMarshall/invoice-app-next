@@ -1,10 +1,12 @@
-import { Database } from '../database'
+import { Database, ReferenceDataStore } from '../database'
 
 let database: Database
 
-function prepareDbForTests(): void {
+function prepareDbForTests(): ReferenceDataStore {
   let schema: string
   let connectionString: string
+
+  const referenceDataStore: ReferenceDataStore = { paymentTerms: [] }
 
   beforeEach(async () => {
     schema = `test-${process.env.JEST_WORKER_ID}`
@@ -18,12 +20,31 @@ function prepareDbForTests(): void {
 
     await database.dropSchema(schema)
     database.migrate()
+
+    await populateDB(database, referenceDataStore)
   })
 
   afterEach(async () => {
     await database.dropSchema(schema)
     await database.disconnect()
   })
+
+  return referenceDataStore
+}
+
+async function populateDB(
+  database: Database,
+  referenceDataStore: ReferenceDataStore
+) {
+  const paymentTerms = await database.seedPaymentTerms(
+    { value: 1, name: 'Net 1 Day' },
+    { value: 7, name: 'Net 7 Days' },
+    { value: 14, name: 'Net 14 Days' },
+    { value: 30, name: 'Net 30 Days' },
+    { value: 90, name: 'Net 90 Days' }
+  )
+
+  referenceDataStore.paymentTerms = paymentTerms
 }
 
 export { prepareDbForTests, database }

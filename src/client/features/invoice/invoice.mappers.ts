@@ -1,4 +1,4 @@
-import { NewInvoiceInputDTO, Stringify } from 'src/shared/dtos'
+import { CreateInvoiceRequest, Stringify } from 'src/shared/dtos'
 import { add, parseJSON } from 'date-fns'
 import {
   generateAlphanumericId,
@@ -6,25 +6,42 @@ import {
 } from 'src/shared/identifier'
 
 import { InvoiceDetail } from './invoice.types'
+import { PaymentTerm } from './payment-term.types'
 
-export function invoiceDetailFromInput(
-  input: NewInvoiceInputDTO,
-  id = generateAlphanumericId()
-): InvoiceDetail {
-  return {
-    ...input,
-    paymentDue: add(input.issuedAt, { days: input.paymentTerms }),
-    itemList: input.itemList.map((itemInput) => ({
-      ...itemInput,
-      id: generateNumericId(),
-      total: itemInput.quantity * itemInput.price,
-    })),
-    amountDue: input.itemList.reduce(
-      (acc, { quantity, price }) => acc + quantity * price,
-      0
-    ),
-    id,
+type ReferenceDataStore = {
+  paymentTerms: PaymentTerm[]
+}
+
+export function invoiceMapperFactory(referenceDataStore: ReferenceDataStore) {
+  function invoiceDetailFromInput(
+    input: CreateInvoiceRequest,
+    id = generateAlphanumericId()
+  ): InvoiceDetail {
+    const paymentTerm = referenceDataStore.paymentTerms.find(
+      (term) => term.id === input.paymentTermId
+    )
+
+    if (!paymentTerm)
+      throw new Error(`Cannot find paymentTerm with id ${input.paymentTermId}`)
+
+    return {
+      ...input,
+      paymentDue: add(input.issuedAt, { days: paymentTerm?.value }),
+      itemList: input.itemList.map((itemInput) => ({
+        ...itemInput,
+        id: generateNumericId(),
+        total: itemInput.quantity * itemInput.price,
+      })),
+      amountDue: input.itemList.reduce(
+        (acc, { quantity, price }) => acc + quantity * price,
+        0
+      ),
+      id,
+      paymentTerm,
+    }
   }
+
+  return { invoiceDetailFromInput }
 }
 
 export function destringifyInvoiceDetail(
@@ -38,7 +55,7 @@ export function destringifyInvoiceDetail(
 }
 
 export function destringifyInvoiceInput(
-  invoiceInput: Stringify<NewInvoiceInputDTO>
-): NewInvoiceInputDTO {
+  invoiceInput: Stringify<CreateInvoiceRequest>
+): CreateInvoiceRequest {
   return { ...invoiceInput, issuedAt: parseJSON(invoiceInput.issuedAt) }
 }

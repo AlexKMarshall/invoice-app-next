@@ -1,19 +1,20 @@
 import * as invoiceModel from './invoice.model'
 
 import {
-  DeleteInvoiceReturnDTO,
-  GetInvoiceDetailDTO,
-  GetInvoiceSummaryDTO,
-  NewInvoiceInputDTO,
-  NewInvoiceReturnDTO,
+  CreateInvoiceRequest,
+  CreateInvoiceResponse,
+  DeleteInvoiceResponse,
+  GetInvoiceByIdResponse,
+  GetInvoicesResponse,
+  GetPaymentTermsResponse,
   Stringify,
-  UpdateInvoiceInputDTO,
-  UpdateInvoiceReturnDTO,
-  UpdateInvoiceStatusInputDTO,
+  UpdateInvoiceRequest,
+  UpdateInvoiceResponse,
+  UpdateInvoiceStatusRequest,
 } from 'src/shared/dtos'
 import {
   destringifyInvoiceInput,
-  invoiceDetailFromInput,
+  invoiceMapperFactory,
 } from 'src/client/features/invoice/invoice.mappers'
 
 import { InvoiceDetail } from 'src/server/features/invoice/invoice.types'
@@ -22,8 +23,10 @@ import { rest } from 'msw'
 
 type EmptyObject = Record<string, never>
 
+const { invoiceDetailFromInput } = invoiceMapperFactory(invoiceModel.store)
+
 export const handlers = [
-  rest.get<EmptyObject, GetInvoiceSummaryDTO, EmptyObject>(
+  rest.get<EmptyObject, GetInvoicesResponse, EmptyObject>(
     '/api/invoices',
     async (req, res, ctx) => {
       const status = req.url.searchParams.getAll('status') as
@@ -34,32 +37,35 @@ export const handlers = [
       return res(ctx.status(200), ctx.json({ data: { invoices } }))
     }
   ),
-  rest.get<EmptyObject, GetInvoiceDetailDTO, { id: string }>(
+  rest.get<EmptyObject, GetInvoiceByIdResponse, { id: string }>(
     '/api/invoices/:id',
     async (req, res, ctx) => {
       const invoice = await invoiceModel.findById(req.params.id)
       return res(ctx.status(200), ctx.json({ data: { invoice } }))
     }
   ),
-  rest.post<Stringify<NewInvoiceInputDTO>, NewInvoiceReturnDTO, EmptyObject>(
-    '/api/invoices',
-    async (req, res, ctx) => {
-      const newInvoice = req.body
-      const savedInvoice = await invoiceModel.create({
-        ...newInvoice,
-        issuedAt: parseJSON(newInvoice.issuedAt),
+  rest.post<
+    Stringify<CreateInvoiceRequest>,
+    CreateInvoiceResponse,
+    EmptyObject
+  >('/api/invoices', async (req, res, ctx) => {
+    const newInvoice = req.body
+
+    const savedInvoice = await invoiceModel.create({
+      ...newInvoice,
+      issuedAt: parseJSON(newInvoice.issuedAt),
+    })
+
+    return res(
+      ctx.status(201),
+      ctx.json({
+        data: {
+          savedInvoice,
+        },
       })
-      return res(
-        ctx.status(201),
-        ctx.json({
-          data: {
-            savedInvoice,
-          },
-        })
-      )
-    }
-  ),
-  rest.delete<EmptyObject, DeleteInvoiceReturnDTO, { id: string }>(
+    )
+  }),
+  rest.delete<EmptyObject, DeleteInvoiceResponse, { id: string }>(
     '/api/invoices/:id',
     async (req, res, ctx) => {
       const { id } = req.params
@@ -76,7 +82,7 @@ export const handlers = [
       )
     }
   ),
-  rest.put<UpdateInvoiceStatusInputDTO, UpdateInvoiceReturnDTO, { id: string }>(
+  rest.put<UpdateInvoiceStatusRequest, UpdateInvoiceResponse, { id: string }>(
     '/api/invoices/:id/status',
     async (req, res, ctx) => {
       const { id } = req.params
@@ -97,8 +103,8 @@ export const handlers = [
     }
   ),
   rest.put<
-    Stringify<UpdateInvoiceInputDTO>,
-    UpdateInvoiceReturnDTO,
+    Stringify<UpdateInvoiceRequest>,
+    UpdateInvoiceResponse,
     { id: string }
   >('/api/invoices/:id', async (req, res, ctx) => {
     const { id } = req.params
@@ -125,4 +131,11 @@ export const handlers = [
       })
     )
   }),
+  rest.get<EmptyObject, GetPaymentTermsResponse, EmptyObject>(
+    '/api/payment-terms',
+    async (req, res, ctx) => {
+      const paymentTerms = await invoiceModel.findAllPaymentTerms()
+      return res(ctx.status(200), ctx.json({ data: { paymentTerms } }))
+    }
+  ),
 ]

@@ -1,24 +1,25 @@
-import {
-  buildMockInvoiceDetail,
-  buildMockInvoiceInput,
-} from 'src/server/test/mocks/invoice.fixtures'
 import { database, prepareDbForTests } from 'src/server/test/test-utils'
 
 import { generateAlphanumericId } from 'src/shared/identifier'
 import handler from 'src/pages/api/invoices/[id]'
-import { invoiceDetailFromInput } from 'src/server/features/invoice/invoice.mappers'
+import { invoiceFixtureFactory } from 'src/server/test/mocks/invoice.fixtures'
 import invoicesHandler from 'src/pages/api/invoices'
 import { randomPick } from 'src/shared/random'
 import { testApiHandler } from 'next-test-api-route-handler'
 
-prepareDbForTests()
+const referenceDataStore = prepareDbForTests()
+const {
+  buildMockInvoiceDetail,
+  buildMockInvoiceRequest,
+  invoiceDetailFromRequest,
+} = invoiceFixtureFactory(referenceDataStore)
 
 it('should get individual invoice detail', async () => {
   expect.hasAssertions()
 
-  const expectedInvoiceDetail = buildMockInvoiceDetail()
+  const expectedInvoiceDetail = buildMockInvoiceDetail({})
 
-  const mockInvoices = [expectedInvoiceDetail, buildMockInvoiceDetail()]
+  const mockInvoices = [expectedInvoiceDetail, buildMockInvoiceDetail({})]
 
   await database.seedInvoices(...mockInvoices)
 
@@ -78,9 +79,9 @@ it('should allow updating a pending invoice', async () => {
   const existingInvoice = buildMockInvoiceDetail({ status: 'pending' })
   await database.seedInvoices(existingInvoice)
 
-  const updatedInvoiceInput = buildMockInvoiceInput({ status: 'pending' })
+  const updatedInvoiceInput = buildMockInvoiceRequest({ status: 'pending' })
 
-  const updatedInvoiceDetail = invoiceDetailFromInput(
+  const updatedInvoiceDetail = invoiceDetailFromRequest(
     { ...updatedInvoiceInput, issuedAt: existingInvoice.issuedAt }, // we don't expect the issuedAt to change
     existingInvoice.id
   )
@@ -122,9 +123,9 @@ it('should allow draft invoices to be updated to pending', async () => {
   const existingDraftInvoice = buildMockInvoiceDetail({ status: 'draft' })
   await database.seedInvoices(existingDraftInvoice)
 
-  const updatedInvoiceInput = buildMockInvoiceInput({ status: 'pending' })
+  const updatedInvoiceInput = buildMockInvoiceRequest({ status: 'pending' })
 
-  const updatedInvoiceDetail = invoiceDetailFromInput(
+  const updatedInvoiceDetail = invoiceDetailFromRequest(
     { ...updatedInvoiceInput, issuedAt: existingDraftInvoice.issuedAt }, // we don't expect the issued at to change
     existingDraftInvoice.id
   )
@@ -166,7 +167,7 @@ it('should not allow pending invoices to be updated to draft', async () => {
   const existingPendingInvoice = buildMockInvoiceDetail({ status: 'pending' })
   await database.seedInvoices(existingPendingInvoice)
 
-  const updatedInvoiceInput = buildMockInvoiceInput({ status: 'draft' })
+  const updatedInvoiceInput = buildMockInvoiceRequest({ status: 'draft' })
 
   await testApiHandler({
     handler,

@@ -5,7 +5,6 @@ import { useId } from '@react-aria/utils'
 
 type Props = {
   label: string
-  clasName?: string
   errorMessage?: string
 } & InputHTMLAttributes<HTMLInputElement>
 

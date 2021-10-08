@@ -2,8 +2,8 @@ import * as z from 'zod'
 
 import { ActionNotPermittedError, NotFoundError } from 'src/server/errors'
 import { AsyncReturnType, IterableElement } from 'type-fest'
+import { CreateInvoiceRequest, UpdateInvoiceRequest } from 'src/shared/dtos'
 import { InvoiceDetail, InvoiceSummary } from './invoice.types'
-import { NewInvoiceInputDTO, UpdateInvoiceInputDTO } from 'src/shared/dtos'
 
 import { Prisma } from '@prisma/client'
 import { add } from 'date-fns'
@@ -16,7 +16,11 @@ function dbFindAllSummaries(where?: Prisma.InvoiceWhereInput) {
     select: {
       id: true,
       issuedAt: true,
-      paymentTerms: true,
+      paymentTerm: {
+        select: {
+          value: true,
+        },
+      },
       client: {
         select: {
           name: true,
@@ -51,7 +55,9 @@ const invoiceSummaryDbSchema = schemaForType<DbInvoiceSummary>()(
   z.object({
     id: z.string(),
     issuedAt: z.date(),
-    paymentTerms: z.number(),
+    paymentTerm: z.object({
+      value: z.number(),
+    }),
     client: z.object({
       name: z.string(),
     }),
@@ -73,13 +79,18 @@ function dbSummaryToInvoiceSummary(
   const {
     id,
     issuedAt,
-    paymentTerms,
+    paymentTerm,
     client: { name: clientName },
     invoiceItems,
     status,
   } = invoice
 
-  const paymentDue = add(issuedAt, { days: paymentTerms })
+  let paymentTermValue = 0
+  if (paymentTerm) {
+    paymentTermValue = paymentTerm.value
+  }
+
+  const paymentDue = add(issuedAt, { days: paymentTermValue })
 
   const amountDue = round2dp(
     invoiceItems.reduce(
@@ -103,7 +114,9 @@ export function findAll({ status }: { status?: InvoiceStatus[] } = {}): Promise<
   )
 }
 
-export function create(newInvoice: NewInvoiceInputDTO): Promise<InvoiceDetail> {
+export function create(
+  newInvoice: CreateInvoiceRequest
+): Promise<InvoiceDetail> {
   const invoiceToSave = prepareInvoiceForCreate(newInvoice)
 
   return dbCreate(invoiceToSave)
@@ -119,7 +132,7 @@ function flattenInvoiceDetail(
     client,
     invoiceItems,
     issuedAt,
-    paymentTerms,
+    paymentTerm,
     ...restInvoice
   } = invoice
 
@@ -133,7 +146,12 @@ function flattenInvoiceDetail(
     })
   )
 
-  const paymentDue = add(issuedAt, { days: paymentTerms })
+  let paymentTermValue = 0
+  if (paymentTerm) {
+    paymentTermValue = paymentTerm.value
+  }
+
+  const paymentDue = add(issuedAt, { days: paymentTermValue })
 
   const amountDue = round2dp(
     itemList.reduce((acc, { total: itemTotal }) => round2dp(acc + itemTotal), 0)
@@ -146,7 +164,7 @@ function flattenInvoiceDetail(
     clientAddress: client.address,
     itemList,
     issuedAt,
-    paymentTerms,
+    paymentTerm: paymentTerm ?? undefined,
     paymentDue,
     amountDue,
     ...restInvoice,
@@ -195,7 +213,12 @@ const draftInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
     id: z.string().min(1),
     status: z.literal('draft'),
     issuedAt: z.date(),
-    paymentTerms: z.number(),
+    paymentTermId: z.number(),
+    paymentTerm: z.object({
+      id: z.number(),
+      value: z.number(),
+      name: z.string(),
+    }),
     projectDescription: possiblyEmptyString,
     sender: z.object({
       address: draftAddressSchema,
@@ -222,7 +245,12 @@ const pendingInvoiceDetailSchema = schemaForType<DBCreateInvoiceReturn>()(
     id: z.string().min(1),
     status: z.literal('pending'),
     issuedAt: z.date(),
-    paymentTerms: z.number(),
+    paymentTermId: z.number(),
+    paymentTerm: z.object({
+      id: z.number(),
+      value: z.number(),
+      name: z.string(),
+    }),
     projectDescription: z.string(),
     sender: z.object({
       address: addressSchema,
@@ -255,7 +283,7 @@ const invoiceDetailSchema = z.union([
 ])
 
 function prepareInvoiceForCreate(
-  newInvoice: NewInvoiceInputDTO
+  newInvoice: CreateInvoiceRequest
 ): Prisma.InvoiceCreateInput {
   const {
     clientName,
@@ -263,6 +291,7 @@ function prepareInvoiceForCreate(
     clientAddress,
     senderAddress,
     itemList,
+    paymentTermId,
     ...restInvoice
   } = newInvoice
 
@@ -298,11 +327,14 @@ function prepareInvoiceForCreate(
     })),
   }
 
+  const paymentTerm = { connect: { id: paymentTermId } }
+
   const invoiceToSave = {
     id,
     sender,
     client,
     invoiceItems,
+    paymentTerm,
     ...restInvoice,
   }
 
@@ -310,7 +342,7 @@ function prepareInvoiceForCreate(
 }
 function prepareInvoiceForUpdate(
   id: InvoiceDetail['id'],
-  updatedInvoice: UpdateInvoiceInputDTO
+  updatedInvoice: UpdateInvoiceRequest
 ): Prisma.InvoiceUpdateInput {
   const {
     clientName,
@@ -318,6 +350,7 @@ function prepareInvoiceForUpdate(
     clientAddress,
     senderAddress,
     itemList,
+    paymentTermId,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     issuedAt: _thrownAwayIssuedAt,
     ...restInvoice
@@ -353,10 +386,13 @@ function prepareInvoiceForUpdate(
     })),
   }
 
+  const paymentTerm = { connect: { id: paymentTermId } }
+
   const invoiceToSave: Prisma.InvoiceUpdateInput = {
     id,
     sender,
     client,
+    paymentTerm,
     invoiceItems: {
       // delete the existing items
       deleteMany: {},
@@ -373,7 +409,14 @@ const invoiceDetailSelect = {
   id: true,
   status: true,
   issuedAt: true,
-  paymentTerms: true,
+  paymentTermId: true,
+  paymentTerm: {
+    select: {
+      id: true,
+      value: true,
+      name: true,
+    },
+  },
   projectDescription: true,
   sender: {
     select: {
@@ -453,7 +496,7 @@ function isStatusTransitionValid(
 
 export async function update(
   id: InvoiceDetail['id'],
-  updatedInvoice: UpdateInvoiceInputDTO
+  updatedInvoice: UpdateInvoiceRequest
 ): Promise<InvoiceDetail> {
   const existingInvoice = await findInvoiceDetail(id)
 

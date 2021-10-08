@@ -1,19 +1,23 @@
 import * as invoiceController from './invoice.controller'
 import * as invoiceModel from './invoice.model'
 
-import { NewInvoiceInputDTO, Stringify } from 'src/shared/dtos'
-import {
-  buildMockInvoiceDetail,
-  buildMockInvoiceInput,
-  buildMockPendingInvoiceInput,
-} from '../../test/mocks/invoice.fixtures'
+import { CreateInvoiceRequest, Stringify } from 'src/shared/dtos'
 
 import { generateAlphanumericId } from 'src/shared/identifier'
+import { invoiceFixtureFactory } from '../../test/mocks/invoice.fixtures'
 import { mocked } from 'ts-jest/utils'
 
 jest.mock('./invoice.model')
 
 const mockInvoiceModel = mocked(invoiceModel, true)
+
+const {
+  buildMockInvoiceDetail,
+  buildMockInvoiceRequest,
+  buildMockPendingInvoiceRequest,
+} = invoiceFixtureFactory({
+  paymentTerms: [{ id: 1, value: 1, name: 'Net 1 Day' }],
+})
 
 afterEach(() => {
   jest.resetAllMocks()
@@ -42,10 +46,10 @@ describe('postInvoice', () => {
     const mockError = new Error('Some error message')
     mockInvoiceModel.create.mockRejectedValueOnce(mockError)
 
-    const mockDraftInvoiceInput = buildMockInvoiceInput({ status: 'draft' })
+    const mockDraftInvoiceInput = buildMockInvoiceRequest({ status: 'draft' })
     const dtoInput = JSON.parse(
       JSON.stringify(mockDraftInvoiceInput)
-    ) as Stringify<NewInvoiceInputDTO>
+    ) as Stringify<CreateInvoiceRequest>
 
     const result = await invoiceController.postInvoice(dtoInput)
 
@@ -56,7 +60,7 @@ describe('postInvoice', () => {
   })
   it('should allow draft input with optional fields', async () => {
     mockInvoiceModel.create.mockResolvedValueOnce(buildMockInvoiceDetail())
-    const mockInput = buildMockInvoiceInput({
+    const mockInput = buildMockInvoiceRequest({
       status: 'draft',
       senderAddress: {
         street: '',
@@ -79,7 +83,7 @@ describe('postInvoice', () => {
     })
   })
   it('should return error when pending input has empty strings', async () => {
-    const mockInput = buildMockPendingInvoiceInput({
+    const mockInput = buildMockPendingInvoiceRequest({
       clientName: '',
       clientEmail: '',
       clientAddress: {
@@ -131,8 +135,7 @@ describe('postInvoice', () => {
   })
 
   it('should return error on invalid numbers', async () => {
-    const mockInput = buildMockInvoiceInput({
-      paymentTerms: -1,
+    const mockInput = buildMockInvoiceRequest({
       itemList: [{ quantity: 0, price: -1 }],
     })
     const dtoInput = JSON.parse(JSON.stringify(mockInput))
@@ -143,7 +146,6 @@ describe('postInvoice', () => {
     expect(result.response).toEqual({
       error: {
         fieldErrors: {
-          paymentTerms: ['Value should be greater than or equal to 0'],
           itemList: {
             '0': {
               quantity: ['Value should be greater than or equal to 1'],

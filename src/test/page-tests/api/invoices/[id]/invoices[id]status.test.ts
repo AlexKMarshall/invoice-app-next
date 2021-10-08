@@ -1,11 +1,12 @@
 import { database, prepareDbForTests } from 'src/server/test/test-utils'
 
-import { buildMockInvoiceDetail } from 'src/server/test/mocks/invoice.fixtures'
 import { generateAlphanumericId } from 'src/shared/identifier'
 import handler from 'src/pages/api/invoices/[id]/status'
+import { invoiceFixtureFactory } from 'src/server/test/mocks/invoice.fixtures'
 import { testApiHandler } from 'next-test-api-route-handler'
 
-prepareDbForTests()
+const referenceDataStore = prepareDbForTests()
+const { buildMockInvoiceDetail } = invoiceFixtureFactory(referenceDataStore)
 
 it('should mark pending invoice as paid', async () => {
   expect.hasAssertions()

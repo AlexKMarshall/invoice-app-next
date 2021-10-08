@@ -1,18 +1,35 @@
+import { CreateInvoiceRequest, GetPaymentTermsResponse } from 'src/shared/dtos'
 import {
   InvoiceDetail,
   InvoiceSummary,
 } from 'src/client/features/invoice/invoice.types'
 
-import { NewInvoiceInputDTO } from 'src/shared/dtos'
+import { IterableElement } from 'type-fest'
 import { add } from 'date-fns'
 import { generateAlphanumericId } from 'src/shared/identifier'
-import { invoiceDetailFromInput } from 'src/client/features/invoice/invoice.mappers'
+import { invoiceMapperFactory } from 'src/client/features/invoice/invoice.mappers'
+
+type PaymentTerm = IterableElement<
+  GetPaymentTermsResponse['data']['paymentTerms']
+>
 
 type Store = {
   invoices: Array<InvoiceDetail>
+  paymentTerms: Array<PaymentTerm>
 }
 
-const store: Store = { invoices: [] }
+export const store: Store = {
+  invoices: [],
+  paymentTerms: [
+    { id: 1, value: 1, name: 'Net 1 Day' },
+    { id: 2, value: 7, name: 'Net 7 Days' },
+    { id: 3, value: 14, name: 'Net 14 Days' },
+    { id: 4, value: 30, name: 'Net 30 Days' },
+    { id: 5, value: 90, name: 'Net 90 Days' },
+  ],
+}
+
+const { invoiceDetailFromInput } = invoiceMapperFactory(store)
 
 export function findAll({
   status,
@@ -34,7 +51,7 @@ export function findById(id: InvoiceDetail['id']): Promise<InvoiceDetail> {
   return Promise.resolve(foundInvoice)
 }
 
-export function create(invoice: NewInvoiceInputDTO): Promise<InvoiceDetail> {
+export function create(invoice: CreateInvoiceRequest): Promise<InvoiceDetail> {
   const invoiceWithId = invoiceDetailFromInput(
     invoice,
     generateAlphanumericId()
@@ -67,11 +84,15 @@ export function initialise(invoices: Array<InvoiceDetail>): void {
 export function invoiceDetailToSummary(invoice: InvoiceDetail): InvoiceSummary {
   return {
     id: invoice.id,
-    paymentDue: add(invoice.issuedAt, { days: invoice.paymentTerms }),
+    paymentDue: add(invoice.issuedAt, { days: invoice.paymentTerm.value }),
     clientName: invoice.clientName,
     amountDue: invoice.itemList
       .map((item) => item.quantity * item.price)
       .reduce((acc, cur) => acc + cur),
     status: invoice.status,
   }
+}
+
+export async function findAllPaymentTerms(): Promise<Array<PaymentTerm>> {
+  return Promise.resolve(store.paymentTerms)
 }

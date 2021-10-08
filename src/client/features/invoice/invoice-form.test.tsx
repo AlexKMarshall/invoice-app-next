@@ -1,7 +1,14 @@
-import { render, screen, userEvent, within } from 'src/client/test/test-utils'
+import {
+  render,
+  screen,
+  userEvent,
+  waitForElementToBeRemoved,
+  within,
+} from 'src/client/test/test-utils'
 
 import { InvoiceForm } from './invoice-form'
 import { format } from 'date-fns'
+import { store } from 'src/client/test/mocks/invoice.model'
 
 const noop = () => void 0
 
@@ -52,4 +59,20 @@ it('should default invoice issue date to today', async () => {
   expect(screen.getByLabelText(/issue date/i)).toHaveValue(
     format(today, 'yyyy-MM-dd')
   )
+})
+it('should have a payment term selector', async () => {
+  render(<InvoiceForm {...defaultFormProps} />)
+
+  const paymentTermsSelect = screen.getByRole('combobox', {
+    name: /payment terms/i,
+  })
+
+  await waitForElementToBeRemoved(() => screen.getByText(/loading/i))
+
+  store.paymentTerms.forEach((term) => {
+    const option = within(paymentTermsSelect).getByRole('option', {
+      name: term.name,
+    })
+    expect(option).toHaveValue(term.id.toString())
+  })
 })

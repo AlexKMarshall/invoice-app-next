@@ -1,5 +1,5 @@
-import { Button, IconButton, Input } from 'src/client/shared/components'
-import { NewInvoiceInputDTO, UpdateInvoiceInputDTO } from 'src/shared/dtos'
+import { Button, IconButton, Input, Select } from 'src/client/shared/components'
+import { CreateInvoiceRequest, UpdateInvoiceRequest } from 'src/shared/dtos'
 import {
   buttonGroup,
   deleteButton,
@@ -18,7 +18,7 @@ import {
   th,
 } from './invoice-form.css'
 import {
-  newInvoiceInputDtoSchema,
+  createInvoiceRequestDtoSchema,
   updateInvoiceInputDtoSchema,
 } from 'src/shared/invoice.schema'
 import { useFieldArray, useForm } from 'react-hook-form'
@@ -26,13 +26,14 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { Delete } from 'src/client/shared/icons'
 import { format } from 'date-fns'
 import { useId } from '@react-aria/utils'
+import { usePaymentTerms } from './payment-term.queries'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 type Props = {
   kind: 'create' | 'update'
   onCancel?: () => void
-  onSubmit: (data: NewInvoiceInputDTO) => void
-  defaultValues?: NewInvoiceInputDTO | UpdateInvoiceInputDTO
+  onSubmit: (data: CreateInvoiceRequest) => void
+  defaultValues?: CreateInvoiceRequest | UpdateInvoiceRequest
   'aria-labelledby': string
 }
 
@@ -53,7 +54,7 @@ const defaultFormValues = {
     country: '',
   },
   issuedAt: new Date(), //format(new Date(), 'yyyy-MM-dd'),
-  paymentTerms: 0,
+  paymentTermId: 0,
   projectDescription: '',
   itemList: [],
   status: 'draft' as const,
@@ -75,16 +76,20 @@ export function InvoiceForm({
     issuedAt: format(defaultValues.issuedAt, 'yyyy-MM-dd'),
   }
 
+  const paymentTermsQuery = usePaymentTerms()
+
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
     setValue,
-  } = useForm<NewInvoiceInputDTO>({
+  } = useForm<CreateInvoiceRequest>({
     defaultValues: formattedDefaultValues,
     resolver: zodResolver(
-      kind === 'create' ? newInvoiceInputDtoSchema : updateInvoiceInputDtoSchema
+      kind === 'create'
+        ? createInvoiceRequestDtoSchema
+        : updateInvoiceInputDtoSchema
     ),
   })
   const itemsFieldArray = useFieldArray({
@@ -180,11 +185,19 @@ export function InvoiceForm({
             })}
             disabled={kind === 'update'}
           />
-          <Input
+          <Select
             className={spanHalf}
             label="Payment Terms"
-            type="number"
-            {...register('paymentTerms', { valueAsNumber: true })}
+            isLoading={paymentTermsQuery.isLoading}
+            options={
+              paymentTermsQuery.isSuccess
+                ? paymentTermsQuery.data.map((pt) => ({
+                    value: pt.id.toString(),
+                    label: pt.name,
+                  }))
+                : undefined
+            }
+            {...register('paymentTermId', { valueAsNumber: true })}
           />
           <Input
             className={spanFull}

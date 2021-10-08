@@ -1,19 +1,19 @@
-import {
-  buildMockInvoiceDetail,
-  buildMockPendingInvoiceInput,
-} from 'src/server/test/mocks/invoice.fixtures'
 import { database, prepareDbForTests } from 'src/server/test/test-utils'
-import {
-  invoiceDetailFromInput,
-  invoiceDetailToSummary,
-} from 'src/server/features/invoice/invoice.mappers'
+import { generateAlphanumericId, idRegex } from 'src/shared/identifier'
 
 import { InvoiceDetail } from 'src/server/features/invoice/invoice.types'
 import handler from 'src/pages/api/invoices'
-import { idRegex } from 'src/shared/identifier'
+import { invoiceDetailToSummary } from 'src/server/features/invoice/invoice.mappers'
+import { invoiceFixtureFactory } from 'src/server/test/mocks/invoice.fixtures'
 import { testApiHandler } from 'next-test-api-route-handler'
 
-prepareDbForTests()
+const referenceDataStore = prepareDbForTests()
+
+const {
+  buildMockInvoiceDetail,
+  buildMockPendingInvoiceRequest,
+  invoiceDetailFromRequest,
+} = invoiceFixtureFactory(referenceDataStore)
 
 it('should get invoice summaries', async () => {
   expect.hasAssertions()
@@ -157,7 +157,7 @@ it('should post a pending invoice', async () => {
         },
       })
 
-      const newInvoiceInput = buildMockPendingInvoiceInput()
+      const newInvoiceInput = buildMockPendingInvoiceRequest({})
 
       const response = await fetch({
         method: 'POST',
@@ -167,12 +167,15 @@ it('should post a pending invoice', async () => {
         },
       })
 
-      expect(response.status).toBe(201)
+      // expect(response.status).toBe(201)
 
       const result = await response.json()
 
       // a post request should give us back the full saved invoice object
-      const mockInvoiceDetail = invoiceDetailFromInput(newInvoiceInput)
+      const mockInvoiceDetail = invoiceDetailFromRequest(
+        newInvoiceInput,
+        generateAlphanumericId()
+      )
       expect(result).toMatchObject({
         data: {
           savedInvoice: {

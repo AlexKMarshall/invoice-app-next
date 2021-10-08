@@ -1,51 +1,23 @@
 import {
-  DeleteInvoiceReturnDTO,
-  GetInvoiceDetailDTO,
-  GetInvoiceSummaryDTO,
-  GetInvoiceSummaryQueryParams,
-  NewInvoiceInputDTO,
-  NewInvoiceReturnDTO,
-  Stringify,
-  UpdateInvoiceInputDTO,
-  UpdateInvoiceReturnDTO,
-  UpdateInvoiceStatusInputDTO,
+  CreateInvoiceRequest,
+  CreateInvoiceResponse,
+  DeleteInvoiceResponse,
+  GetInvoiceByIdResponse,
+  GetInvoicesResponse,
+  UpdateInvoiceRequest,
+  UpdateInvoiceResponse,
+  UpdateInvoiceStatusRequest,
+  getInvoicesQueryParams,
 } from 'src/shared/dtos'
 import { InvoiceDetail, InvoiceSummary } from './invoice.types'
 
+import { client } from 'src/client/shared/api-client'
 import { destringifyInvoiceDetail } from './invoice.mappers'
 import { parseJSON } from 'date-fns'
 import { toArray } from 'src/shared/array'
 
-type EmptyObject = Record<string, never>
-type ClientOptions<TData> = RequestInit & {
-  data?: TData
-}
-
-async function client<TResponse, TBody = EmptyObject>(
-  endpoint: string,
-  { data, headers: customHeaders, ...customOptions }: ClientOptions<TBody> = {}
-): Promise<Stringify<TResponse>> {
-  const requestOptions: RequestInit = {}
-  const requestHeaders: HeadersInit = {}
-
-  if (data) {
-    Object.assign(requestOptions, {
-      body: JSON.stringify(data),
-      method: 'POST',
-    })
-    Object.assign(requestHeaders, { 'content-type': 'application/json' })
-  }
-
-  Object.assign(requestHeaders, customHeaders)
-  Object.assign(requestOptions, { headers: requestHeaders }, customOptions)
-
-  const res = await fetch(endpoint, requestOptions)
-  const responseData: Stringify<TResponse> = await res.json()
-  return responseData
-}
-
 export async function getInvoices(
-  filter?: GetInvoiceSummaryQueryParams
+  filter?: getInvoicesQueryParams
 ): Promise<Array<InvoiceSummary>> {
   const searchParams = new URLSearchParams()
 
@@ -56,7 +28,7 @@ export async function getInvoices(
     })
   }
 
-  const { data } = await client<GetInvoiceSummaryDTO>(
+  const { data } = await client<GetInvoicesResponse>(
     `/api/invoices?${searchParams}`
   )
 
@@ -71,7 +43,7 @@ export async function getInvoiceDetail(
 ): Promise<InvoiceDetail> {
   const {
     data: { invoice },
-  } = await client<GetInvoiceDetailDTO>(`/api/invoices/${id}`)
+  } = await client<GetInvoiceByIdResponse>(`/api/invoices/${id}`)
 
   return {
     ...invoice,
@@ -81,13 +53,16 @@ export async function getInvoiceDetail(
 }
 
 export async function postInvoice(
-  newInvoice: NewInvoiceInputDTO
+  newInvoice: CreateInvoiceRequest
 ): Promise<InvoiceDetail> {
   const {
     data: { savedInvoice },
-  } = await client<NewInvoiceReturnDTO, NewInvoiceInputDTO>('/api/invoices', {
-    data: newInvoice,
-  })
+  } = await client<CreateInvoiceResponse, CreateInvoiceRequest>(
+    '/api/invoices',
+    {
+      data: newInvoice,
+    }
+  )
   return destringifyInvoiceDetail(savedInvoice)
 }
 
@@ -97,7 +72,7 @@ export async function updateStatus(
 ): Promise<InvoiceDetail> {
   const {
     data: { updatedInvoice },
-  } = await client<UpdateInvoiceReturnDTO, UpdateInvoiceStatusInputDTO>(
+  } = await client<UpdateInvoiceResponse, UpdateInvoiceStatusRequest>(
     `/api/invoices/${invoiceId}/status`,
     {
       data: { status },
@@ -110,11 +85,11 @@ export async function updateStatus(
 
 export async function updateInvoice(
   invoiceId: InvoiceDetail['id'],
-  invoice: UpdateInvoiceInputDTO
+  invoice: UpdateInvoiceRequest
 ): Promise<InvoiceDetail> {
   const {
     data: { updatedInvoice },
-  } = await client<UpdateInvoiceReturnDTO, UpdateInvoiceInputDTO>(
+  } = await client<UpdateInvoiceResponse, UpdateInvoiceRequest>(
     `/api/invoices/${invoiceId}`,
     {
       data: invoice,
@@ -130,7 +105,7 @@ export async function deleteInvoice(
 ): Promise<InvoiceDetail> {
   const {
     data: { deletedInvoice },
-  } = await client<DeleteInvoiceReturnDTO>(`/api/invoices/${invoiceId}`, {
+  } = await client<DeleteInvoiceResponse>(`/api/invoices/${invoiceId}`, {
     method: 'DELETE',
   })
 

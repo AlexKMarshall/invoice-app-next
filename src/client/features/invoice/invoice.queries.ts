@@ -1,5 +1,5 @@
+import { CreateInvoiceRequest, UpdateInvoiceRequest } from 'src/shared/dtos'
 import { InvoiceDetail, InvoiceSummary } from './invoice.types'
-import { NewInvoiceInputDTO, UpdateInvoiceInputDTO } from 'src/shared/dtos'
 import {
   UseMutationOptions,
   UseMutationResult,
@@ -17,8 +17,9 @@ import {
   updateStatus,
 } from './invoice.api-client'
 
-import { invoiceDetailFromInput } from './invoice.mappers'
+import { invoiceMapperFactory } from './invoice.mappers'
 import { nanoid } from 'nanoid'
+import { usePaymentTerms } from './payment-term.queries'
 
 type InvoiceSummaryFilters = {
   status?: InvoiceSummary['status'][]
@@ -78,7 +79,7 @@ type UseCreateInvoiceProps = {
   onSuccess?: UseMutationOptions<
     InvoiceDetail,
     unknown,
-    NewInvoiceInputDTO
+    CreateInvoiceRequest
   >['onSuccess']
 }
 
@@ -87,14 +88,15 @@ export function useCreateInvoice({
 }: UseCreateInvoiceProps): UseMutationResult<
   InvoiceDetail,
   unknown,
-  NewInvoiceInputDTO,
+  CreateInvoiceRequest,
   unknown
 > {
   const queryClient = useQueryClient()
+  const { invoiceDetailFromInput } = useInvoiceMapper()
   return useMutation(
-    (newInvoice: NewInvoiceInputDTO) => postInvoice(newInvoice),
+    (newInvoice: CreateInvoiceRequest) => postInvoice(newInvoice),
     {
-      onMutate: async (newInvoice: NewInvoiceInputDTO) => {
+      onMutate: async (newInvoice: CreateInvoiceRequest) => {
         await queryClient.cancelQueries(invoiceKeys.all)
         const previousInvoices =
           queryClient.getQueryData<Array<InvoiceSummary>>(invoiceKeys.list()) ??
@@ -194,7 +196,7 @@ export function useMarkAsPaid({
 
 type UseUpdateInvoiceMutationProps = {
   id: InvoiceDetail['id']
-  invoice: UpdateInvoiceInputDTO
+  invoice: UpdateInvoiceRequest
 }
 type UseUpdateInvoiceProps = Pick<
   UseMutationOptions<InvoiceDetail, unknown, UseUpdateInvoiceMutationProps>,
@@ -208,6 +210,7 @@ export function useUpdateInvoice({
   UseUpdateInvoiceMutationProps
 > {
   const queryClient = useQueryClient()
+  const { invoiceDetailFromInput } = useInvoiceMapper()
 
   return useMutation(
     ({ id, invoice }: UseUpdateInvoiceMutationProps) =>
@@ -294,4 +297,10 @@ export function useDeleteInvoice({
       },
     }
   )
+}
+
+function useInvoiceMapper() {
+  const paymentTermsQuery = usePaymentTerms()
+
+  return invoiceMapperFactory({ paymentTerms: paymentTermsQuery.data ?? [] })
 }

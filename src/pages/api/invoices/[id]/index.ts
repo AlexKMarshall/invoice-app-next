@@ -2,9 +2,9 @@ import * as invoiceController from 'src/server/features/invoice/invoice.controll
 import * as z from 'zod'
 
 import {
-  DeleteInvoiceReturnDTO,
-  GetInvoiceDetailDTO,
-  UpdateInvoiceReturnDTO,
+  DeleteInvoiceResponse,
+  GetInvoiceByIdResponse,
+  UpdateInvoiceResponse,
 } from 'src/shared/dtos'
 import { NextApiRequest, NextApiResponse } from 'next'
 
@@ -13,9 +13,9 @@ import { idRegex } from 'src/shared/identifier'
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<
-    | GetInvoiceDetailDTO
-    | UpdateInvoiceReturnDTO
-    | DeleteInvoiceReturnDTO
+    | GetInvoiceByIdResponse
+    | UpdateInvoiceResponse
+    | DeleteInvoiceResponse
     | { error: unknown }
   >
 ): Promise<void> {

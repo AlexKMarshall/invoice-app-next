@@ -10,7 +10,7 @@ type DateStringify<T> = T extends Date
 
 export type Stringify<T> = Jsonify<DateStringify<T>>
 
-export type GetInvoiceSummaryDTO = {
+export type GetInvoicesResponse = {
   data: {
     invoices: Array<{
       id: string
@@ -22,11 +22,11 @@ export type GetInvoiceSummaryDTO = {
   }
 }
 
-export type GetInvoiceSummaryQueryParams = {
+export type getInvoicesQueryParams = {
   status?: InvoiceStatus[] | InvoiceStatus
 }
 
-export type GetInvoiceDetailDTO = {
+export type GetInvoiceByIdResponse = {
   data: {
     invoice: InvoiceDetail
   }
@@ -34,15 +34,15 @@ export type GetInvoiceDetailDTO = {
 
 type InvoiceStatus = 'draft' | 'pending' | 'paid'
 
-export type NewInvoiceInputDTO = Except<
+export type CreateInvoiceRequest = Except<
   InvoiceDetail,
-  'id' | 'paymentDue' | 'itemList' | 'amountDue' | 'status'
+  'id' | 'paymentDue' | 'itemList' | 'amountDue' | 'status' | 'paymentTerm'
 > & {
-  itemList: Array<NewInvoiceItemInput>
+  itemList: Array<CreateInvoiceItemRequest>
   status: Exclude<InvoiceStatus, 'paid'>
 }
 
-type NewInvoiceItemInput = Except<InvoiceItem, 'id' | 'total'>
+type CreateInvoiceItemRequest = Except<InvoiceItem, 'id' | 'total'>
 
 type InvoiceDetail = {
   id: string
@@ -62,7 +62,12 @@ type InvoiceDetail = {
     country: string
   }
   issuedAt: Date
-  paymentTerms: number
+  paymentTermId: number
+  paymentTerm: {
+    id: number
+    value: number
+    name: string
+  }
   paymentDue: Date
   projectDescription: string
   itemList: Array<InvoiceItem>
@@ -77,26 +82,36 @@ type InvoiceItem = {
   total: number
 }
 
-export type NewInvoiceReturnDTO = {
+export type CreateInvoiceResponse = {
   data: {
     savedInvoice: InvoiceDetail
   }
 }
 
-export type UpdateInvoiceStatusInputDTO = {
+export type UpdateInvoiceStatusRequest = {
   status: 'paid'
 }
 
-export type UpdateInvoiceReturnDTO = {
+export type UpdateInvoiceResponse = {
   data: {
     updatedInvoice: InvoiceDetail
   }
 }
 
-export type DeleteInvoiceReturnDTO = {
+export type DeleteInvoiceResponse = {
   data: {
     deletedInvoice: InvoiceDetail
   }
 }
 
-export type UpdateInvoiceInputDTO = NewInvoiceInputDTO
+export type UpdateInvoiceRequest = CreateInvoiceRequest
+
+export type GetPaymentTermsResponse = {
+  data: {
+    paymentTerms: Array<{
+      id: number
+      value: number
+      name: string
+    }>
+  }
+}
