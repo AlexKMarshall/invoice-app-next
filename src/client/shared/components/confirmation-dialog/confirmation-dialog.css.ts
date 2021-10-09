@@ -20,7 +20,7 @@ export const overlay = style({
   display: 'flex',
   flexDirection: 'column',
   gap: '1rem',
-  width: 'min(480px, 80%)',
+  maxWidth: '80%',
 })
 
 export const heading = style({
