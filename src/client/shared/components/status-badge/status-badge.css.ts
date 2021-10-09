@@ -19,6 +19,7 @@ export const statusBadge = recipe({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'baseline',
+    gap: size,
     paddingBlock: themeVars.layout.size[-1],
     paddingInline: themeVars.layout.size[1],
     borderRadius: themeVars.layout.borderRadius.m,
@@ -28,14 +29,13 @@ export const statusBadge = recipe({
     color: colorVars.opaque,
 
     vars: {
-      [size]: '0.5rem',
+      [size]: themeVars.layout.size[-3],
     },
 
     ':before': {
       content: `''`,
       width: size,
       height: size,
-      marginRight: size,
       borderRadius: themeVars.layout.borderRadius.circle,
       backgroundColor: colorVars.opaque,
     },

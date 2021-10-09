@@ -1,6 +1,7 @@
 import { ForwardedRef, InputHTMLAttributes, forwardRef } from 'react'
 import { input, inputWrapper, labelWrapper } from './input.css'
 
+import { Stack } from 'src/client/shared/components'
 import { useId } from '@react-aria/utils'
 
 type Props = {
@@ -23,7 +24,7 @@ export const Input = forwardRef(function Input(
   })
 
   return (
-    <div className={`${inputWrapperClassName} ${className}`}>
+    <Stack size="-2" className={`${inputWrapperClassName} ${className}`}>
       <div className={labelWrapper}>
         <label htmlFor={inputId}>{label}</label>
 
@@ -41,6 +42,6 @@ export const Input = forwardRef(function Input(
         disabled={disabled}
         {...props}
       />
-    </div>
+    </Stack>
   )
 })

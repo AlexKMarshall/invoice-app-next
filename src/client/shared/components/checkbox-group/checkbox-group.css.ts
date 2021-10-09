@@ -10,7 +10,7 @@ export const checkboxGroup = style({
 export const checkboxWrapper = style({
   display: 'flex',
   alignItems: 'center',
-  gap: '1rem',
+  gap: themeVars.layout.size[0],
   color: themeVars.color.text.strong,
   fontWeight: themeVars.typography.fontWeight.bold,
 })
@@ -18,8 +18,8 @@ export const checkboxWrapper = style({
 export const checkbox = style({
   display: 'grid',
   placeItems: 'center',
-  height: '1rem',
-  width: '1rem',
+  height: themeVars.layout.size[0],
+  width: themeVars.layout.size[0],
   backgroundColor: themeVars.color.muted.hover,
   borderRadius: themeVars.layout.borderRadius.xs,
 

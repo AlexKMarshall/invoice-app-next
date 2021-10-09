@@ -11,8 +11,6 @@ const colorVars = createThemeContract({
 
 export const inputWrapper = recipe({
   base: {
-    display: 'flex',
-    flexDirection: 'column',
     color: colorVars.text,
     outlineColor: colorVars.outline,
     borderColor: colorVars.border,
@@ -54,7 +52,6 @@ export const labelWrapper = style({
 })
 
 export const input = style({
-  marginTop: '10px',
   paddingBlock: themeVars.layout.size[0],
   paddingInline: themeVars.layout.size[1],
   border: '1px solid',

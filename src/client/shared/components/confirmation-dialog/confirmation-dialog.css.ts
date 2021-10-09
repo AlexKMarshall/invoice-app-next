@@ -17,9 +17,6 @@ export const overlay = style({
   padding: themeVars.layout.size[5],
   backgroundColor: 'white',
   borderRadius: themeVars.layout.borderRadius.l,
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem',
   maxWidth: '80%',
 })
 

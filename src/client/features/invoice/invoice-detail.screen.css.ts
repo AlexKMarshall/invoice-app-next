@@ -1,4 +1,4 @@
-import { createTheme, createVar, style } from '@vanilla-extract/css'
+import { createVar, style } from '@vanilla-extract/css'
 
 import { recipe } from '@vanilla-extract/recipes'
 import { themeVars } from 'src/client/shared/styles/theme.css'

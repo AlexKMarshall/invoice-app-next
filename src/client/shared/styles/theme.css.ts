@@ -85,6 +85,7 @@ export const themeVars = createGlobalTheme(':root', {
       circle: '50%',
       pill: '100vh',
     },
+    measure: '75ch',
     size: {
       '-3': `${scale(-3)}rem`,
       '-2': `${scale(-2)}rem`,

@@ -10,7 +10,7 @@ export const layoutWrapper = style({
 
 export const mainWrapper = style({
   width: '100%',
-  maxWidth: 730,
+  maxWidth: themeVars.layout.measure,
   marginLeft: 'auto',
   marginRight: 'auto',
   gridArea: 'main',

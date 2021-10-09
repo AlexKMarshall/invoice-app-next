@@ -5,7 +5,7 @@ export const filterButton = style({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: '1rem',
+  gap: themeVars.layout.size[0],
   color: themeVars.color.text.strong,
   fontWeight: themeVars.typography.fontWeight.bold,
   background: 'transparent',

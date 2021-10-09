@@ -22,6 +22,7 @@ globalStyle('a:not([class])', {
 
 globalStyle('input, button, textarea, select', {
   font: 'inherit',
+  lineHeight: 'inherit',
 })
 
 globalStyle('img, svg', {

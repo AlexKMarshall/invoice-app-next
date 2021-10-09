@@ -1,6 +1,6 @@
 import { sizeVariants, stack } from './stack.css'
 
-import { HTMLAttributes } from 'react'
+import { forwardRef } from 'react'
 
 type DivProps = {
   component?: 'div'
@@ -17,17 +17,18 @@ type BaseProps = {
 }
 type Props = BaseProps & ComponentProps
 
-export function Stack({
-  component = 'div',
-  children,
-  className,
-  size = '0',
-  ...props
-}: Props): JSX.Element {
+export const Stack = forwardRef(function Stack(
+  { component = 'div', children, className, size = '0', ...props }: Props,
+  ref: any
+): JSX.Element {
   const Component = component
   return (
-    <Component className={`${stack({ size })} ${className}`} {...props}>
+    <Component
+      className={`${stack({ size })} ${className}`}
+      {...props}
+      ref={ref}
+    >
       {children}
     </Component>
   )
-}
+})
