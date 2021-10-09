@@ -55,7 +55,8 @@ export const labelWrapper = style({
 
 export const select = style({
   marginTop: '10px',
-  padding: '16px 20px',
+  paddingBlock: themeVars.layout.size[0],
+  paddingInline: themeVars.layout.size[1],
   border: '1px solid',
   borderColor: 'inherit',
   outlineColor: 'inherit',

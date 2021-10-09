@@ -14,7 +14,7 @@ export const underlay = style({
 })
 
 export const overlay = style({
-  padding: '48px',
+  padding: themeVars.layout.size[5],
   backgroundColor: 'white',
   borderRadius: themeVars.layout.borderRadius.l,
   display: 'flex',

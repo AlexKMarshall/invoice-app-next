@@ -85,5 +85,22 @@ export const themeVars = createGlobalTheme(':root', {
       circle: '50%',
       pill: '100vh',
     },
+    size: {
+      '-3': `${scale(-3)}rem`,
+      '-2': `${scale(-2)}rem`,
+      '-1': `${scale(-1)}rem`,
+      '0': `${scale(0)}rem`,
+      '1': `${scale(1)}rem`,
+      '2': `${scale(2)}rem`,
+      '3': `${scale(3)}rem`,
+      '4': `${scale(4)}rem`,
+      '5': `${scale(5)}rem`,
+      '6': `${scale(6)}rem`,
+    },
   },
 })
+
+function scale(level: number) {
+  const scaleRhythm = 1.25
+  return 1 * Math.pow(scaleRhythm, level)
+}

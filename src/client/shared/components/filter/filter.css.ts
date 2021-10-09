@@ -9,7 +9,7 @@ export const filterButton = style({
   color: themeVars.color.text.strong,
   fontWeight: themeVars.typography.fontWeight.bold,
   background: 'transparent',
-  padding: '1rem',
+  padding: themeVars.layout.size[0],
   border: 'none',
 })
 
@@ -19,7 +19,7 @@ export const downChevron = style({
 })
 
 export const popover = style({
-  padding: '1.5rem',
+  padding: themeVars.layout.size[2],
   minWidth: '10rem',
   backgroundColor: 'white',
   borderRadius: themeVars.layout.borderRadius.l,
