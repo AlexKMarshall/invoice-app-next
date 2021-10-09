@@ -1,5 +1,6 @@
+import { createTheme, createVar, style } from '@vanilla-extract/css'
+
 import { recipe } from '@vanilla-extract/recipes'
-import { style } from '@vanilla-extract/css'
 import { themeVars } from 'src/client/shared/styles/theme.css'
 
 export const statusBar = style({
@@ -8,7 +9,8 @@ export const statusBar = style({
   justifyContent: 'flex-start',
   alignItems: 'baseline',
   gap: '8px',
-  padding: '20px 32px',
+  paddingBlock: themeVars.layout.size[1],
+  paddingInline: themeVars.layout.size[3],
   marginBottom: '24px',
   backgroundColor: 'white',
   borderRadius: themeVars.layout.borderRadius.l,
@@ -23,7 +25,7 @@ export const status = style({
 })
 
 export const details = style({
-  padding: '48px',
+  padding: themeVars.layout.size[5],
   backgroundColor: 'white',
   borderRadius: themeVars.layout.borderRadius.l,
   boxShadow: `0 10px 10px -10px ${themeVars.color.shadow}`,
@@ -90,13 +92,21 @@ export const primaryValue = style({
   fontWeight: themeVars.typography.fontWeight.bold,
 })
 
+const tablePadding = createVar()
+const tableRowGap = createVar()
+
 export const itemTable = style({
   tableLayout: 'fixed',
   width: '100%',
-  padding: '32px',
+  padding: themeVars.layout.size[3],
   borderCollapse: 'collapse',
   borderRadius: themeVars.layout.borderRadius.l,
   overflow: 'hidden',
+
+  vars: {
+    [tablePadding]: themeVars.layout.size[3],
+    [tableRowGap]: themeVars.layout.size[3],
+  },
 })
 
 export const thead = style({
@@ -108,14 +118,13 @@ export const thead = style({
 })
 
 export const headingCell = style({
-  paddingTop: '32px',
-  paddingBottom: '32px',
+  paddingBlock: tablePadding,
   fontWeight: 'inherit',
   boxSizing: 'content-box',
 
   selectors: {
     '&:nth-child(1)': {
-      paddingLeft: '32px',
+      paddingLeft: tablePadding,
       width: '50%',
       textAlign: 'left',
     },
@@ -128,7 +137,7 @@ export const headingCell = style({
       textAlign: 'right',
     },
     '&:nth-child(4)': {
-      paddingRight: '32px',
+      paddingRight: tablePadding,
       width: '20%',
       textAlign: 'right',
     },
@@ -141,10 +150,10 @@ export const tbody = style({
 })
 
 export const bodyCell = style({
-  paddingBottom: '32px',
+  paddingBottom: tableRowGap,
   selectors: {
     '&:nth-child(1)': {
-      paddingLeft: '32px',
+      paddingLeft: tablePadding,
       textAlign: 'left',
       color: themeVars.color.text.strong,
     },
@@ -155,12 +164,12 @@ export const bodyCell = style({
       textAlign: 'right',
     },
     '&:nth-child(4)': {
-      paddingRight: '32px',
+      paddingRight: tablePadding,
       textAlign: 'right',
       color: themeVars.color.text.strong,
     },
     'tr:last-child > &': {
-      paddingBottom: '40px',
+      paddingBottom: themeVars.layout.size[4],
     },
   },
 })
@@ -171,7 +180,7 @@ export const tfoot = style({
 })
 
 export const totalHeader = style({
-  paddingLeft: '32px',
+  paddingLeft: tablePadding,
   textAlign: 'left',
   fontSize: themeVars.typography.body2.fontSize,
   lineHeight: themeVars.typography.body2.lineHeight,
@@ -180,9 +189,9 @@ export const totalHeader = style({
 })
 
 export const totalValue = style({
-  paddingRight: '32px',
-  paddingTop: '24px',
-  paddingBottom: '24px',
+  paddingRight: tablePadding,
+  paddingTop: themeVars.layout.size[2],
+  paddingBottom: themeVars.layout.size[2],
   textAlign: 'right',
   fontSize: `${24 / 16}rem`,
   letterSpacing: '-0.5px',

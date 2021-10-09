@@ -96,6 +96,7 @@ export const themeVars = createGlobalTheme(':root', {
       '4': `${scale(4)}rem`,
       '5': `${scale(5)}rem`,
       '6': `${scale(6)}rem`,
+      '7': `${scale(7)}rem`,
     },
   },
 })

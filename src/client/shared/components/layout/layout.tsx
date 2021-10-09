@@ -19,7 +19,7 @@ type Props = {
 export function Layout({ children }: Props): JSX.Element {
   return (
     <div className={layoutWrapper}>
-      <main className={mainWrapper}>{children}</main>
+      <div className={mainWrapper}>{children}</div>
       <Sidebar />
     </div>
   )
@@ -27,7 +27,7 @@ export function Layout({ children }: Props): JSX.Element {
 
 function Sidebar(): JSX.Element {
   return (
-    <div className={sidebarWrapper}>
+    <aside className={sidebarWrapper}>
       <div className={logoBox}>
         <Logo className={logo} />
       </div>
@@ -41,6 +41,6 @@ function Sidebar(): JSX.Element {
           />
         </div>
       </div>
-    </div>
+    </aside>
   )
 }
