@@ -21,7 +21,7 @@ export const checkbox = style({
   height: '1rem',
   width: '1rem',
   backgroundColor: themeVars.color.muted.hover,
-  borderRadius: '2px',
+  borderRadius: themeVars.layout.borderRadius.xs,
 
   selectors: {
     'input[aria-checked="true"] ~ &': {

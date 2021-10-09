@@ -75,4 +75,15 @@ export const themeVars = createGlobalTheme(':root', {
       letterSpacing: '-0.23px',
     },
   },
+  layout: {
+    borderRadius: {
+      xs: '2px',
+      s: '4px',
+      m: '6px',
+      l: '8px',
+      xl: '20px',
+      circle: '50%',
+      pill: '100vh',
+    },
+  },
 })

@@ -11,7 +11,7 @@ export const statusBar = style({
   padding: '20px 32px',
   marginBottom: '24px',
   backgroundColor: 'white',
-  borderRadius: '8px',
+  borderRadius: themeVars.layout.borderRadius.l,
   boxShadow: `0 10px 10px -10px ${themeVars.color.shadow}`,
 })
 
@@ -25,7 +25,7 @@ export const status = style({
 export const details = style({
   padding: '48px',
   backgroundColor: 'white',
-  borderRadius: '8px',
+  borderRadius: themeVars.layout.borderRadius.l,
   boxShadow: `0 10px 10px -10px ${themeVars.color.shadow}`,
 })
 
@@ -95,7 +95,7 @@ export const itemTable = style({
   width: '100%',
   padding: '32px',
   borderCollapse: 'collapse',
-  borderRadius: '8px',
+  borderRadius: themeVars.layout.borderRadius.l,
   overflow: 'hidden',
 })
 

@@ -30,7 +30,7 @@ export const sidebarWrapper = style({
   backgroundColor: themeVars.color.sidebar,
 
   vars: {
-    [borderRadius]: '20px',
+    [borderRadius]: themeVars.layout.borderRadius.xl,
   },
 
   borderTopRightRadius: borderRadius,

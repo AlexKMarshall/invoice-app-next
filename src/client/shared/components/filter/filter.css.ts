@@ -22,6 +22,6 @@ export const popover = style({
   padding: '1.5rem',
   minWidth: '10rem',
   backgroundColor: 'white',
-  borderRadius: '8px',
+  borderRadius: themeVars.layout.borderRadius.l,
   boxShadow: `0px 10px 10px ${themeVars.color.shadow}`,
 })

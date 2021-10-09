@@ -71,7 +71,7 @@ export const rowWrapper = recipe({
 
     vars: {
       [cursor]: 'pointer',
-      [borderRadius]: '8px',
+      [borderRadius]: themeVars.layout.borderRadius.l,
       [borderColor]: 'transparent',
       [borderWidth]: '2px',
       [borderStyle]: 'solid',

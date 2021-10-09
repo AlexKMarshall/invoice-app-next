@@ -69,7 +69,7 @@ export const th = style({
 export const tableInput = style({
   padding: '16px 20px',
   border: `1px solid ${themeVars.color.fieldBoder}`,
-  borderRadius: '4px',
+  borderRadius: themeVars.layout.borderRadius.s,
   fontWeight: themeVars.typography.fontWeight.bold,
   width: '100%',
 })

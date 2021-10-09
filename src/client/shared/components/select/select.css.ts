@@ -60,7 +60,7 @@ export const select = style({
   borderColor: 'inherit',
   outlineColor: 'inherit',
   color: themeVars.color.text.strong,
-  borderRadius: '4px',
+  borderRadius: themeVars.layout.borderRadius.s,
   fontWeight: themeVars.typography.fontWeight.bold,
   lineHeight: themeVars.typography.body1.lineHeight,
 })

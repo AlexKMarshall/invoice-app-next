@@ -60,6 +60,6 @@ export const input = style({
   borderColor: 'inherit',
   outlineColor: 'inherit',
   color: themeVars.color.text.strong,
-  borderRadius: '4px',
+  borderRadius: themeVars.layout.borderRadius.s,
   fontWeight: themeVars.typography.fontWeight.bold,
 })
