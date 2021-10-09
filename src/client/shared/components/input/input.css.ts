@@ -59,7 +59,7 @@ export const input = style({
   border: '1px solid',
   borderColor: 'inherit',
   outlineColor: 'inherit',
-  color: 'inherit',
+  color: themeVars.color.text.strong,
   borderRadius: '4px',
   fontWeight: themeVars.typography.fontWeight.bold,
 })
