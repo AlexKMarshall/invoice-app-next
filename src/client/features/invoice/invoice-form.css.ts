@@ -1,10 +1,15 @@
-import { createVar, style } from '@vanilla-extract/css'
-
 import { calc } from '@vanilla-extract/css-utils'
+import { style } from '@vanilla-extract/css'
 import { themeVars } from 'src/client/shared/styles/theme.css'
 
 export const form = style({
   maxWidth: themeVars.layout.measure,
+  height: '100%',
+  display: 'flex',
+})
+
+export const scrollArea = style({
+  overflowY: 'auto',
 })
 
 export const fieldset = style({
@@ -44,19 +49,21 @@ export const spanFull = style({
   gridColumn: 'span 6',
 })
 
-const spacing = createVar()
+export const tableWrapper = style([
+  {
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  spanFull,
+])
 
 export const table = style([
   {
     tableLayout: 'fixed',
-    borderSpacing: spacing,
-    margin: calc.negate(spacing),
-
-    vars: {
-      [spacing]: themeVars.layout.size[0],
-    },
+    borderSpacing: themeVars.layout.size[0],
+    margin: calc.negate(themeVars.layout.size[0]),
   },
-  spanFull,
 ])
 
 export const th = style({

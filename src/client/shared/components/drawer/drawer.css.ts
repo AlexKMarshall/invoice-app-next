@@ -20,7 +20,8 @@ export const overlay = style({
   padding: padding,
   paddingLeft: calc.add(padding, themeVars.layout.sidebarDepth.desktop),
   backgroundColor: 'white',
-  overflowY: 'auto',
+  borderTopRightRadius: themeVars.layout.borderRadius.xl,
+  borderBottomRightRadius: themeVars.layout.borderRadius.xl,
 
   vars: {
     [padding]: themeVars.layout.size[6],
