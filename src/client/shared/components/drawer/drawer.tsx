@@ -1,5 +1,6 @@
 import { ReactNode, useContext, useMemo, useRef, useState } from 'react'
 import { overlay, underlay } from './drawer.css'
+import { useOverlay, usePreventScroll } from '@react-aria/overlays'
 
 import { FocusScope } from '@react-aria/focus'
 import ReactDOM from 'react-dom'
@@ -7,7 +8,6 @@ import { RefObject } from 'hoist-non-react-statics/node_modules/@types/react'
 import { createContext } from 'react'
 import { useDialog } from '@react-aria/dialog'
 import { useId } from '@react-aria/utils'
-import { useOverlay } from '@react-aria/overlays'
 
 type Props = {
   children: ReactNode
@@ -47,6 +47,8 @@ export function Drawer(props: Props): JSX.Element {
 
 function DrawerPortal({ children }: { children: ReactNode }) {
   const { drawerPortalRef } = useDrawer()
+
+  usePreventScroll()
 
   if (!drawerPortalRef.current) return null
 
