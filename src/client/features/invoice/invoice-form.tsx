@@ -33,7 +33,7 @@ type Props = {
   kind: 'create' | 'update'
   onCancel?: () => void
   onSubmit: (data: CreateInvoiceRequest) => void
-  defaultValues?: CreateInvoiceRequest | UpdateInvoiceRequest
+  defaultValues?: Partial<CreateInvoiceRequest | UpdateInvoiceRequest>
   'aria-labelledby': string
 }
 
@@ -54,7 +54,7 @@ const defaultFormValues = {
     country: '',
   },
   issuedAt: new Date(), //format(new Date(), 'yyyy-MM-dd'),
-  paymentTermId: 0,
+  // paymentTermId: '',
   projectDescription: '',
   itemList: [],
   status: 'draft' as const,
@@ -73,7 +73,9 @@ export function InvoiceForm({
 
   const formattedDefaultValues = {
     ...defaultValues,
-    issuedAt: format(defaultValues.issuedAt, 'yyyy-MM-dd'),
+    issuedAt: defaultValues.issuedAt
+      ? format(defaultValues.issuedAt, 'yyyy-MM-dd')
+      : undefined,
   }
 
   const paymentTermsQuery = usePaymentTerms()
@@ -188,6 +190,7 @@ export function InvoiceForm({
           <Select
             className={spanHalf}
             label="Payment Terms"
+            errorMessage={errors.paymentTermId?.message}
             isLoading={paymentTermsQuery.isLoading}
             options={
               paymentTermsQuery.isSuccess

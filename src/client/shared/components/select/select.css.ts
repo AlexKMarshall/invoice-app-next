@@ -59,7 +59,7 @@ export const select = style({
   border: '1px solid',
   borderColor: 'inherit',
   outlineColor: 'inherit',
-  color: 'inherit',
+  color: themeVars.color.text.strong,
   borderRadius: '4px',
   fontWeight: themeVars.typography.fontWeight.bold,
   lineHeight: themeVars.typography.body1.lineHeight,

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 
 import { Select } from '.'
 import { randomPick } from 'src/shared/random'
@@ -49,7 +49,8 @@ it('should render all options when not loading', () => {
 
   const options = screen.getAllByRole('option')
 
-  expect(options).toHaveLength(defaultProps.options.length)
+  // we should have all the options, plus the empty one
+  expect(options).toHaveLength(defaultProps.options.length + 1)
 
   defaultProps.options.forEach((option) => {
     expect(screen.getByRole('option', { name: option.label })).toHaveValue(
@@ -64,4 +65,11 @@ it('shhould show error message if passed one', () => {
   const selectControl = screen.getByRole('combobox')
   expect(selectControl).toBeInvalid()
   expect(selectControl).toHaveAccessibleDescription(errorMessage)
+})
+it('should have empty value to start with', () => {
+  render(<Select {...defaultProps} />)
+
+  const selectControl = screen.getByRole('combobox')
+  expect(selectControl).toHaveDisplayValue('')
+  expect(within(selectControl).getByRole('option', { name: '' })).toBeDisabled()
 })
