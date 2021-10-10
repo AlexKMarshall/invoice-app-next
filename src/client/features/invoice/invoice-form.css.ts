@@ -72,6 +72,11 @@ export const tableInput = style({
   width: '100%',
 })
 
+export const itemTotal = style({
+  textAlign: 'right',
+  fontWeight: themeVars.typography.fontWeight.bold,
+})
+
 export const buttonGroup = style([
   {
     display: 'flex',

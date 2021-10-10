@@ -1,5 +1,6 @@
 import {
   Button,
+  CurrencyValue,
   IconButton,
   Input,
   Select,
@@ -15,6 +16,7 @@ import {
   form,
   gridWrapper,
   itemListHeader,
+  itemTotal,
   marginLeftAuto,
   spanFull,
   spanHalf,
@@ -290,7 +292,9 @@ export function InvoiceForm({
                           })}
                         />
                       </td>
-                      <td>{total}</td>
+                      <td className={itemTotal}>
+                        <CurrencyValue value={total} />
+                      </td>
                       <td>
                         <IconButton
                           label="delete"

@@ -12,6 +12,7 @@ import { FunctionComponent } from 'react'
 import { PaymentTerm } from 'src/client/features/invoice/payment-term.types'
 import { format } from 'date-fns'
 import userEvent from '@testing-library/user-event'
+import { validateGBPValue } from 'src/test/validators'
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 const Providers: FunctionComponent<{}> = ({ children }) => {
@@ -168,7 +169,7 @@ export async function fillInInvoiceForm(
 
     const totalField = inLastRow.getAllByRole('cell')[totalColIndex]
     const expectedTotalValue = item.quantity * item.price
-    expect(totalField).toHaveTextContent(expectedTotalValue.toString())
+    validateGBPValue(expectedTotalValue, within(totalField))
   })
 }
 

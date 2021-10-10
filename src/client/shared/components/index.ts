@@ -1,6 +1,7 @@
 export * from './button'
 export * from './checkbox-group'
 export * from './confirmation-dialog'
+export * from './currency-value'
 export * from './drawer'
 export * from './filter'
 export * from './icon-button'

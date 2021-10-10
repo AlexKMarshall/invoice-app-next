@@ -4,6 +4,7 @@ import {
 } from 'src/client/features/invoice/invoice.types'
 import {
   Button,
+  CurrencyValue,
   Drawer,
   Stack,
   StatusBadge,
@@ -45,7 +46,6 @@ import { Except } from 'type-fest'
 import { InvoiceForm } from './invoice-form'
 import { ReactNode } from 'hoist-non-react-statics/node_modules/@types/react'
 import { UpdateInvoiceRequest } from 'src/shared/dtos'
-import { currencyFormatterGBP } from 'src/client/shared/currency'
 import { format } from 'date-fns'
 import { useCallback } from 'react'
 import { useRouter } from 'next/router'
@@ -210,10 +210,10 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
                   <td className={bodyCell}>{item.name}</td>
                   <td className={bodyCell}>{item.quantity}</td>
                   <td className={bodyCell}>
-                    <GBPValue value={item.price} />
+                    <CurrencyValue value={item.price} />
                   </td>
                   <td className={bodyCell}>
-                    <GBPValue value={item.total} />
+                    <CurrencyValue value={item.total} />
                   </td>
                 </tr>
               ))}
@@ -224,7 +224,7 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
                   Amount Due
                 </th>
                 <td colSpan={2} className={totalValue}>
-                  <GBPValue value={invoice.amountDue} />
+                  <CurrencyValue value={invoice.amountDue} />
                 </td>
               </tr>
             </tfoot>
@@ -268,20 +268,6 @@ function Address({ address, align = 'left' }: AddressProps): JSX.Element {
       <br />
       <span>{address.country}</span>
     </p>
-  )
-}
-
-type GBPValueProps = {
-  value: number
-}
-function GBPValue({ value }: GBPValueProps) {
-  const [poundSign, ...rest] = currencyFormatterGBP.format(value).split('')
-  const formattedValue = rest.join('')
-
-  return (
-    <>
-      {poundSign}&nbsp;{formattedValue}
-    </>
   )
 }
 
