@@ -20,7 +20,7 @@ const borderRadius = createVar()
 
 export const sidebarWrapper = style({
   height: '100vh',
-  width: 'fit-content',
+  width: themeVars.layout.sidebarDepth,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',

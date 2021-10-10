@@ -86,6 +86,7 @@ export const themeVars = createGlobalTheme(':root', {
       pill: '100vh',
     },
     measure: '75ch',
+    sidebarDepth: '103px',
     size: {
       '-3': `${scale(-3)}rem`,
       '-2': `${scale(-2)}rem`,

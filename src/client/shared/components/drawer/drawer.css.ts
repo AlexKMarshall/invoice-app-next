@@ -13,19 +13,16 @@ export const underlay = style({
   display: 'flex',
 })
 
-const sidebarWidth = createVar()
 const padding = createVar()
 
 export const overlay = style({
   maxWidth: '80vw',
   padding: padding,
-  paddingLeft: calc.add(padding, sidebarWidth),
+  paddingLeft: calc.add(padding, themeVars.layout.sidebarDepth),
   backgroundColor: 'white',
   overflowY: 'auto',
 
   vars: {
-    // TODO make this dynamic based on sidebar width
-    [sidebarWidth]: '102.5px',
     [padding]: themeVars.layout.size[6],
   },
 })
