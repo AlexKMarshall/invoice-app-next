@@ -94,6 +94,7 @@ export function InvoiceForm({
     handleSubmit,
     control,
     formState: { errors },
+    watch,
     setValue,
   } = useForm<CreateInvoiceRequest>({
     defaultValues: formattedDefaultValues,
@@ -107,6 +108,12 @@ export function InvoiceForm({
     control,
     name: 'itemList',
   })
+
+  const watchItemFieldArray = watch('itemList')
+
+  const watchedItems = itemsFieldArray.fields.map((_, index) => ({
+    ...watchItemFieldArray[index],
+  }))
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} {...props} className={form}>
@@ -233,61 +240,69 @@ export function InvoiceForm({
                     Item Name
                   </th>
                   {/* TODO Don't like this hardcoding of widths */}
-                  <th className={th} scope="col" style={{ width: '20%' }}>
+                  <th className={th} scope="col" style={{ width: '15%' }}>
                     Qty.
                   </th>
-                  <th className={th} scope="col" style={{ width: '30%' }}>
+                  <th className={th} scope="col" style={{ width: '20%' }}>
                     Price
+                  </th>
+                  <th className={th} scope="col" style={{ width: '10%' }}>
+                    Total
                   </th>
                   <th className={th} scope="col" style={{ width: '10%' }} />
                 </tr>
               </thead>
               <tbody>
-                {itemsFieldArray.fields.map((item, index) => (
-                  <tr key={item.id}>
-                    <td>
-                      <input
-                        className={tableInput}
-                        type="text"
-                        defaultValue={`${item.name}`}
-                        aria-label="Item Name"
-                        {...register(`itemList.${index}.name`)}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        className={tableInput}
-                        type="number"
-                        aria-label="Quantity"
-                        defaultValue={`${item.quantity}`}
-                        {...register(`itemList.${index}.quantity`, {
-                          valueAsNumber: true,
-                        })}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        className={tableInput}
-                        size={0}
-                        type="number"
-                        aria-label="Price"
-                        defaultValue={`${item.price}`}
-                        {...register(`itemList.${index}.price`, {
-                          valueAsNumber: true,
-                        })}
-                      />
-                    </td>
-                    <td>
-                      <IconButton
-                        label="delete"
-                        onClick={() => itemsFieldArray.remove(index)}
-                        className={deleteButton}
-                      >
-                        <Delete className={deleteIcon} />
-                      </IconButton>
-                    </td>
-                  </tr>
-                ))}
+                {itemsFieldArray.fields.map((item, index) => {
+                  const watchedItem = watchedItems[index]
+                  const total = watchedItem.quantity * watchedItem.price
+                  return (
+                    <tr key={item.id}>
+                      <td>
+                        <input
+                          className={tableInput}
+                          type="text"
+                          defaultValue={`${item.name}`}
+                          aria-label="Item Name"
+                          {...register(`itemList.${index}.name`)}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          className={tableInput}
+                          type="number"
+                          aria-label="Quantity"
+                          defaultValue={`${item.quantity}`}
+                          {...register(`itemList.${index}.quantity`, {
+                            valueAsNumber: true,
+                          })}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          className={tableInput}
+                          size={0}
+                          type="number"
+                          aria-label="Price"
+                          defaultValue={`${item.price}`}
+                          {...register(`itemList.${index}.price`, {
+                            valueAsNumber: true,
+                          })}
+                        />
+                      </td>
+                      <td>{total}</td>
+                      <td>
+                        <IconButton
+                          label="delete"
+                          onClick={() => itemsFieldArray.remove(index)}
+                          className={deleteButton}
+                        >
+                          <Delete className={deleteIcon} />
+                        </IconButton>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
             <Button
