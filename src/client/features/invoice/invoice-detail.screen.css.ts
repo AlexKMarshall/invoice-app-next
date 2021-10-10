@@ -3,15 +3,18 @@ import { createVar, style } from '@vanilla-extract/css'
 import { recipe } from '@vanilla-extract/recipes'
 import { themeVars } from 'src/client/shared/styles/theme.css'
 
+export const main = style({
+  paddingBlock: themeVars.layout.size[7],
+})
+
 export const statusBar = style({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'flex-start',
   alignItems: 'baseline',
-  gap: '8px',
+  gap: themeVars.layout.size[-3],
   paddingBlock: themeVars.layout.size[1],
   paddingInline: themeVars.layout.size[3],
-  marginBottom: '24px',
   backgroundColor: 'white',
   borderRadius: themeVars.layout.borderRadius.l,
   boxShadow: `0 10px 10px -10px ${themeVars.color.shadow}`,
@@ -20,7 +23,7 @@ export const statusBar = style({
 export const status = style({
   display: 'flex',
   alignItems: 'baseline',
-  gap: '16px',
+  gap: themeVars.layout.size[0],
   marginRight: 'auto',
 })
 
@@ -34,8 +37,7 @@ export const details = style({
 export const grid = style({
   display: 'grid',
   gridTemplateColumns: 'repeat(3, 1fr)',
-  gap: '21px',
-  marginBottom: '45px',
+  gap: themeVars.layout.size[2],
 })
 
 export const twoColumns = style({
@@ -81,7 +83,6 @@ export const sectionHeader = style({
   fontSize: themeVars.typography.body1.fontSize,
   letterSpacing: themeVars.typography.body1.letterSpacing,
   fontWeight: themeVars.typography.fontWeight.normal,
-  marginBottom: '12px',
 })
 
 export const primaryValue = style({
@@ -200,14 +201,12 @@ export const totalValue = style({
 })
 
 export const backButton = style({
-  marginTop: '64px',
-  marginBottom: '32px',
   border: 'none',
   backgroundColor: 'transparent',
   display: 'flex',
   justifyContent: 'flex-start',
   alignItems: 'baseline',
-  gap: '24px',
+  gap: themeVars.layout.size[2],
   fontWeight: themeVars.typography.fontWeight.bold,
   color: themeVars.color.text.strong,
   cursor: 'pointer',

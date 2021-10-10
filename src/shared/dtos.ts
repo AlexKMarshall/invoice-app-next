@@ -1,10 +1,12 @@
 import { Except, Jsonify } from 'type-fest'
 
+import { AnyObject } from './type-utils'
+
 type DateStringify<T> = T extends Date
   ? string
   : T extends Array<infer U>
   ? Array<DateStringify<U>>
-  : T extends Record<string, unknown>
+  : T extends AnyObject
   ? { [P in keyof T]: DateStringify<T[P]> }
   : T
 

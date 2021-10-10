@@ -10,7 +10,11 @@ type MainProps = {
   component?: 'main'
 } & React.ComponentPropsWithoutRef<'main'>
 
-type ComponentProps = DivProps | MainProps
+type SectionProps = {
+  component?: 'section'
+} & React.ComponentPropsWithoutRef<'section'>
+
+type ComponentProps = DivProps | MainProps | SectionProps
 
 type BaseProps = {
   size?: keyof typeof sizeVariants

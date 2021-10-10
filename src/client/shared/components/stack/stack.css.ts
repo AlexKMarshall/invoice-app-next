@@ -3,13 +3,13 @@ import { themeVars } from '../../styles/theme.css'
 
 export const sizeVariants = {
   '-3': {
-    gap: themeVars.layout.size[0],
+    gap: themeVars.layout.size[-3],
   },
   '-2': {
-    gap: themeVars.layout.size[0],
+    gap: themeVars.layout.size[-2],
   },
   '-1': {
-    gap: themeVars.layout.size[0],
+    gap: themeVars.layout.size[-1],
   },
   '0': {
     gap: themeVars.layout.size[0],

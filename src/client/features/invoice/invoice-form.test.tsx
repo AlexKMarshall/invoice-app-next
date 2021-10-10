@@ -16,6 +16,7 @@ const defaultFormProps = {
   kind: 'create' as const,
   'aria-labelledby': 'some-id',
   onSubmit: noop,
+  heading: <h2>My Heading</h2>,
 }
 
 it('should be possible to add and delete invoice items', async () => {

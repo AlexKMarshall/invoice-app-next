@@ -13,7 +13,7 @@ export const header = style({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: '1.5rem',
+  gap: themeVars.layout.size[2],
 })
 
 globalStyle(`${header} > :first-child`, {
@@ -42,7 +42,6 @@ export const emptyStateHeader = style({
 })
 
 export const drawerTitle = style({
-  marginBottom: '48px',
   fontSize: `${24 / 16}rem`,
   fontWeight: themeVars.typography.fontWeight.bold,
   lineHeight: `${32 / 16}rem`,

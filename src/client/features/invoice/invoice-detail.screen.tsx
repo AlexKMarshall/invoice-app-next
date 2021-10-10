@@ -5,6 +5,7 @@ import {
 import {
   Button,
   Drawer,
+  Stack,
   StatusBadge,
   useConfirmationDialog,
   useDrawer,
@@ -20,6 +21,7 @@ import {
   headingCell,
   invoiceId,
   itemTable,
+  main,
   primaryValue,
   sectionHeader,
   status,
@@ -125,8 +127,9 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
     const invoice = invoiceDetailQuery.data
     const editableInvoice = editableInvoiceFromInvoiceDetail(invoice)
     return (
-      <>
+      <Stack size="2" component="main" className={main}>
         <BackButton />
+
         <div className={statusBar}>
           <div className={status}>
             Status
@@ -151,12 +154,12 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
             </Button>
           </AllowedAction>
         </div>
-        <div className={details}>
+        <Stack size="5" className={details}>
           <div className={grid}>
-            <section className={twoColumns}>
+            <Stack size="-1" component="section" className={twoColumns}>
               <h1 className={invoiceId}>{invoice.id}</h1>
               <p>{invoice.projectDescription}</p>
-            </section>
+            </Stack>
             <section>
               <Address address={invoice.senderAddress} align="right" />
             </section>
@@ -167,30 +170,30 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
                 justifyContent: 'space-between',
               }}
             >
-              <section>
+              <Stack size="-1" component="section">
                 <h2 className={sectionHeader}>Invoice Date</h2>
                 <p className={primaryValue}>
                   {format(invoice.issuedAt, 'dd MMM yyyy')}
                 </p>
-              </section>
-              <section>
+              </Stack>
+              <Stack size="-1" component="section">
                 <h2 className={sectionHeader}>Payment Due</h2>
                 <p className={primaryValue}>
                   {format(invoice.paymentDue, 'dd MMM yyyy')}
                 </p>
-              </section>
+              </Stack>
             </div>
-            <section>
+            <Stack size="-1" component="section">
               <h2 className={sectionHeader}>Bill To</h2>
               <p className={primaryValue} style={{ marginBottom: '8px' }}>
                 {invoice.clientName}
               </p>
               <Address address={invoice.clientAddress} />
-            </section>
-            <section>
+            </Stack>
+            <Stack size="-1" component="section">
               <h2 className={sectionHeader}>Sent To</h2>
               <p className={primaryValue}>{invoice.clientEmail}</p>
-            </section>
+            </Stack>
           </div>
           <table className={itemTable}>
             <thead className={thead}>
@@ -226,14 +229,17 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
               </tr>
             </tfoot>
           </table>
-        </div>
+        </Stack>
+
         {editableInvoice !== null ? (
           <Drawer>
-            <h2 id={drawer.titleId}>
-              Edit <span className={invoiceId}>{invoice.id}</span>
-            </h2>
             <InvoiceForm
               kind="update"
+              heading={
+                <h2 id={drawer.titleId}>
+                  Edit <span className={invoiceId}>{invoice.id}</span>
+                </h2>
+              }
               defaultValues={editableInvoice}
               aria-labelledby={drawer.titleId}
               onCancel={drawer.close}
@@ -241,7 +247,7 @@ export function InvoiceDetailScreen({ id }: Props): JSX.Element {
             />
           </Drawer>
         ) : null}
-      </>
+      </Stack>
     )
   }
   return <></>

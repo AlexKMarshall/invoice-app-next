@@ -165,11 +165,13 @@ export function InvoiceSummaryScreen(): JSX.Element {
         />
       ) : null}
       <Drawer>
-        <h2 className={drawerTitle} id={drawerTitleId}>
-          New Invoice
-        </h2>
         <InvoiceForm
           kind="create"
+          heading={
+            <h2 className={drawerTitle} id={drawerTitleId}>
+              New Invoice
+            </h2>
+          }
           aria-labelledby={drawerTitleId}
           onCancel={close}
           onSubmit={handleCreateFormSubmit}
