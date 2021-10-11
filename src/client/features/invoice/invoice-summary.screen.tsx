@@ -5,6 +5,7 @@ import {
   Drawer,
   Filter,
   Heading,
+  Stack,
   StatusBadge,
   useDrawer,
   useScreenReaderNotification,
@@ -19,12 +20,14 @@ import {
 import {
   cell,
   drawerTitle,
+  emptyState,
+  emptyStateHeader,
   emptyStateWrapper,
   header,
-  heading,
   iconSvg,
   iconWrapper,
   invoiceId,
+  main,
   rowLink,
   rowWrapper,
   table,
@@ -106,14 +109,14 @@ export function InvoiceSummaryScreen(): JSX.Element {
   const filterButtonId = useId()
 
   return (
-    <>
+    <Stack size="6" component="main" className={main}>
       <header className={header}>
-        <div>
-          <Heading level={1} id={headingId} className={heading}>
+        <Stack size="-3">
+          <Heading level={1} id={headingId}>
             Invoices
           </Heading>
           <TotalInvoiceCount />
-        </div>
+        </Stack>
         <Filter label="Filter by status" id={filterButtonId}>
           <CheckboxGroup
             aria-labelledby={filterButtonId}
@@ -140,33 +143,41 @@ export function InvoiceSummaryScreen(): JSX.Element {
           )}
           emptyState={
             <div className={emptyStateWrapper}>
-              <Image
-                src="/illustration-empty.svg"
-                alt="Illustration of woman with a megaphone emerging from an open envelope, with a paper aeroplane flying around her"
-                width="241"
-                height="200"
-              />
-              <Heading level={2}>There is nothing here</Heading>
-              <p>
-                Create an invoice by clicking the <strong>New Invoice</strong>{' '}
-                button and get started
-              </p>
+              <Stack size="6" className={emptyState}>
+                <Image
+                  src="/illustration-empty.svg"
+                  alt="Illustration of woman with a megaphone emerging from an open envelope, with a paper aeroplane flying around her"
+                  width="241"
+                  height="200"
+                />
+                <Stack size="2">
+                  <Heading level={2} className={emptyStateHeader}>
+                    There is nothing here
+                  </Heading>
+                  <p>
+                    Create an invoice by clicking the{' '}
+                    <strong>New Invoice</strong> button and get started
+                  </p>
+                </Stack>
+              </Stack>
             </div>
           }
         />
       ) : null}
       <Drawer>
-        <h2 className={drawerTitle} id={drawerTitleId}>
-          New Invoice
-        </h2>
         <InvoiceForm
           kind="create"
+          heading={
+            <h2 className={drawerTitle} id={drawerTitleId}>
+              New Invoice
+            </h2>
+          }
           aria-labelledby={drawerTitleId}
           onCancel={close}
           onSubmit={handleCreateFormSubmit}
         />
       </Drawer>
-    </>
+    </Stack>
   )
 }
 

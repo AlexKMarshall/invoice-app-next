@@ -10,7 +10,7 @@ export const layoutWrapper = style({
 
 export const mainWrapper = style({
   width: '100%',
-  maxWidth: 730,
+  maxWidth: themeVars.layout.measure,
   marginLeft: 'auto',
   marginRight: 'auto',
   gridArea: 'main',
@@ -20,7 +20,7 @@ const borderRadius = createVar()
 
 export const sidebarWrapper = style({
   height: '100vh',
-  width: 'fit-content',
+  width: themeVars.layout.sidebarDepth,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
@@ -30,7 +30,7 @@ export const sidebarWrapper = style({
   backgroundColor: themeVars.color.sidebar,
 
   vars: {
-    [borderRadius]: '20px',
+    [borderRadius]: themeVars.layout.borderRadius.xl,
   },
 
   borderTopRightRadius: borderRadius,
@@ -39,7 +39,8 @@ export const sidebarWrapper = style({
 })
 
 export const logoBox = style({
-  padding: '1.5rem 2rem',
+  paddingBlock: themeVars.layout.size[2],
+  paddingInline: themeVars.layout.size[3],
   backgroundColor: themeVars.color.primary.main,
   marginBottom: 'auto',
   position: 'relative',
@@ -66,7 +67,8 @@ export const logo = style({
 })
 
 export const avatarBox = style({
-  padding: '1.5rem 2rem',
+  paddingBlock: themeVars.layout.size[2],
+  paddingInline: themeVars.layout.size[3],
   borderTop: `2px solid ${themeVars.color.divider}`,
 })
 

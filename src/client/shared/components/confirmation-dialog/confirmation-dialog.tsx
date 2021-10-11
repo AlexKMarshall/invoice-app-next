@@ -1,3 +1,4 @@
+import { Button, Stack } from 'src/client/shared/components'
 import {
   OverlayContainer,
   OverlayProps,
@@ -23,7 +24,6 @@ import {
 } from './confirmation-dialog.css'
 
 import { AriaDialogProps } from '@react-types/dialog'
-import { Button } from 'src/client/shared/components'
 import { FocusScope } from '@react-aria/focus'
 import { useDialog } from '@react-aria/dialog'
 
@@ -161,7 +161,8 @@ export function ConfirmationDialog(props: Props): JSX.Element {
   return (
     <div className={underlay} {...underlayProps}>
       <FocusScope contain restoreFocus autoFocus>
-        <div
+        <Stack
+          size="2"
           {...overlayProps}
           {...dialogProps}
           {...modalProps}
@@ -180,7 +181,7 @@ export function ConfirmationDialog(props: Props): JSX.Element {
               {actionLabel}
             </Button>
           </div>
-        </div>
+        </Stack>
       </FocusScope>
     </div>
   )

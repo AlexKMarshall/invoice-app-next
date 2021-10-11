@@ -12,6 +12,7 @@ import { FunctionComponent } from 'react'
 import { PaymentTerm } from 'src/client/features/invoice/payment-term.types'
 import { format } from 'date-fns'
 import userEvent from '@testing-library/user-event'
+import { validateGBPValue } from 'src/test/validators'
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 const Providers: FunctionComponent<{}> = ({ children }) => {
@@ -136,6 +137,9 @@ export async function fillInInvoiceForm(
 
   const elItemList = screen.getByRole('table', { name: /item list/i })
   const inItemList = within(elItemList)
+  const columnHeaders = inItemList.getAllByRole('columnheader')
+  const totalHeader = inItemList.getByRole('columnheader', { name: /total/i })
+  const totalColIndex = columnHeaders.indexOf(totalHeader)
 
   // delete existing items if there are any, ignore headers
   inItemList
@@ -162,6 +166,10 @@ export async function fillInInvoiceForm(
       item.price.toString(),
       item.price
     )
+
+    const totalField = inLastRow.getAllByRole('cell')[totalColIndex]
+    const expectedTotalValue = item.quantity * item.price
+    validateGBPValue(expectedTotalValue, within(totalField))
   })
 }
 

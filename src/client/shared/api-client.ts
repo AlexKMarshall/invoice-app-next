@@ -1,6 +1,6 @@
+import { EmptyObject } from 'src/shared/type-utils'
 import { Stringify } from 'src/shared/dtos'
 
-type EmptyObject = Record<string, never>
 type ClientOptions<TData> = RequestInit & {
   data?: TData
 }

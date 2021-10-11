@@ -4,10 +4,7 @@ import { calc } from '@vanilla-extract/css-utils'
 import { themeVars } from 'src/client/shared/styles/theme.css'
 
 export const form = style({
-  maxWidth: '730px',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '48px',
+  maxWidth: themeVars.layout.measure,
 })
 
 export const fieldset = style({
@@ -32,7 +29,7 @@ export const itemListHeader = style({
 
 export const gridWrapper = style({
   display: 'grid',
-  gap: '24px',
+  gap: themeVars.layout.size[2],
   gridTemplateColumns: 'repeat(6, 1fr)',
   gridAutoRows: 'auto',
 })
@@ -56,7 +53,7 @@ export const table = style([
     margin: calc.negate(spacing),
 
     vars: {
-      [spacing]: '1rem',
+      [spacing]: themeVars.layout.size[0],
     },
   },
   spanFull,
@@ -67,18 +64,24 @@ export const th = style({
 })
 
 export const tableInput = style({
-  padding: '16px 20px',
+  paddingBlock: themeVars.layout.size[0],
+  paddingInline: themeVars.layout.size[1],
   border: `1px solid ${themeVars.color.fieldBoder}`,
-  borderRadius: '4px',
+  borderRadius: themeVars.layout.borderRadius.s,
   fontWeight: themeVars.typography.fontWeight.bold,
   width: '100%',
+})
+
+export const itemTotal = style({
+  textAlign: 'right',
+  fontWeight: themeVars.typography.fontWeight.bold,
 })
 
 export const buttonGroup = style([
   {
     display: 'flex',
     justifyContent: 'flex-end',
-    gap: '8px',
+    gap: themeVars.layout.size[-3],
   },
   spanFull,
 ])

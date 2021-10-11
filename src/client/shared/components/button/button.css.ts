@@ -4,8 +4,8 @@ import { calc } from '@vanilla-extract/css-utils'
 import { recipe } from '@vanilla-extract/recipes'
 import { themeVars } from 'src/client/shared/styles/theme.css'
 
-const horizontalPadding = createVar()
-const verticalPadding = createVar()
+const inlinePadding = createVar()
+const blockPadding = createVar()
 const iconSize = createVar()
 export const prefixContent = createVar()
 
@@ -20,10 +20,10 @@ const colorVars = createThemeContract({
 export const button = recipe({
   base: {
     position: 'relative',
-    padding: `${verticalPadding} ${horizontalPadding}`,
+    padding: `${blockPadding} ${inlinePadding}`,
     border: '2px solid transparent',
     backgroundClip: 'padding-box',
-    borderRadius: '999px',
+    borderRadius: themeVars.layout.borderRadius.pill,
     backgroundColor: colorVars.background,
     color: colorVars.text,
     fontWeight: themeVars.typography.fontWeight.bold,
@@ -41,8 +41,8 @@ export const button = recipe({
     },
 
     vars: {
-      [horizontalPadding]: '1.5rem',
-      [verticalPadding]: '1rem',
+      [inlinePadding]: themeVars.layout.size[2],
+      [blockPadding]: themeVars.layout.size[0],
       [colorVars.background]: colorVars.idleBackground,
       [colorVars.focusOutline]: colorVars.background,
     },
@@ -51,7 +51,7 @@ export const button = recipe({
   variants: {
     kind: {
       icon: {
-        paddingLeft: calc.add(horizontalPadding, iconSize),
+        paddingLeft: calc.add(inlinePadding, iconSize),
         vars: {
           [iconSize]: '32px',
         },
@@ -108,7 +108,7 @@ export const iconWrapper = style({
   backgroundColor: 'white',
   color: colorVars.background,
   position: 'absolute',
-  borderRadius: '50%',
+  borderRadius: themeVars.layout.borderRadius.circle,
   top: '8px',
   left: '8px',
   display: 'grid',

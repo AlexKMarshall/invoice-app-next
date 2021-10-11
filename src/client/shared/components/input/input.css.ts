@@ -11,8 +11,6 @@ const colorVars = createThemeContract({
 
 export const inputWrapper = recipe({
   base: {
-    display: 'flex',
-    flexDirection: 'column',
     color: colorVars.text,
     outlineColor: colorVars.outline,
     borderColor: colorVars.border,
@@ -54,12 +52,12 @@ export const labelWrapper = style({
 })
 
 export const input = style({
-  marginTop: '10px',
-  padding: '16px 20px',
+  paddingBlock: themeVars.layout.size[0],
+  paddingInline: themeVars.layout.size[1],
   border: '1px solid',
   borderColor: 'inherit',
   outlineColor: 'inherit',
   color: themeVars.color.text.strong,
-  borderRadius: '4px',
+  borderRadius: themeVars.layout.borderRadius.s,
   fontWeight: themeVars.typography.fontWeight.bold,
 })

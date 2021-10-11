@@ -17,11 +17,10 @@ import {
   invoiceMapperFactory,
 } from 'src/client/features/invoice/invoice.mappers'
 
+import { EmptyObject } from 'src/shared/type-utils'
 import { InvoiceDetail } from 'src/server/features/invoice/invoice.types'
 import { parseJSON } from 'date-fns'
 import { rest } from 'msw'
-
-type EmptyObject = Record<string, never>
 
 const { invoiceDetailFromInput } = invoiceMapperFactory(invoiceModel.store)
 

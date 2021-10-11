@@ -5,11 +5,11 @@ export const filterButton = style({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: '1rem',
+  gap: themeVars.layout.size[0],
   color: themeVars.color.text.strong,
   fontWeight: themeVars.typography.fontWeight.bold,
   background: 'transparent',
-  padding: '1rem',
+  padding: themeVars.layout.size[0],
   border: 'none',
 })
 
@@ -19,9 +19,9 @@ export const downChevron = style({
 })
 
 export const popover = style({
-  padding: '1.5rem',
+  padding: themeVars.layout.size[2],
   minWidth: '10rem',
   backgroundColor: 'white',
-  borderRadius: '8px',
+  borderRadius: themeVars.layout.borderRadius.l,
   boxShadow: `0px 10px 10px ${themeVars.color.shadow}`,
 })

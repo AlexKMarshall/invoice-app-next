@@ -4,39 +4,44 @@ import { calc } from '@vanilla-extract/css-utils'
 import { recipe } from '@vanilla-extract/recipes'
 import { themeVars } from 'src/client/shared/styles/theme.css'
 
+export const main = style({
+  paddingBlock: themeVars.layout.size[7],
+  minHeight: '99vh', // 100vh is giving extra scrollbar
+})
+
 export const header = style({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: '1.5rem',
-  paddingTop: '72px',
-  paddingBottom: '65px',
+  gap: themeVars.layout.size[2],
 })
 
 globalStyle(`${header} > :first-child`, {
   marginRight: 'auto',
 })
 
-export const heading = style({
-  marginBottom: '8px',
-})
-
 export const emptyStateWrapper = style({
-  marginLeft: 'auto',
-  marginRight: 'auto',
-  maxWidth: 'min-content',
+  width: '100%',
+  display: 'grid',
+  gridTemplateAreas: '"content"',
+  placeItems: 'center',
   textAlign: 'center',
-  paddingTop: '48px',
+  flexGrow: 1,
 })
 
-globalStyle(`${emptyStateWrapper} > :nth-child(2)`, {
-  marginTop: '64px',
-  marginBottom: '24px',
+globalStyle(`${emptyStateWrapper} > *`, {
+  gridArea: 'content',
+})
+
+export const emptyState = style({
+  maxWidth: 'min-content',
+})
+
+export const emptyStateHeader = style({
   whiteSpace: 'nowrap',
 })
 
 export const drawerTitle = style({
-  marginBottom: '48px',
   fontSize: `${24 / 16}rem`,
   fontWeight: themeVars.typography.fontWeight.bold,
   lineHeight: `${32 / 16}rem`,
@@ -62,6 +67,9 @@ const borderColor = createVar()
 const borderWidth = createVar()
 const borderStyle = createVar()
 const border = createVar()
+const tablePaddingInline = createVar()
+const cellPaddingBlock = createVar()
+const cellPaddingInline = createVar()
 
 export const rowWrapper = recipe({
   base: {
@@ -71,11 +79,14 @@ export const rowWrapper = recipe({
 
     vars: {
       [cursor]: 'pointer',
-      [borderRadius]: '8px',
+      [borderRadius]: themeVars.layout.borderRadius.l,
       [borderColor]: 'transparent',
       [borderWidth]: '2px',
       [borderStyle]: 'solid',
       [border]: `${borderWidth} ${borderStyle} ${borderColor}`,
+      [cellPaddingBlock]: themeVars.layout.size[0],
+      [tablePaddingInline]: themeVars.layout.size[3],
+      [cellPaddingInline]: themeVars.layout.size[1],
     },
 
     selectors: {
@@ -116,22 +127,20 @@ export const rowLink = style({
 
 export const cell = style({
   backgroundColor: 'white',
-  paddingTop: '1rem',
-  paddingBottom: '1rem',
+  paddingBlock: cellPaddingBlock,
   borderTop: border,
   borderBottom: border,
-  paddingLeft: '1.25rem',
-  paddingRight: '1.25rem',
+  paddingInline: cellPaddingInline,
 
   ':first-child': {
-    paddingLeft: '2rem',
+    paddingLeft: tablePaddingInline,
     borderLeft: border,
     borderTopLeftRadius: borderRadius,
     borderBottomLeftRadius: borderRadius,
   },
 
   ':last-child': {
-    paddingRight: '3rem',
+    paddingRight: themeVars.layout.size[5],
     borderRight: border,
     borderTopRightRadius: borderRadius,
     borderBottomRightRadius: borderRadius,
@@ -140,7 +149,7 @@ export const cell = style({
 
 export const iconWrapper = style({
   position: 'absolute',
-  right: '24px',
+  right: themeVars.layout.size[2],
   top: '50%',
   transform: 'translateY(-50%)',
   color: themeVars.color.primary.main,

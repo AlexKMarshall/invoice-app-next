@@ -14,13 +14,10 @@ export const underlay = style({
 })
 
 export const overlay = style({
-  padding: '48px',
+  padding: themeVars.layout.size[5],
   backgroundColor: 'white',
-  borderRadius: '8px',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem',
-  width: 'min(480px, 80%)',
+  borderRadius: themeVars.layout.borderRadius.l,
+  maxWidth: '80%',
 })
 
 export const heading = style({

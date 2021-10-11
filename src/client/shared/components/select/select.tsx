@@ -5,6 +5,7 @@ import {
 } from 'hoist-non-react-statics/node_modules/@types/react'
 import { labelWrapper, select, wrapper } from './select.css'
 
+import { Stack } from 'src/client/shared/components'
 import { useId } from '@react-aria/utils'
 
 type Props = {
@@ -54,7 +55,7 @@ export const Select = forwardRef(function Select(
   })
 
   return (
-    <div className={`${wrapperClassName} ${className}`}>
+    <Stack size="-2" className={`${wrapperClassName} ${className}`}>
       <div className={labelWrapper}>
         <label htmlFor={controlId}>{label}</label>
 
@@ -81,6 +82,6 @@ export const Select = forwardRef(function Select(
           </option>
         ))}
       </select>
-    </div>
+    </Stack>
   )
 })

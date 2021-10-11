@@ -75,4 +75,35 @@ export const themeVars = createGlobalTheme(':root', {
       letterSpacing: '-0.23px',
     },
   },
+  layout: {
+    borderRadius: {
+      xs: '2px',
+      s: '4px',
+      m: '6px',
+      l: '8px',
+      xl: '20px',
+      circle: '50%',
+      pill: '100vh',
+    },
+    measure: '75ch',
+    sidebarDepth: '103px',
+    size: {
+      '-3': `${scale(-3)}rem`,
+      '-2': `${scale(-2)}rem`,
+      '-1': `${scale(-1)}rem`,
+      '0': `${scale(0)}rem`,
+      '1': `${scale(1)}rem`,
+      '2': `${scale(2)}rem`,
+      '3': `${scale(3)}rem`,
+      '4': `${scale(4)}rem`,
+      '5': `${scale(5)}rem`,
+      '6': `${scale(6)}rem`,
+      '7': `${scale(7)}rem`,
+    },
+  },
 })
+
+function scale(level: number) {
+  const scaleRhythm = 1.25
+  return 1 * Math.pow(scaleRhythm, level)
+}
