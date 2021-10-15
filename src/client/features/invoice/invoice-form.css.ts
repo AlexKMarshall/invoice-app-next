@@ -1,10 +1,22 @@
 import { createVar, style } from '@vanilla-extract/css'
 
 import { calc } from '@vanilla-extract/css-utils'
+import { recipe } from '@vanilla-extract/recipes'
 import { themeVars } from 'src/client/shared/styles/theme.css'
 
 export const form = style({
   maxWidth: themeVars.layout.measure,
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  position: 'relative',
+})
+
+export const scrollArea = style({
+  overflowY: 'auto',
+  padding: themeVars.layout.size[6],
+  paddingBlockEnd: themeVars.layout.size[0],
+  position: 'relative',
 })
 
 export const fieldset = style({
@@ -44,19 +56,21 @@ export const spanFull = style({
   gridColumn: 'span 6',
 })
 
-const spacing = createVar()
+export const tableWrapper = style([
+  {
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  spanFull,
+])
 
 export const table = style([
   {
     tableLayout: 'fixed',
-    borderSpacing: spacing,
-    margin: calc.negate(spacing),
-
-    vars: {
-      [spacing]: themeVars.layout.size[0],
-    },
+    borderSpacing: themeVars.layout.size[0],
+    margin: calc.negate(themeVars.layout.size[0]),
   },
-  spanFull,
 ])
 
 export const th = style({
@@ -79,9 +93,14 @@ export const itemTotal = style({
 
 export const buttonGroup = style([
   {
+    backgroundColor: 'white',
+    position: 'relative',
     display: 'flex',
     justifyContent: 'flex-end',
     gap: themeVars.layout.size[-3],
+    paddingBlock: themeVars.layout.size[3],
+    paddingInline: themeVars.layout.size[6],
+    borderTopRightRadius: themeVars.layout.borderRadius.xl,
   },
   spanFull,
 ])
@@ -102,4 +121,61 @@ export const deleteButton = style({
 
 export const deleteIcon = style({
   height: '16px',
+})
+
+const shadowGradient = createVar()
+
+const scrollShadow = style({
+  position: 'absolute',
+  left: '-50px',
+  right: '0',
+  height: '25%',
+  pointerEvents: 'none',
+  transition: 'opacity 200ms ease-in-out',
+
+  vars: {
+    [shadowGradient]: 'rgba(0,0,0,0.1), rgba(0,0,0,0)',
+  },
+})
+
+export const topShadow = recipe({
+  base: [
+    scrollShadow,
+    {
+      top: '0',
+      backgroundImage: `linear-gradient(to bottom, ${shadowGradient})`,
+    },
+  ],
+
+  variants: {
+    visibility: {
+      visible: {
+        opacity: '1',
+      },
+      invisible: {
+        opacity: '0',
+      },
+    },
+  },
+})
+
+export const bottomShadow = recipe({
+  base: [
+    scrollShadow,
+    {
+      bottom: '40px',
+      backgroundImage: `linear-gradient(to top, ${shadowGradient})`,
+    },
+  ],
+
+  variants: {
+    visibility: {
+      visible: {
+        opacity: '1',
+      },
+      invisible: {
+        opacity: '0',
+      },
+    },
+  },
 })

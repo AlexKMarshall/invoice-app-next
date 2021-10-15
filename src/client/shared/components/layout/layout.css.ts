@@ -6,6 +6,14 @@ export const layoutWrapper = style({
   display: 'grid',
   gridTemplateColumns: `auto 1fr`,
   gridTemplateAreas: `'sidebar main'`,
+
+  '@media': {
+    'screen and (max-width: 1023px)': {
+      gridTemplateColumns: '1fr',
+      gridTemplateAreas: `'sidebar'
+      'main'`,
+    },
+  },
 })
 
 export const mainWrapper = style({
@@ -20,31 +28,43 @@ const borderRadius = createVar()
 
 export const sidebarWrapper = style({
   height: '100vh',
-  width: themeVars.layout.sidebarDepth,
+  width: themeVars.layout.sidebarDepth.desktop,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
+  alignItems: 'center',
   gridArea: 'sidebar',
   position: 'sticky',
   top: 0,
   backgroundColor: themeVars.color.sidebar,
+  borderTopRightRadius: borderRadius,
+  borderBottomRightRadius: borderRadius,
+  overflow: 'hidden',
+  isolation: 'isolate',
 
   vars: {
     [borderRadius]: themeVars.layout.borderRadius.xl,
   },
 
-  borderTopRightRadius: borderRadius,
-  borderBottomRightRadius: borderRadius,
-  overflow: 'hidden',
+  '@media': {
+    'screen and (max-width: 1023px)': {
+      width: 'auto',
+      height: themeVars.layout.sidebarDepth.mobile,
+      flexDirection: 'row',
+      position: 'static',
+      top: 'unset',
+      borderRadius: 0,
+    },
+  },
 })
 
 export const logoBox = style({
   paddingBlock: themeVars.layout.size[2],
   paddingInline: themeVars.layout.size[3],
   backgroundColor: themeVars.color.primary.main,
-  marginBottom: 'auto',
   position: 'relative',
   overflow: 'hidden',
+  borderTopRightRadius: borderRadius,
   borderBottomRightRadius: borderRadius,
   zIndex: -2,
 
@@ -69,7 +89,17 @@ export const logo = style({
 export const avatarBox = style({
   paddingBlock: themeVars.layout.size[2],
   paddingInline: themeVars.layout.size[3],
-  borderTop: `2px solid ${themeVars.color.divider}`,
+  borderColor: themeVars.color.divider,
+  borderWidth: 0,
+  borderStyle: 'solid',
+  borderTopWidth: '2px',
+
+  '@media': {
+    'screen and (max-width: 1023px)': {
+      borderTopWidth: 0,
+      borderLeftWidth: '2px',
+    },
+  },
 })
 
 export const avatarImageWrapper = style({

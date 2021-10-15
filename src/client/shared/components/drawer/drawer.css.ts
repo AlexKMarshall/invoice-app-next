@@ -1,7 +1,7 @@
 import { createVar, style } from '@vanilla-extract/css'
 
 import { calc } from '@vanilla-extract/css-utils'
-import { themeVars } from '../../styles/theme.css'
+import { themeVars } from 'src/client/shared/styles/theme.css'
 
 export const underlay = style({
   position: 'fixed',
@@ -18,11 +18,20 @@ const padding = createVar()
 export const overlay = style({
   maxWidth: '80vw',
   padding: padding,
-  paddingLeft: calc.add(padding, themeVars.layout.sidebarDepth),
+  paddingLeft: calc.add(padding, themeVars.layout.sidebarDepth.desktop),
   backgroundColor: 'white',
-  overflowY: 'auto',
+  borderTopRightRadius: themeVars.layout.borderRadius.xl,
+  borderBottomRightRadius: themeVars.layout.borderRadius.xl,
+  overflow: 'hidden',
 
   vars: {
-    [padding]: themeVars.layout.size[6],
+    [padding]: '0px', //themeVars.layout.size[6],
+  },
+
+  '@media': {
+    'screen and (max-width: 1023px)': {
+      paddingLeft: padding,
+      marginTop: calc.add(padding, themeVars.layout.sidebarDepth.mobile),
+    },
   },
 })
