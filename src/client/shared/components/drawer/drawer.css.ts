@@ -31,7 +31,7 @@ export const overlay = style({
   '@media': {
     'screen and (max-width: 1023px)': {
       paddingLeft: padding,
-      paddingTop: calc.add(padding, themeVars.layout.sidebarDepth.mobile),
+      marginTop: calc.add(padding, themeVars.layout.sidebarDepth.mobile),
     },
   },
 })
