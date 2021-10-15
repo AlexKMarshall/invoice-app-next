@@ -1,0 +1,24 @@
+name: Deploymemt
+
+on:
+  push:
+    branches: main
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    environment: production
+
+    env:
+      POSTGRES_USER: test
+      POSTGRES_DB: test
+      POSTGRES_PASSWORD: ${{ secrets.TEST_DATABASE_PASSWORD }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - name: DB migrate
+        run: yarn db:deploy
