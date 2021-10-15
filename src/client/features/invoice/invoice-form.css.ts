@@ -1,4 +1,5 @@
 import { calc } from '@vanilla-extract/css-utils'
+import { recipe } from '@vanilla-extract/recipes'
 import { style } from '@vanilla-extract/css'
 import { themeVars } from 'src/client/shared/styles/theme.css'
 
@@ -6,10 +7,15 @@ export const form = style({
   maxWidth: themeVars.layout.measure,
   height: '100%',
   display: 'flex',
+  flexDirection: 'column',
+  position: 'relative',
 })
 
 export const scrollArea = style({
   overflowY: 'auto',
+  padding: themeVars.layout.size[6],
+  paddingBlockEnd: themeVars.layout.size[0],
+  position: 'relative',
 })
 
 export const fieldset = style({
@@ -86,9 +92,14 @@ export const itemTotal = style({
 
 export const buttonGroup = style([
   {
+    backgroundColor: 'white',
+    position: 'relative',
     display: 'flex',
     justifyContent: 'flex-end',
     gap: themeVars.layout.size[-3],
+    paddingBlock: themeVars.layout.size[3],
+    paddingInline: themeVars.layout.size[6],
+    borderTopRightRadius: themeVars.layout.borderRadius.xl,
   },
   spanFull,
 ])
@@ -109,4 +120,52 @@ export const deleteButton = style({
 
 export const deleteIcon = style({
   height: '16px',
+})
+
+export const topShadow = style({
+  position: 'absolute',
+  top: '0',
+  left: '-50px',
+  right: '0',
+  height: '25%',
+  backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0))',
+  pointerEvents: 'none',
+})
+
+export const bottomShadow = style({
+  position: 'absolute',
+  left: '-50px',
+  right: '0',
+  bottom: '40px',
+  height: '25%',
+  backgroundImage: 'linear-gradient(to top, rgba(0,0,0,0.1), rgba(0,0,0,0))',
+  pointerEvents: 'none',
+})
+
+export const topShadowRecipe = recipe({
+  base: topShadow,
+  variants: {
+    visibility: {
+      visible: {
+        opacity: '1',
+      },
+      invisible: {
+        opacity: '0',
+      },
+    },
+  },
+})
+
+export const bottomShadowRecipe = recipe({
+  base: bottomShadow,
+  variants: {
+    visibility: {
+      visible: {
+        opacity: '1',
+      },
+      invisible: {
+        opacity: '0',
+      },
+    },
+  },
 })

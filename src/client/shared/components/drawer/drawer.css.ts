@@ -22,9 +22,10 @@ export const overlay = style({
   backgroundColor: 'white',
   borderTopRightRadius: themeVars.layout.borderRadius.xl,
   borderBottomRightRadius: themeVars.layout.borderRadius.xl,
+  overflow: 'hidden',
 
   vars: {
-    [padding]: themeVars.layout.size[6],
+    [padding]: '0px', //themeVars.layout.size[6],
   },
 
   '@media': {
