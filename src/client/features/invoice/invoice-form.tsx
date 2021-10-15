@@ -7,9 +7,17 @@ import {
   Stack,
 } from 'src/client/shared/components'
 import { CreateInvoiceRequest, UpdateInvoiceRequest } from 'src/shared/dtos'
-import { ReactNode, useReducer } from 'react'
 import {
-  bottomShadowRecipe,
+  FormHTMLAttributes,
+  ReactNode,
+  UIEvent,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+} from 'react'
+import {
+  bottomShadow,
   buttonGroup,
   deleteButton,
   deleteIcon,
@@ -28,7 +36,7 @@ import {
   tableInput,
   tableWrapper,
   th,
-  topShadowRecipe,
+  topShadow,
 } from './invoice-form.css'
 import {
   createInvoiceRequestDtoSchema,
@@ -121,16 +129,11 @@ export function InvoiceForm({
     ...watchItemFieldArray[index],
   }))
 
-  const [scrollState, dispatch] = useReducer(scrollReducer, 'top')
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} {...props} className={form}>
-      <div
-        className={scrollArea}
-        onScroll={(event) => {
-          dispatch({ type: 'scroll', payload: event.currentTarget })
-        }}
-      >
+    <FormContainer
+      onSubmit={handleSubmit(onSubmit)}
+      {...props}
+      formContent={
         <Stack size="5">
           {heading}
           <fieldset className={fieldset} aria-labelledby={billFromLegendId}>
@@ -336,66 +339,58 @@ export function InvoiceForm({
           </fieldset>
           <input type="hidden" {...register('status')} />
         </Stack>
-      </div>
-      <div
-        className={topShadowRecipe({
-          visibility: scrollState === 'top' ? 'invisible' : 'visible',
-        })}
-      />
-      <div
-        className={bottomShadowRecipe({
-          visibility: scrollState === 'bottom' ? 'invisible' : 'visible',
-        })}
-      />
-      <div className={buttonGroup}>
-        {kind === 'update' ? (
-          <>
-            <Button type="button" color="muted" onClick={() => onCancel?.()}>
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              color="primary"
-              onClick={() => {
-                setValue('status', 'pending')
-              }}
-            >
-              Save Changes
-            </Button>
-          </>
-        ) : null}
-        {kind === 'create' ? (
-          <>
-            <Button type="button" color="muted" onClick={() => onCancel?.()}>
-              Discard
-            </Button>
-            <Button
-              type="submit"
-              color="mono"
-              onClick={() => {
-                setValue('status', 'draft')
-              }}
-              className={marginLeftAuto}
-            >
-              Save as Draft
-            </Button>
-            <Button
-              type="submit"
-              color="primary"
-              onClick={() => {
-                setValue('status', 'pending')
-              }}
-            >
-              Save & Send
-            </Button>
-          </>
-        ) : null}
-      </div>
-    </form>
+      }
+      formActions={
+        <>
+          {kind === 'update' ? (
+            <>
+              <Button type="button" color="muted" onClick={() => onCancel?.()}>
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                color="primary"
+                onClick={() => {
+                  setValue('status', 'pending')
+                }}
+              >
+                Save Changes
+              </Button>
+            </>
+          ) : null}
+          {kind === 'create' ? (
+            <>
+              <Button type="button" color="muted" onClick={() => onCancel?.()}>
+                Discard
+              </Button>
+              <Button
+                type="submit"
+                color="mono"
+                onClick={() => {
+                  setValue('status', 'draft')
+                }}
+                className={marginLeftAuto}
+              >
+                Save as Draft
+              </Button>
+              <Button
+                type="submit"
+                color="primary"
+                onClick={() => {
+                  setValue('status', 'pending')
+                }}
+              >
+                Save & Send
+              </Button>
+            </>
+          ) : null}
+        </>
+      }
+    />
   )
 }
 
-type ScrollPosition = 'top' | 'middle' | 'bottom'
+type ScrollPosition = 'top' | 'middle' | 'bottom' | 'no-scroll'
 
 function getScrollPosition(
   {
@@ -405,6 +400,7 @@ function getScrollPosition(
   }: { scrollHeight: number; scrollTop: number; clientHeight: number },
   threshold = 0
 ): ScrollPosition {
+  if (scrollHeight - clientHeight < 1) return 'no-scroll'
   if (scrollTop - threshold < 1) return 'top'
   if (scrollHeight - scrollTop - clientHeight - threshold < 1) return 'bottom'
   return 'middle'
@@ -426,4 +422,65 @@ const scrollReducer = (
   action: ScrollAction
 ): ScrollPosition => {
   return getScrollPosition(action.payload)
+}
+
+function useScrollDetection() {
+  const [scrollState, dispatch] = useReducer(scrollReducer, 'no-scroll')
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      dispatch({ type: 'scroll', payload: scrollContainerRef.current })
+    }
+  }, [])
+
+  return useMemo(
+    () => ({
+      scrollState,
+      scrollContainerRef,
+      scrollHandler: {
+        onScroll: (event: UIEvent) => {
+          dispatch({ type: 'scroll', payload: event.currentTarget })
+        },
+      },
+    }),
+    [scrollState]
+  )
+}
+
+type FormContainerProps = {
+  formContent: ReactNode
+  formActions: ReactNode
+} & FormHTMLAttributes<HTMLFormElement>
+function FormContainer({
+  formContent,
+  formActions,
+  ...delegatedProps
+}: FormContainerProps) {
+  const { scrollState, scrollContainerRef, scrollHandler } =
+    useScrollDetection()
+
+  const shadowVisibility = (side: 'top' | 'bottom') =>
+    scrollState !== 'no-scroll' && scrollState !== side
+      ? 'visible'
+      : 'invisible'
+
+  return (
+    <form {...delegatedProps} className={form}>
+      <div ref={scrollContainerRef} className={scrollArea} {...scrollHandler}>
+        {formContent}
+      </div>
+      <div
+        className={topShadow({
+          visibility: shadowVisibility('top'),
+        })}
+      />
+      <div
+        className={bottomShadow({
+          visibility: shadowVisibility('bottom'),
+        })}
+      />
+      <div className={buttonGroup}>{formActions}</div>
+    </form>
+  )
 }

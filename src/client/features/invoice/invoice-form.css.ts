@@ -1,6 +1,7 @@
+import { createVar, style } from '@vanilla-extract/css'
+
 import { calc } from '@vanilla-extract/css-utils'
 import { recipe } from '@vanilla-extract/recipes'
-import { style } from '@vanilla-extract/css'
 import { themeVars } from 'src/client/shared/styles/theme.css'
 
 export const form = style({
@@ -122,28 +123,30 @@ export const deleteIcon = style({
   height: '16px',
 })
 
-export const topShadow = style({
-  position: 'absolute',
-  top: '0',
-  left: '-50px',
-  right: '0',
-  height: '25%',
-  backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0))',
-  pointerEvents: 'none',
-})
+const shadowGradient = createVar()
 
-export const bottomShadow = style({
+const scrollShadow = style({
   position: 'absolute',
   left: '-50px',
   right: '0',
-  bottom: '40px',
   height: '25%',
-  backgroundImage: 'linear-gradient(to top, rgba(0,0,0,0.1), rgba(0,0,0,0))',
   pointerEvents: 'none',
+  transition: 'opacity 200ms ease-in-out',
+
+  vars: {
+    [shadowGradient]: 'rgba(0,0,0,0.1), rgba(0,0,0,0)',
+  },
 })
 
-export const topShadowRecipe = recipe({
-  base: topShadow,
+export const topShadow = recipe({
+  base: [
+    scrollShadow,
+    {
+      top: '0',
+      backgroundImage: `linear-gradient(to bottom, ${shadowGradient})`,
+    },
+  ],
+
   variants: {
     visibility: {
       visible: {
@@ -156,8 +159,15 @@ export const topShadowRecipe = recipe({
   },
 })
 
-export const bottomShadowRecipe = recipe({
-  base: bottomShadow,
+export const bottomShadow = recipe({
+  base: [
+    scrollShadow,
+    {
+      bottom: '40px',
+      backgroundImage: `linear-gradient(to top, ${shadowGradient})`,
+    },
+  ],
+
   variants: {
     visibility: {
       visible: {
