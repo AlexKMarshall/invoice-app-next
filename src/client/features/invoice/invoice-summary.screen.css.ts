@@ -57,7 +57,7 @@ export const table = style({
   marginTop: calc.negate(tableSpacing),
 
   vars: {
-    [tableSpacing]: '1rem',
+    [tableSpacing]: themeVars.layout.size[0],
   },
 })
 
@@ -70,6 +70,13 @@ const border = createVar()
 const tablePaddingInline = createVar()
 const cellPaddingBlock = createVar()
 const cellPaddingInline = createVar()
+
+// this uses fluid width calculator theory https://courses.joshwcomeau.com/css-for-js/05-responsive-css/16-fluid-calculator
+// it should give the small size at around 750px screen width and the large size around 950px
+// this helps to gracefully shrink the cell padding as space gets smaller, reducing cell wrapping
+const responsiveCellInlinePadding = `clamp(${
+  themeVars.layout.size[-3]
+}, 6vw - 2.5rem, ${themeVars.layout.size[1]})`
 
 export const rowWrapper = recipe({
   base: {
@@ -86,7 +93,7 @@ export const rowWrapper = recipe({
       [border]: `${borderWidth} ${borderStyle} ${borderColor}`,
       [cellPaddingBlock]: themeVars.layout.size[0],
       [tablePaddingInline]: themeVars.layout.size[3],
-      [cellPaddingInline]: themeVars.layout.size[1],
+      [cellPaddingInline]: responsiveCellInlinePadding,
     },
 
     selectors: {

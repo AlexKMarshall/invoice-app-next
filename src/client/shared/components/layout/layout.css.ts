@@ -1,5 +1,6 @@
 import { createVar, globalStyle, style } from '@vanilla-extract/css'
 
+import { calc } from '@vanilla-extract/css-utils'
 import { themeVars } from 'src/client/shared/styles/theme.css'
 
 export const layoutWrapper = style({
@@ -18,7 +19,11 @@ export const layoutWrapper = style({
 
 export const mainWrapper = style({
   width: '100%',
-  maxWidth: themeVars.layout.measure,
+  maxWidth: calc(themeVars.layout.size[5])
+    .multiply(2)
+    .add(themeVars.layout.measure)
+    .toString(),
+  paddingInline: themeVars.layout.size[5],
   marginLeft: 'auto',
   marginRight: 'auto',
   gridArea: 'main',
