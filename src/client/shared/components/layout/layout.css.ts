@@ -1,5 +1,6 @@
 import { createVar, globalStyle, style } from '@vanilla-extract/css'
 
+import { calc } from '@vanilla-extract/css-utils'
 import { themeVars } from 'src/client/shared/styles/theme.css'
 
 export const layoutWrapper = style({
@@ -18,7 +19,11 @@ export const layoutWrapper = style({
 
 export const mainWrapper = style({
   width: '100%',
-  maxWidth: themeVars.layout.measure,
+  maxWidth: calc(themeVars.layout.size[5])
+    .multiply(2)
+    .add(themeVars.layout.measure)
+    .toString(),
+  paddingInline: themeVars.layout.size[5],
   marginLeft: 'auto',
   marginRight: 'auto',
   gridArea: 'main',
@@ -83,7 +88,13 @@ export const logoBox = style({
 })
 
 export const logo = style({
-  width: '40px',
+  width: themeVars.layout.size[4],
+
+  '@media': {
+    'screen and (max-width: 1023px)': {
+      width: themeVars.layout.size[3],
+    },
+  },
 })
 
 export const avatarBox = style({
@@ -103,8 +114,14 @@ export const avatarBox = style({
 })
 
 export const avatarImageWrapper = style({
-  width: 'fit-content',
-  clipPath: 'circle(50%)',
+  width: themeVars.layout.size[4],
+  clipPath: 'circle(49%)', // 50% seems to clip the circle on the edge, maybe due to rounding px values, so smaller just to be safe
+
+  '@media': {
+    'screen and (max-width: 1023px)': {
+      width: themeVars.layout.size[3],
+    },
+  },
 })
 
 /* NextJS Image component sets inline-block on its wrapper, and it's otherwise impossible to change

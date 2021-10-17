@@ -87,8 +87,8 @@ export const themeVars = createGlobalTheme(':root', {
     },
     measure: '75ch',
     sidebarDepth: {
-      mobile: '87px',
-      desktop: '103px',
+      mobile: '79px',
+      desktop: '102px',
     },
     size: {
       '-3': `${scale(-3)}rem`,
