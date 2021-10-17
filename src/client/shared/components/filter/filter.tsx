@@ -102,7 +102,7 @@ export function Filter({
         className={`${filterButton} ${className}`}
       >
         {label}
-        <ArrowDown className={downChevron} />
+        <ArrowDown className={downChevron} aria-hidden />
       </button>
       {state.isOpen && (
         <OverlayContainer>

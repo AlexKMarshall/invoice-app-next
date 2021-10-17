@@ -56,7 +56,7 @@ type IconProps = {
 function Icon({ icon }: IconProps) {
   const SvgComponent = ICON_SVGS[icon]
   return (
-    <div className={styles.iconWrapper}>
+    <div className={styles.iconWrapper} aria-hidden>
       <SvgComponent className={styles.iconSvg} />
     </div>
   )
